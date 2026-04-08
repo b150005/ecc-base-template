@@ -16,13 +16,14 @@ jobs:
       security-events: write
       actions: read
       contents: read
+    # TODO: Remove this line and set languages in the matrix below for derived repos
+    if: false
     strategy:
       fail-fast: false
       matrix:
-        # TODO: Set your project's languages in derived repos
         # Supported: javascript, python, go, ruby, java, csharp, cpp, swift, actions
         # Example: language: ["javascript", "python"]
-        language: []
+        language: ["javascript"]
     steps:
       - name: Checkout
         uses: actions/checkout@v6
