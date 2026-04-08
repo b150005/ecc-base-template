@@ -24,6 +24,7 @@ This project uses an agent team for structured development. The **orchestrator**
 | market-analyst | Market research, competitor analysis |
 | monetization-strategist | Business model, pricing, revenue strategy |
 | ui-ux-designer | UI/UX design, accessibility, usability review |
+| docs-researcher | Documentation research, API verification, freshness-safe search |
 | architect | System architecture, technology decisions |
 | implementer | Code implementation following architecture and TDD |
 | code-reviewer | Code quality and standards review |
