@@ -9,7 +9,8 @@ Proposed (stabilized). Supersedes earlier drafts of this ADR per owner decisions
 - Date: 2026-04-22
 - Revised: 2026-04-22 — toggle moved to a Skill, notes gitignored by default, taxonomy stabilized at 19 canonical domains (added `ui-ux-craft` so ui-ux-designer has a primary domain that matches its craft rather than being force-fit into `api-design`), length-budget language removed, every agent assigned at least one primary domain.
 - Deciders: Agent Team, with owner decisions recorded in Context
-- Related: [docs/en/prd/developer-growth-mode.md](../prd/developer-growth-mode.md), [docs/en/growth/domain-taxonomy.md](../growth/domain-taxonomy.md) (canonical taxonomy — authoritative for domain list and ownership matrix)
+- Related: [docs/en/prd/developer-growth-mode.md](../prd/developer-growth-mode.md), [docs/en/growth/domain-taxonomy.md](../growth/domain-taxonomy.md) (canonical taxonomy — authoritative for domain list and ownership matrix), [docs/en/adr/002-growth-domains-location.md](002-growth-domains-location.md) (refines the Growth Domains declaration location — body section, not frontmatter)
+- Learner-facing explainer: [docs/en/growth-mode-explained.md](../growth-mode-explained.md) — long-form prose walkthrough of what learners see when Growth Mode is on
 - Prior drafts of this ADR framed Growth Mode as (a) an annotation layer with length caps, (b) an append-only journal, and (c) a custom slash-command toggle. All three framings are superseded by the decisions below.
 
 ## Context
@@ -20,7 +21,7 @@ Three owner decisions landed on 2026-04-22 and reshape the architecture. They ar
 
 ### Decision 1 — All fifteen agents are growth-aware from release
 
-Every agent in `.claude/agents/` ships with a growth contract and with at least one primary domain. There is no subset, no "deferred" list, and no agent has `growth_domains: []`. The feature ships with all fifteen agents wired to the taxonomy, or it does not ship.
+Every agent in `.claude/agents/` ships with a growth contract and with at least one primary domain. There is no subset, no "deferred" list, and no agent has an empty Growth Domains list. The feature ships with all fifteen agents wired to the taxonomy, or it does not ship.
 
 ### Decision 2 — Depth over brevity; no length budget
 
@@ -186,9 +187,9 @@ The organizing principle is that files are organized by concept, never by date. 
 
 ### Per-agent growth responsibility
 
-Every agent declares one or more domains it owns. Ownership is not exclusive — multiple agents can write into the same domain — but each agent is expected to be the primary contributor to the domains listed as primary under its name. Ownership is encoded in each agent's YAML frontmatter as a `growth_domains:` field, with primary domains listed first.
+Every agent declares one or more domains it owns. Ownership is not exclusive — multiple agents can write into the same domain — but each agent is expected to be the primary contributor to the domains listed as primary under its name. Ownership is encoded in each agent's YAML frontmatter as a `## Growth Domains` section, with primary domains listed first.
 
-Every one of the fifteen agents has at least one primary domain. No agent ships with `growth_domains: []`. The ownership matrix below is the authoritative mapping for this ADR and is reconciled against [the taxonomy document](../growth/domain-taxonomy.md) — if any row drifts from the taxonomy, the taxonomy is the source of truth.
+Every one of the fifteen agents has at least one primary domain. No agent ships with an empty Growth Domains list. The ownership matrix below is the authoritative mapping for this ADR and is reconciled against [the taxonomy document](../growth/domain-taxonomy.md) — if any row drifts from the taxonomy, the taxonomy is the source of truth.
 
 | Agent | Primary domains | Secondary domains |
 |-------|-----------------|-------------------|
@@ -347,7 +348,7 @@ After each session, an agent reads the full domain file, rewrites it as a tighte
 - **Domain-keyed structure survives stack changes.** The same nineteen domain names apply to a Flutter project and a Go project. A learner who moves between stacks carries a stable mental scaffold, and the inside of each domain file teaches them how the domain plays out in the current ecosystem.
 - **Supersession-with-history captures how understanding evolves.** A junior-level entry from month one and a senior-level refinement from month six coexist in the same section. The learner can see their own progress by reading downward.
 - **Self-review at any time.** Before a review session, a learner can open `review-taste.md` and re-read what they have accumulated. Before a deploy, `release-and-deployment.md`. The notebook is a study tool as well as a session artifact.
-- **Per-agent ownership is explicit.** The `growth_domains:` frontmatter makes it auditable which agent is supposed to contribute to which domain. Adding or removing an agent's growth responsibility is a one-line change.
+- **Per-agent ownership is explicit.** The `## Growth Domains` section in each agent's prompt body makes it auditable which agent is supposed to contribute to which domain. Adding or removing an agent's growth responsibility is a one-line change. (The declaration location moved from frontmatter to prompt body in ADR-002 for schema compliance.)
 - **Authorship boundary is enforceable at the platform layer.** `disable-model-invocation: true` on the growth Skill means no model turn can silently flip the learner into teaching mode. The invariant is enforced by Claude Code, not by prompt discipline.
 - **Privacy-by-default lowers adoption friction.** Learners can run Growth Mode on a public repository without worrying that their notes ship with their code. Teams that want the team-textbook outcome flip one inversion in `.gitignore.example`.
 - **Default-off invariant is preserved.** Users who never run `/growth on` see no notes, no reads, no writes, no changes to agent behavior.
@@ -440,20 +441,28 @@ The preamble is the single source of truth for the enrichment protocol. It:
 
 Every growth-aware agent reads this file on session start (when Growth Mode is ON). The agent prompts reference it by path; they do not inline its content.
 
-### Per-agent frontmatter addition
+### Per-agent Growth Domains declaration
 
-Every file in `.claude/agents/` gets a new `growth_domains:` field in its YAML frontmatter. All fifteen agents ship with at least one primary domain — there is no exempt list, and no agent has `growth_domains: []`. The value is an ordered list of domain keys with primary domains first, followed by secondary domains. Example for the architect:
+Every file in `.claude/agents/` gets a `## Growth Domains` section at the top of its prompt body. All fifteen agents ship with at least one primary domain — there is no exempt list, and no agent has an empty Growth Domains list. The section lists primary and secondary domains on two labeled lines. Example for the architect:
 
-```yaml
+```markdown
 ---
 name: architect
 description: ...
 model: opus
-growth_domains: [architecture, api-design, data-modeling, persistence-strategy, error-handling, ecosystem-fluency, dependency-management, security-mindset]
 ---
+
+# Architect Agent
+
+## Growth Domains
+
+- Primary: architecture, api-design, data-modeling
+- Secondary: persistence-strategy, error-handling, ecosystem-fluency, dependency-management, security-mindset
 ```
 
-Each agent's prompt body gets a short conditional block that says, in substance: "If `.claude/growth/config.json` has `enabled: true`, read `.claude/growth/preamble.md` and the domain files listed in your `growth_domains`, then follow the enrichment protocol. At end of response, emit the teaching-provenance summary and the notebook-diff report." This is the only growth-specific content that lives in each agent prompt. The policy lives in `preamble.md`.
+> **Note.** ADR-002 (accepted 2026-04-23) moved this declaration from the `growth_domains:` frontmatter key to the `## Growth Domains` body section shown above. The substance is unchanged; only the location changed to stay within the officially documented Claude Code sub-agent frontmatter schema. See [docs/en/adr/002-growth-domains-location.md](002-growth-domains-location.md) for the rationale.
+
+Each agent's prompt body gets a short conditional block that says, in substance: "If `.claude/growth/config.json` has `enabled: true`, read `.claude/growth/preamble.md` and the domain files listed in your Growth Domains section, then follow the enrichment protocol. At end of response, emit the teaching-provenance summary and the notebook-diff report." This is the only growth-specific content that lives in each agent prompt. The policy lives in `preamble.md`.
 
 ### Growth Skill at `.claude/skills/growth/SKILL.md`
 
@@ -510,7 +519,7 @@ This is the only growth-mode content in CLAUDE.md. Agent prompt content does not
 
 ### Orchestrator serialization rule
 
-Add a rule to the orchestrator agent prompt: when Growth Mode is ON and two or more delegated agents have overlapping `growth_domains`, run them sequentially rather than in parallel. When `growth_domains` do not overlap, parallel execution is fine. This preserves the read-modify-write invariant for the notebook without giving up parallelism elsewhere.
+Add a rule to the orchestrator agent prompt: when Growth Mode is ON and two or more delegated agents have overlapping Growth Domains, run them sequentially rather than in parallel. When Growth Domains do not overlap, parallel execution is fine. This preserves the read-modify-write invariant for the notebook without giving up parallelism elsewhere.
 
 ### Enforcement: default-off invariant
 
@@ -519,7 +528,7 @@ The default-off invariant is the load-bearing claim of the entire feature. It is
 The three preconditions that actually enforce the invariant:
 
 1. **The `disable-model-invocation: true` flag on `.claude/skills/growth/SKILL.md`.** This is the wall — the model cannot flip Growth Mode on. Only the user can. Verified by a one-line grep in CI.
-2. **The guard branch in every growth-aware agent prompt.** Every agent is instructed: at session start, read `.claude/growth/config.json`; if the file is absent or `enabled: false`, skip all growth steps. This is the floor — the behavior itself lives here. Verified by grep for the guard-branch marker string in every file under `.claude/agents/` that declares `growth_domains:`.
+2. **The guard branch in every growth-aware agent prompt.** Every agent is instructed: at session start, read `.claude/growth/config.json`; if the file is absent or `enabled: false`, skip all growth steps. This is the floor — the behavior itself lives here. Verified by grep for the guard-branch marker string in every file under `.claude/agents/` that declares a `## Growth Domains` section.
 3. **The gitignore posture.** `.claude/growth/notes/` and `.claude/growth/config.json` are ignored by the shipped `.gitignore`. Verified by grep.
 
 CI runs a single shell script (`scripts/check-growth-invariants.sh`) that performs these three grep checks. All three are deterministic and model-version-agnostic. No LLM is in the loop.
@@ -546,7 +555,7 @@ Positions below are tentative. Items settled by owner decision (gitignore postur
    Tentative position: split when the file exceeds ~1200 lines or ~8 top-level sections, whichever comes first. Splitting is triggered by the technical-writer agent in its curator role, not by content-contributing agents. The split creates a sibling file with a derivative key (e.g., `architecture.md` → `architecture-layering.md` plus `architecture-boundaries.md`) and leaves a pointer section in the original. Reasoning: a 1200-line file is still readable as a reference; past that, concept retrieval degrades. The threshold itself is the open question — it may move once we see real notebooks in the wild.
 
 2. **How does the orchestrator serialize concurrent writes to the same domain file?**
-   Tentative position: the orchestrator inspects the `growth_domains` of every agent it plans to invoke for the current turn; if two or more have overlapping domains, it runs them sequentially, otherwise parallel execution is fine. The open part: what is the right contract when the harness itself parallelizes agents outside the orchestrator's control? Can the Skill framework expose a file-level lock, or do we rely entirely on sequencing at the orchestrator layer? This matters as soon as a non-orchestrator harness runs multiple growth-aware agents in parallel.
+   Tentative position: the orchestrator inspects the Growth Domains of every agent it plans to invoke for the current turn; if two or more have overlapping domains, it runs them sequentially, otherwise parallel execution is fine. The open part: what is the right contract when the harness itself parallelizes agents outside the orchestrator's control? Can the Skill framework expose a file-level lock, or do we rely entirely on sequencing at the orchestrator layer? This matters as soon as a non-orchestrator harness runs multiple growth-aware agents in parallel.
 
 3. **How do we detect a teaching moment that spans multiple domains?**
    Tentative position: the agent writes to the primary domain and emits a cross-reference line in the secondary domain pointing to the primary entry. Cross-references use relative markdown links (`See [Dependency Inversion](./architecture.md#dependency-inversion)`). Not perfect, but the cheapest approach that keeps the notebook navigable. Open: whether cross-references should themselves be tracked as an operation in the diff report.
@@ -563,7 +572,7 @@ Positions below are tentative. Items settled by owner decision (gitignore postur
 - Taxonomy: [docs/en/growth/domain-taxonomy.md](../growth/domain-taxonomy.md) — canonical 18-domain definitions, owner-specific boundaries between adjacent domains (notably `ecosystem-fluency` vs `dependency-management`, and `data-modeling` vs `persistence-strategy`), and the authoritative per-agent ownership matrix. This ADR's ownership table is reconciled against that document; if any row drifts, the taxonomy is the source of truth.
 - ADR template: [docs/en/adr/000-template.md](./000-template.md) — this ADR extends the minimal template with Metadata, Alternatives Considered (table plus prose), Open Questions, and Implementation Notes sections.
 - Claude Code Skills: https://docs.claude.com/en/docs/claude-code/skills — canonical reference for `disable-model-invocation`, `arguments`, and the supporting-files directory.
-- Claude Code agent frontmatter: https://docs.claude.com/en/docs/claude-code/sub-agents — source for the `growth_domains:` field convention.
+- Claude Code agent frontmatter: https://docs.claude.com/en/docs/claude-code/sub-agents — source for the Growth Domains section convention.
 - Project CLAUDE.md: [.claude/CLAUDE.md](../../../.claude/CLAUDE.md) — lists the fifteen-agent team this feature extends.
 
 Style note: structure goes Metadata, Context, Decision, Alternatives, Consequences, Implementation Notes, Open Questions, References. This is the shape used here going forward for decisions of comparable weight.

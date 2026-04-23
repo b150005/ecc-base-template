@@ -13,10 +13,13 @@
 #
 # Checks:
 #   1. `disable-model-invocation: true` is present in .claude/skills/growth/SKILL.md
-#   2. Every .claude/agents/*.md file that declares `growth_domains:` also
-#      contains the guard-branch marker referencing .claude/growth/config.json
+#   2. Every .claude/agents/*.md file that declares a `## Growth Domains` section
+#      also contains the guard-branch marker referencing .claude/growth/config.json
 #   3. .gitignore ignores .claude/growth/notes/ and .claude/growth/config.json,
 #      and .gitignore.example contains the opt-in inversion block
+#
+# Note: Check 2 re-anchored in ADR-002 (2026-04-23). Previously grepped for
+# `growth_domains:` in frontmatter; now grepped for `## Growth Domains` in body.
 
 set -euo pipefail
 
@@ -52,7 +55,7 @@ guard_marker=".claude/growth/config.json"
 agents_without_guard=()
 
 while IFS= read -r -d '' agent_file; do
-  if grep -Eq '^growth_domains:' "$agent_file" || grep -Eq '^\s*growth_domains:' "$agent_file"; then
+  if grep -Eq '^## Growth Domains$' "$agent_file"; then
     if ! grep -Fq "$guard_marker" "$agent_file"; then
       agents_without_guard+=("$agent_file")
     fi
@@ -60,10 +63,10 @@ while IFS= read -r -d '' agent_file; do
 done < <(find .claude/agents -maxdepth 1 -name '*.md' -print0 2>/dev/null)
 
 if [[ ${#agents_without_guard[@]} -eq 0 ]]; then
-  pass "every agent with growth_domains: references $guard_marker"
+  pass "every agent with ## Growth Domains section references $guard_marker"
 else
   for a in "${agents_without_guard[@]}"; do
-    fail_check "$a declares growth_domains: but lacks guard-branch reference to $guard_marker"
+    fail_check "$a has ## Growth Domains section but lacks guard-branch reference to $guard_marker"
   done
 fi
 printf "\n"

@@ -36,7 +36,7 @@ The default experience — Growth Mode off — is unchanged for developers who d
 
 The following goals are testable. Each states an observable condition and the measurement method.
 
-1. **All-agent coverage.** When Growth Mode is active, all 15 agents in the team participate in knowledge enrichment according to their declared domain responsibilities. Measurable: inspect `growth_domains:` frontmatter across all 15 agent files and confirm each agent's enrichment contract is exercised by a session that exercises that agent's primary task.
+1. **All-agent coverage.** When Growth Mode is active, all 15 agents in the team participate in knowledge enrichment according to their declared domain responsibilities. Measurable: inspect the `## Growth Domains` sections across all 15 agent files and confirm each agent's enrichment contract is exercised by a session that exercises that agent's primary task.
 
 2. **Default-off invariant.** When Growth Mode is inactive (default), agent responses contain no growth-mode artifacts — no `## Growth:` sections, no `[Growth Note]` markers — and no file under `.claude/growth/notes/` is created or modified. This is a design claim about where the logic branches in agent prompts, not an output-equivalence claim (LLM outputs are non-deterministic across runs, model versions, and prompt compaction events; treating them as hashable against golden files is an antipattern). Verified: `scripts/check-growth-invariants.sh` asserts the three enforcement preconditions on every PR — `disable-model-invocation: true` on the growth Skill, the guard branch in every growth-aware agent prompt, and the gitignore posture.
 
@@ -272,7 +272,7 @@ Config is read at session start by every growth-aware agent. The read sequence:
 
 1. Read `.claude/growth/config.json`. If absent or `enabled: false`, skip all growth steps entirely. No reads of preamble, no reads of domain files, no modifications of any file under `.claude/growth/notes/`.
 2. If `enabled: true`, read `.claude/growth/preamble.md` for the enrichment protocol.
-3. Identify which domain files are relevant to the current task by mapping the task to domain keys from the agent's declared `growth_domains` frontmatter.
+3. Identify which domain files are relevant to the current task by mapping the task to domain keys from the agent's declared Growth Domains section.
 4. Read those domain files so the agent knows what is already recorded and does not duplicate.
 5. Proceed with the primary task. When a teaching moment arises, follow the enrichment protocol.
 
@@ -330,7 +330,7 @@ Custom domains opened via `/growth domain new <key>` follow the same shape and l
 
 ### FR-006: Per-Agent Domain Ownership
 
-Every agent file in `.claude/agents/` carries a `growth_domains:` field in its YAML frontmatter. Every agent has at least one primary domain. There is no exempt list — all 15 agents participate in growth enrichment.
+Every agent file in `.claude/agents/` carries a `## Growth Domains` section at the top of its prompt body. Every agent has at least one primary domain. There is no exempt list — all 15 agents participate in growth enrichment.
 
 The 19-domain ownership map (aligned to the canonical taxonomy in `docs/en/growth/domain-taxonomy.md` and ADR-001):
 
@@ -352,7 +352,7 @@ The 19-domain ownership map (aligned to the canonical taxonomy in `docs/en/growt
 | devops-engineer | operational-awareness, release-and-deployment | dependency-management, persistence-strategy, security-mindset |
 | technical-writer | documentation-craft | — |
 
-The `growth_domains:` frontmatter value is a list of domain keys combining primary and secondary. Ownership does not restrict writing — multiple agents can write into the same domain — but it defines primary responsibility and the default expectation for which agent will produce the most thorough contributions to that domain.
+The Growth Domains section is a list of domain keys combining primary and secondary. Ownership does not restrict writing — multiple agents can write into the same domain — but it defines primary responsibility and the default expectation for which agent will produce the most thorough contributions to that domain.
 
 ### FR-007: Enrichment Operation Contract
 
@@ -360,7 +360,7 @@ The contract every growth-aware agent follows when a teaching moment arises. The
 
 Five-step contract:
 
-1. **Identify the target domain.** Map the teaching moment to a domain key from `growth_domains`. If the moment spans two domains, choose the one where the concept is most foundational and add a cross-reference link in the secondary domain. If no existing domain fits, propose a new one and wait for learner confirmation via `/growth domain new <key>`; do not auto-create domain files.
+1. **Identify the target domain.** Map the teaching moment to a domain key from the agent's Growth Domains section. If the moment spans two domains, choose the one where the concept is most foundational and add a cross-reference link in the secondary domain. If no existing domain fits, propose a new one and wait for learner confirmation via `/growth domain new <key>`; do not auto-create domain files.
 
 2. **Read the current domain file.** The agent reads the existing file before deciding how to contribute. This is non-negotiable. A contribution made without reading the current file risks duplicating content, contradicting an earlier entry without marking the supersession, or fragmenting a concept that already has a home.
 
@@ -470,7 +470,7 @@ Domain files are standard Markdown. No proprietary format. Organization is by co
 
 ### NFR-007: Serialization for Overlapping Domain Writes
 
-When the orchestrator delegates to two or more agents in a single workflow, and both agents have `growth_domains` that overlap, the orchestrator runs them sequentially rather than in parallel for the growth-writing phase. When `growth_domains` do not overlap, parallel execution is permitted. This preserves the read-modify-write invariant for the notebook. The serialization rule is encoded in the orchestrator's agent prompt.
+When the orchestrator delegates to two or more agents in a single workflow, and both agents have Growth Domains that overlap, the orchestrator runs them sequentially rather than in parallel for the growth-writing phase. When Growth Domains do not overlap, parallel execution is permitted. This preserves the read-modify-write invariant for the notebook. The serialization rule is encoded in the orchestrator's agent prompt.
 
 ---
 
@@ -516,7 +516,7 @@ Three deterministic preconditions enforce the invariant. All three are checked b
 
 1. **Skill flag check.** `.claude/skills/growth/SKILL.md` contains `disable-model-invocation: true`. This prevents the model from flipping `enabled: true` on the user's behalf. One line of grep.
 
-2. **Agent guard-branch check.** Every file under `.claude/agents/` that declares `growth_domains:` in frontmatter also contains the guard-branch text — reading `config.json`, skipping all growth steps when absent or disabled. One regex per agent file.
+2. **Agent guard-branch check.** Every file under `.claude/agents/` that declares a `## Growth Domains` section also contains the guard-branch text — reading `config.json`, skipping all growth steps when absent or disabled. One regex per agent file.
 
 3. **Gitignore posture check.** `.gitignore` ignores `.claude/growth/notes/` and `.claude/growth/config.json`. `.gitignore.example` contains the opt-in inversion comment block. Two greps.
 
@@ -552,7 +552,7 @@ All criteria must be satisfied for this feature to be considered shippable. The 
 
 ### All-Agent Coverage
 
-- [ ] Every agent file in `.claude/agents/` has a `growth_domains:` field in its YAML frontmatter.
+- [ ] Every agent file in `.claude/agents/` has a `## Growth Domains` section at the top of its prompt body.
 - [ ] A session invoking the architect produces at least one domain file enrichment in `architecture.md` or `api-design.md` when a non-trivial design decision is involved.
 - [ ] A session invoking the security-reviewer produces at least one enrichment in `security-mindset.md` when a security finding is present.
 - [ ] A session invoking the devops-engineer produces at least one enrichment in `operational-awareness.md` or `release-and-deployment.md` when a deployment pattern is used.
@@ -599,7 +599,7 @@ All criteria must be satisfied for this feature to be considered shippable. The 
 ### Default-Off Enforcement
 
 - [ ] `scripts/check-growth-invariants.sh` asserts `disable-model-invocation: true` in `.claude/skills/growth/SKILL.md`.
-- [ ] `scripts/check-growth-invariants.sh` asserts every `.claude/agents/*.md` file that declares `growth_domains:` also contains the guard-branch reference to `config.json`.
+- [ ] `scripts/check-growth-invariants.sh` asserts every `.claude/agents/*.md` file that declares a `## Growth Domains` section also contains the guard-branch reference to `config.json`.
 - [ ] `scripts/check-growth-invariants.sh` asserts `.gitignore` contains entries for `.claude/growth/notes/` and `.claude/growth/config.json`.
 - [ ] The script runs in CI on every PR and fails the build if any check fails.
 
@@ -639,7 +639,7 @@ These metrics are observable without instrumentation inside agent internals. Van
 | A growth note fabricates a citation — cites an ADR that does not exist or misquotes a named pattern. | Medium — model hallucination is a known risk for citation-heavy tasks. | High — a wrong citation is worse than no citation; it builds incorrect mental models. | The preamble explicitly forbids fabricated ADR citations. Agents must verify that an ADR file exists before citing it by number. For external sources, the agent cites by named pattern rather than URL when the URL is not directly accessible; the developer is expected to verify. Fabricated citations are treated as defects and block merge. |
 | Non-destructive editing fails under pressure — an agent rewrites or compresses prior content to save space. | Medium — agents under cost pressure may optimize for brevity. | High — silent loss of prior understanding breaks the supersession-with-history model. | The preamble forbids rewrites of prior content. PR reviewers check the property whenever `.claude/growth/preamble.md` or agent prompts change. The `correct` operation is the only sanctioned mechanism for changing a prior entry; it always preserves the original. |
 | Guard-branch marker in an agent prompt is removed or edited in a way that breaks the grep check. | Medium — refactoring of agent prompts is routine. | High — the default-off invariant would silently break. | `scripts/check-growth-invariants.sh` fails the PR. The script's grep pattern is simple and stable; if a legitimate refactor needs to change it, the script is updated in the same PR and the reviewer checks that the new pattern still matches all fifteen agents. |
-| Two agents in the same workflow write to the same domain concurrently — the second write overwrites the first. | Medium — parallel agent execution is common in the orchestrator's delegation pattern. | Medium — lost enrichment is visible in the diff report but may not be caught until review. | The orchestrator serializes growth-writing agents when their `growth_domains` overlap. The session contract's diff report makes lost operations visible in the same response. If serialization fails, the learner can ask the agent to retry the enrichment. |
+| Two agents in the same workflow write to the same domain concurrently — the second write overwrites the first. | Medium — parallel agent execution is common in the orchestrator's delegation pattern. | Medium — lost enrichment is visible in the diff report but may not be caught until review. | The orchestrator serializes growth-writing agents when their Growth Domains overlap. The session contract's diff report makes lost operations visible in the same response. If serialization fails, the learner can ask the agent to retry the enrichment. |
 | Domain files grow large enough that agents load too much context per session when Growth Mode is on. | Medium — a mature project with 50+ sessions will produce domain files of meaningful size. | Low-Medium — large domain files slow agent reads and increase context cost. The feature is opt-in, so this cost is known. | The technical-writer's `/growth review` command triggers a reorganization proposal when a file exceeds the split threshold (see Open Questions). Content-contributing agents flag the threshold in the diff report rather than splitting unilaterally. |
 
 ---
@@ -656,7 +656,7 @@ The following questions are not decided by this PRD. Each is a candidate for a f
 
 4. **How does level change mid-project affect existing domain notes?** `[ADR-scope]` Tentative position per ADR: new contributions follow the new level; existing entries are not rewritten. The foundational scaffolding from `junior` sessions remains and is layered by `senior` refinements. This PRD inherits that position.
 
-5. **Interaction with parallel agent execution.** `[ADR-scope]` The serialization rule for overlapping `growth_domains` is specified in NFR-007 of this PRD and in the ADR. Verification that the orchestrator correctly detects domain overlap before dispatch is an implementation concern; the mechanism for overlap detection is not yet specified.
+5. **Interaction with parallel agent execution.** `[ADR-scope]` The serialization rule for overlapping Growth Domains is specified in NFR-007 of this PRD and in the ADR. Verification that the orchestrator correctly detects domain overlap before dispatch is an implementation concern; the mechanism for overlap detection is not yet specified.
 
 6. **i18n of Growth Notes.** `[PRD-scope]` Notes are English-only in this release. For teams whose primary working language is not English, this limits effectiveness. Machine translation is not addressed here; it is explicitly out of scope.
 
@@ -689,7 +689,11 @@ The owner's intent is a clean release, not adoption maximization. The plan below
 
 ### Phase 1: Dark
 
-Ship the feature with the default-off invariant verified by CI. The `.claude/growth/` directory and all its contents are not present in repositories derived from the template until the developer first runs `/growth on`. The Skill file is present. CLAUDE.md contains the pointer block. No other user-facing change. `scripts/check-growth-invariants.sh` runs in CI and passes for all three checks (Skill flag, agent guard branches, gitignore posture).
+Ship the feature with the default-off invariant verified by CI. Present in repositories derived from the template from the first clone: the `/growth` Skill at `.claude/skills/growth/SKILL.md`, the `/quiet` companion Skill at `.claude/skills/quiet/SKILL.md`, the enrichment contract at `.claude/growth/preamble.md`, and the 19 pre-seeded canonical domain files under `.claude/growth/notes/` (consistent with FR-005). CLAUDE.md contains the pointer block. `scripts/check-growth-invariants.sh` runs in CI and passes for all three checks (Skill flag, agent guard branches, gitignore posture).
+
+Created at runtime on the learner's first `/growth on` invocation: `.claude/growth/config.json` only. Additional `.claude/growth/notes/<key>.md` files are created only when the learner opens a custom domain via `/growth domain new <key>`.
+
+Both `.claude/growth/config.json` and `.claude/growth/notes/` are gitignored by default. The shipped `preamble.md` and seeded notes files are not hidden from the repository — they are part of the template — but any enrichment a learner accumulates under `notes/` stays local unless the learner inverts the gitignore entry.
 
 The feature is available to any developer who runs the Skill. It is not mentioned in release notes beyond the ADR and PRD existing in the repository.
 

@@ -2,8 +2,12 @@
 
 This file is the single source of truth for the enrichment protocol that every
 growth-aware agent follows when Developer Growth Mode is active. It is read at session
-start by every agent that declares `growth_domains:` in its frontmatter, when and only
-when `.claude/growth/config.json` has `"enabled": true`.
+start by every agent that declares a `## Growth Domains` section at the top of its
+prompt body, when and only when `.claude/growth/config.json` has `"enabled": true`.
+
+The domain declaration location changed from a frontmatter key to a prompt-body section
+in ADR-002; see [docs/en/adr/002-growth-domains-location.md](../../docs/en/adr/002-growth-domains-location.md)
+for the rationale.
 
 ---
 
@@ -31,8 +35,9 @@ deviation from byte-identical output when Growth Mode is disabled is a defect.
 1. Read `.claude/growth/config.json`. Check `enabled`.
 2. If `enabled: true`, read this file (`preamble.md`) for the enrichment protocol.
 3. At session start, this agent does NOT pre-load any domain file. It identifies candidate
-   domains from its `growth_domains` frontmatter so it knows which domains are relevant,
-   but it reads a domain file only when a teaching moment actually arises for that domain.
+   domains from its own `## Growth Domains` section (already present in its prompt body) so
+   it knows which domains are relevant, but it reads a domain file only when a teaching
+   moment actually arises for that domain.
    This keeps session-start context cost minimal and avoids loading files the agent will
    not touch.
 4. Proceed with the primary task. When a teaching moment arises, follow the protocol below
@@ -51,8 +56,9 @@ against the target domain file.
 
 ### Step 1: Identify the target domain
 
-Map the teaching moment to a domain key the agent owns (see `growth_domains:` in this
-agent's frontmatter). Domain key definitions are in `docs/en/growth/domain-taxonomy.md`.
+Map the teaching moment to a domain key the agent owns (see the `## Growth Domains`
+section at the top of this agent's prompt body). Domain key definitions are in
+`docs/en/growth/domain-taxonomy.md`.
 
 If the teaching moment spans two domains, pick the one where the concept is most
 foundational. Place the primary explanation there. In the secondary domain file, write a
@@ -423,7 +429,7 @@ contributing-agents: []
 This is a custom domain opened by the learner. It covers concepts that do not fit
 cleanly into the 19 canonical domains defined in docs/en/growth/domain-taxonomy.md.
 
-Agents contribute here only when their growth_domains frontmatter includes this key.
+Agents contribute here only when their Growth Domains section includes this key.
 The enrichment protocol is defined in .claude/growth/preamble.md.
 
 ## Placeholder
@@ -526,27 +532,26 @@ focus list, not what counts as worth understanding.
 ## 10. Orchestrator Serialization for Concurrent Domain Writes
 
 When the orchestrator delegates to two or more agents in a single workflow turn, and
-those agents have overlapping `growth_domains`, they must not write to the same domain
+those agents have overlapping Growth Domains, they must not write to the same domain
 file in parallel. The invariant: a domain file write is a read-modify-write cycle, and
 two concurrent read-modify-write cycles that start from the same pre-edit file will lose
 one agent's contribution when the second write commits.
 
 **The rule the orchestrator follows:**
 
-Before dispatching agents in parallel, inspect the `growth_domains` lists of all agents
+Before dispatching agents in parallel, inspect the Growth Domains lists of all agents
 to be dispatched. If any two agents share at least one domain key, the agents that share
 domains must run sequentially — the first agent completes its full enrichment cycle
 (including writing the domain file), then the second agent starts from the updated file.
 
-Agents with entirely disjoint `growth_domains` may run in parallel without restriction.
+Agents with entirely disjoint Growth Domains may run in parallel without restriction.
 Their domain file writes cannot conflict.
 
 **Example:**
 
-Architect (`growth_domains: [architecture, api-design, data-modeling, ...]`) and
-code-reviewer (`growth_domains: [review-taste, testing-discipline, implementation-patterns,
-security-mindset, architecture, ...]`) share `architecture`. The orchestrator must
-sequence their growth-writing phases: architect writes first, code-reviewer reads the
+Architect (Primary: `architecture, api-design, data-modeling`) and
+code-reviewer (Secondary includes `architecture`) share `architecture`. The orchestrator
+must sequence their growth-writing phases: architect writes first, code-reviewer reads the
 updated `architecture.md` before writing its own contribution.
 
 **This is an orchestrator-side concern.** This preamble documents the rule so agents
