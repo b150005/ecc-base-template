@@ -37,6 +37,41 @@ This project uses an agent team for structured development. The **orchestrator**
 
 All agents detect the project ecosystem at runtime by reading this file and project manifest files (package.json, pubspec.yaml, go.mod, etc.).
 
+## Developer Growth Mode
+
+Growth Mode is a default-off learning layer. When enabled via the `/growth` Skill
+(`/growth on [junior|mid|senior]`), every agent contributes to a domain-organized
+knowledge base at `.claude/growth/notes/`. The knowledge base grows and is refined
+over many sessions into a personalized reference built by shipping real features.
+The learner-facing explanation is in the project README.
+
+Runtime files:
+
+- `.claude/growth/config.json` — state (`enabled`, `level`, `focus_domains`, `updatedAt`); gitignored by default
+- `.claude/growth/preamble.md` — the enrichment contract every growth-aware agent reads when Growth Mode is on
+- `.claude/growth/notes/` — 19 canonical domain files plus any learner-opened custom domains; gitignored by default
+- `.claude/skills/growth/SKILL.md` — the `/growth` toggle Skill (`disable-model-invocation: true`)
+- `.claude/skills/quiet/SKILL.md` — the `/quiet` per-invocation trailer-suppression Skill
+
+Agent instruction: at session start, read `.claude/growth/config.json`. If the file
+does not exist or has `"enabled": false`, skip all growth steps entirely — do not
+read preamble, do not read any domain file, do not write any file under
+`.claude/growth/`. If `"enabled": true`, read `.claude/growth/preamble.md` and
+follow the enrichment contract for teaching moments that fall within this agent's
+`growth_domains` frontmatter.
+
+Related: [ADR-001](docs/en/adr/001-developer-growth-mode.md) and the domain
+taxonomy at [docs/en/growth/domain-taxonomy.md](docs/en/growth/domain-taxonomy.md).
+
+Default-off guarantee: when Growth Mode is off, all 15 agents behave as if the
+feature did not exist — no `## Growth:` sections, no reads or writes of any file
+under `.claude/growth/`. The invariant is enforced by three deterministic checks
+(the `disable-model-invocation: true` flag on the growth Skill, the guard branch
+in every growth-aware agent prompt, and the gitignore posture), run in CI via
+`scripts/check-growth-invariants.sh`. Byte-level regression against agent output
+is explicitly rejected — LLM output is non-deterministic and golden-file tests
+would flake.
+
 ## Development Workflow
 
 1. **Issue Analysis**: Feed issues to the orchestrator via GitHub MCP or copy-paste

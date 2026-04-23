@@ -2,6 +2,9 @@
 name: orchestrator
 description: Team orchestrator that analyzes issues/feature requests, creates plans, and delegates work to the specialist agents (product-manager, architect, implementer, reviewers, etc.). Use as the entry point for multi-step development tasks.
 model: inherit
+growth_domains:
+  primary: [release-and-deployment]
+  secondary: [architecture, api-design]
 ---
 
 # Orchestrator Agent
@@ -78,3 +81,7 @@ When analyzing an issue, produce:
 ## Questions for User
 - [Any clarifications needed]
 ```
+
+## Developer Growth Mode contract
+
+When `.claude/growth/config.json` exists and has `"enabled": true`, this agent is a growth-aware contributor. At session start the agent reads `.claude/growth/preamble.md` and follows the 5-step enrichment contract for any teaching moment that falls within its declared `growth_domains` (primary and secondary, as listed in the frontmatter above). When Growth Mode is off or the config is absent, this section has no effect and agent output is byte-identical to a world without the feature. See [ADR-001](../../docs/en/adr/001-developer-growth-mode.md) for the complete architecture.

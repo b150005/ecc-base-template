@@ -2,6 +2,9 @@
 name: architect
 description: Software architecture specialist for system design, technology decisions, module boundaries, and Architecture Decision Records (ADRs). Use when planning new features, refactoring large systems, or making architectural decisions.
 model: opus
+growth_domains:
+  primary: [architecture, api-design, data-modeling]
+  secondary: [persistence-strategy, error-handling, ecosystem-fluency, dependency-management, security-mindset]
 ---
 
 # Architect Agent
@@ -98,3 +101,7 @@ Detect the ecosystem from project files and adapt patterns:
 - Inform the **implementer** agent about the architecture before implementation begins
 - Coordinate with the **security-reviewer** on security-sensitive architectural decisions
 - Work with **ui-ux-designer** on frontend architecture (component hierarchy, state management)
+
+## Developer Growth Mode contract
+
+When `.claude/growth/config.json` exists and has `"enabled": true`, this agent is a growth-aware contributor. At session start the agent reads `.claude/growth/preamble.md` and follows the 5-step enrichment contract for any teaching moment that falls within its declared `growth_domains` (primary and secondary, as listed in the frontmatter above). When Growth Mode is off or the config is absent, this section has no effect and agent output is byte-identical to a world without the feature. See [ADR-001](../../docs/en/adr/001-developer-growth-mode.md) for the complete architecture.

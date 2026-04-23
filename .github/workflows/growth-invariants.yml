@@ -1,0 +1,39 @@
+name: Growth Mode Invariants
+
+# Verifies the three deterministic preconditions that guard the Developer
+# Growth Mode default-off invariant. See scripts/check-growth-invariants.sh
+# and docs/en/adr/001-developer-growth-mode.md for the rationale.
+#
+# This job runs on the template repository itself. Derived projects inherit
+# the script but are free to drop this workflow if they do not use Growth Mode.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".claude/agents/**"
+      - ".claude/skills/growth/**"
+      - ".claude/growth/**"
+      - ".gitignore"
+      - ".gitignore.example"
+      - "scripts/check-growth-invariants.sh"
+      - ".github/workflows/growth-invariants.yml"
+  pull_request:
+    paths:
+      - ".claude/agents/**"
+      - ".claude/skills/growth/**"
+      - ".claude/growth/**"
+      - ".gitignore"
+      - ".gitignore.example"
+      - "scripts/check-growth-invariants.sh"
+      - ".github/workflows/growth-invariants.yml"
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Run Growth Mode invariant checks
+        run: bash scripts/check-growth-invariants.sh

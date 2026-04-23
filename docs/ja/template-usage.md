@@ -48,7 +48,7 @@ cd {repo-name}
 
 ## テンプレート更新の取り込み
 
-GitHub テンプレートリポジトリはアップストリーム接続を維持しません。後で更新を同期するには：
+GitHub テンプレートリポジトリはアップストリーム接続を維持しません。後で更新を同期するには:
 
 ```bash
 # テンプレートをリモートとして追加（1回のみ）
@@ -61,7 +61,7 @@ git checkout template/main -- .github/workflows/ci-base.yml
 
 ## 参考リンク
 
-このドキュメントで解説している概念の1次情報です：
+このドキュメントで解説している概念の1次情報です:
 
 - [Creating a Repository from a Template](https://docs.github.com/ja/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template) — 「Use this template」の仕組み
 - [github/gitignore](https://github.com/github/gitignore) — 言語別の公式 .gitignore テンプレート

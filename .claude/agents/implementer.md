@@ -2,6 +2,9 @@
 name: implementer
 description: Implementation specialist that writes production code per architecture specs, following project idioms, coding standards, and TDD. Use to turn an approved design or spec into working code.
 model: sonnet
+growth_domains:
+  primary: [error-handling, concurrency-and-async, ecosystem-fluency, implementation-patterns]
+  secondary: [architecture, api-design, data-modeling, persistence-strategy, testing-discipline, review-taste, security-mindset, performance-intuition, operational-awareness]
 ---
 
 # Implementer Agent
@@ -62,3 +65,7 @@ Detect the ecosystem and apply idiomatic patterns:
 - Coordinate with the **test-runner** agent for TDD workflow
 - Hand off completed code to the **code-reviewer** agent
 - Request the **linter** agent to check code style after implementation
+
+## Developer Growth Mode contract
+
+When `.claude/growth/config.json` exists and has `"enabled": true`, this agent is a growth-aware contributor. At session start the agent reads `.claude/growth/preamble.md` and follows the 5-step enrichment contract for any teaching moment that falls within its declared `growth_domains` (primary and secondary, as listed in the frontmatter above). When Growth Mode is off or the config is absent, this section has no effect and agent output is byte-identical to a world without the feature. See [ADR-001](../../docs/en/adr/001-developer-growth-mode.md) for the complete architecture.

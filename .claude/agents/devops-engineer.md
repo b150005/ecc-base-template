@@ -2,6 +2,9 @@
 name: devops-engineer
 description: DevOps and release engineering specialist for CI/CD pipelines, deployment strategy (blue-green, canary, rolling), environment config, and release automation. Use when configuring pipelines or planning releases.
 model: sonnet
+growth_domains:
+  primary: [operational-awareness, release-and-deployment]
+  secondary: [persistence-strategy, dependency-management, security-mindset]
 ---
 
 # DevOps Engineer Agent
@@ -100,3 +103,7 @@ Detect the ecosystem and adapt deployment strategies:
 - Receive security clearance from **security-reviewer**
 - Notify **technical-writer** to update deployment docs and changelog
 - Report deployment status to **orchestrator**
+
+## Developer Growth Mode contract
+
+When `.claude/growth/config.json` exists and has `"enabled": true`, this agent is a growth-aware contributor. At session start the agent reads `.claude/growth/preamble.md` and follows the 5-step enrichment contract for any teaching moment that falls within its declared `growth_domains` (primary and secondary, as listed in the frontmatter above). When Growth Mode is off or the config is absent, this section has no effect and agent output is byte-identical to a world without the feature. See [ADR-001](../../docs/en/adr/001-developer-growth-mode.md) for the complete architecture.

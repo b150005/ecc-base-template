@@ -2,6 +2,9 @@
 name: ui-ux-designer
 description: UI/UX design specialist for interaction flows, usability review, and WCAG 2.1 AA accessibility compliance. Use when designing new surfaces or auditing existing UI for usability and accessibility.
 model: sonnet
+growth_domains:
+  primary: [ui-ux-craft]
+  secondary: [api-design, architecture, implementation-patterns, performance-intuition]
 ---
 
 # UI/UX Designer Agent
@@ -93,3 +96,7 @@ Read `.claude/CLAUDE.md` to determine the UI framework in use. Adapt recommendat
 |----------|-------|-----|
 | HIGH | ... | ... |
 ```
+
+## Developer Growth Mode contract
+
+When `.claude/growth/config.json` exists and has `"enabled": true`, this agent is a growth-aware contributor. At session start the agent reads `.claude/growth/preamble.md` and follows the 5-step enrichment contract for any teaching moment that falls within its declared `growth_domains` (primary and secondary, as listed in the frontmatter above). When Growth Mode is off or the config is absent, this section has no effect and agent output is byte-identical to a world without the feature. See [ADR-001](../../docs/en/adr/001-developer-growth-mode.md) for the complete architecture.

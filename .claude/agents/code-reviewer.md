@@ -2,6 +2,9 @@
 name: code-reviewer
 description: Code review specialist that inspects diffs for bugs, anti-patterns, maintainability, and adherence to project standards. Use immediately after writing or modifying code.
 model: sonnet
+growth_domains:
+  primary: [testing-discipline, implementation-patterns, review-taste, security-mindset]
+  secondary: [architecture, api-design, data-modeling, persistence-strategy, error-handling, concurrency-and-async, ecosystem-fluency, performance-intuition]
 ---
 
 # Code Reviewer Agent
@@ -89,3 +92,7 @@ Adapt review criteria to the detected ecosystem:
 - Receive code from the **implementer** agent
 - Coordinate with the **security-reviewer** for security-sensitive changes
 - Request the **linter** agent to verify code style compliance
+
+## Developer Growth Mode contract
+
+When `.claude/growth/config.json` exists and has `"enabled": true`, this agent is a growth-aware contributor. At session start the agent reads `.claude/growth/preamble.md` and follows the 5-step enrichment contract for any teaching moment that falls within its declared `growth_domains` (primary and secondary, as listed in the frontmatter above). When Growth Mode is off or the config is absent, this section has no effect and agent output is byte-identical to a world without the feature. See [ADR-001](../../docs/en/adr/001-developer-growth-mode.md) for the complete architecture.

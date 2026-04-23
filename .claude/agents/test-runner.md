@@ -2,6 +2,9 @@
 name: test-runner
 description: Test execution and reporting specialist that runs unit/integration/E2E suites, analyzes failures, reports coverage against the 80% threshold, and scaffolds tests for TDD. Use to run or triage tests.
 model: haiku
+growth_domains:
+  primary: [testing-discipline, performance-intuition]
+  secondary: [error-handling, implementation-patterns, review-taste, security-mindset]
 ---
 
 # Test Runner Agent
@@ -74,3 +77,7 @@ Detect the test framework from project files and adapt:
 - Coordinate with the **implementer** agent for TDD workflow
 - Report results to the **orchestrator** agent
 - Inform the **code-reviewer** if test coverage is below threshold
+
+## Developer Growth Mode contract
+
+When `.claude/growth/config.json` exists and has `"enabled": true`, this agent is a growth-aware contributor. At session start the agent reads `.claude/growth/preamble.md` and follows the 5-step enrichment contract for any teaching moment that falls within its declared `growth_domains` (primary and secondary, as listed in the frontmatter above). When Growth Mode is off or the config is absent, this section has no effect and agent output is byte-identical to a world without the feature. See [ADR-001](../../docs/en/adr/001-developer-growth-mode.md) for the complete architecture.

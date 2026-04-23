@@ -9,3 +9,7 @@ Thumbs.db
 *.swp
 *.swo
 *~
+
+# Developer Growth Mode — private learning material (see README.md "Notes are private by default")
+.claude/growth/notes/
+.claude/growth/config.json
