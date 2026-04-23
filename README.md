@@ -22,7 +22,7 @@ The two sections are `## Growth: taught this session` and `## Growth: notebook d
 
 ### What changes when Growth Mode is ON
 
-When Growth Mode is active, each agent in the team reads `.claude/growth/config.json` before completing its response. If `enabled` is `true` and the agent's scope entry is also `true`, the agent appends the two trailer sections after its primary output. The generated artifact is not touched. No inline educational comments are added to production code. No files are written to `docs/` or anywhere outside `.claude/growth/`. The trailer sections appear in the chat response, and each agent also updates the corresponding domain file under `.claude/growth/notes/<domain>.md` using a non-destructive enrichment operation defined in `.claude/growth/preamble.md`. The knowledge base is not a chronological log; it is organized by domain, and each session enriches existing sections or opens new ones as understanding accumulates across real project decisions.
+When Growth Mode is active, each agent in the team reads `.claude/growth/config.json` before completing its response. If `enabled` is `true`, the agent appends the two trailer sections after its primary output. The generated artifact is not touched. No inline educational comments are added to production code. No files are written to `docs/` or anywhere outside `.claude/growth/`. The trailer sections appear in the chat response, and each agent also updates the corresponding domain file under `.claude/growth/notes/<domain>.md` using a non-destructive enrichment operation defined in `.claude/growth/preamble.md`. The knowledge base is not a chronological log; it is organized by domain, and each session enriches existing sections or opens new ones as understanding accumulates across real project decisions.
 
 What changes in practice: the developer learns the name of the pattern being applied, the reason this project chose it over the common alternative, and the ADR or external reference that records that decision. Over many sessions this adds up to something more than isolated tips. It adds up to a mental model of how the project's decisions fit together.
 
@@ -191,6 +191,8 @@ Each agent's `Growth domains` column lists its primary contribution domains; sec
 
 The old README listed 14 agents. The current team has 15. `docs-researcher` was added to give the team a dedicated research specialist: an agent that verifies API behavior, framework changes, and migration paths against primary documentation before code is written, rather than relying on training data that may be stale.
 
+> **Implementation note.** Each agent's domain ownership is declared in a `growth_domains:` key in its frontmatter and referenced in the agent prompt body. The official Claude Code sub-agent frontmatter schema is `name`, `description`, `tools`, `model`; `growth_domains:` is a template-local convention that works because the agent prompt reads its own file as text. If Anthropic closes the frontmatter schema strictly in the future, this key will be moved into the agent prompt body. The default-off invariant is unaffected either way — it is enforced by `scripts/check-growth-invariants.sh`, not by frontmatter behavior.
+
 ---
 
 ## Getting started
@@ -227,42 +229,34 @@ There are three surfaces involved. Each has a distinct job.
 **The Skill** is the action surface. `/growth` is a Claude Code Skill (defined at `.claude/skills/growth/SKILL.md`) that changes the state immediately for the current session. The skill uses `disable-model-invocation: true`, which means only the user can toggle Growth Mode — the model cannot auto-invoke it. This is a design guarantee, not a soft convention.
 
 ```
-/growth on junior
-/growth on mid
-/growth on senior
-/growth off
-/growth status
+/growth on [junior|mid|senior]       Enable at the given level (or the last stored level)
+/growth off                          Disable; preserve level and focus for the next enable
+/growth status                       Print current state and recent notebook-diff summaries
+/growth focus <domain>[,<domain>]    Narrow agent teaching effort to specific domains
+/growth unfocus                      Clear focus; treat all domains equally
+/growth level <junior|mid|senior>    Change level without toggling enabled
+/growth domain new <key>             Create a custom domain file (prompts for confirmation)
 ```
 
-**The config file** is the state surface. `.claude/growth/config.json` persists the level across sessions. It is created on first `/growth on` invocation. Its schema:
+`/quiet` is a separate, companion Skill at `.claude/skills/quiet/SKILL.md`. It suppresses the `## Growth: taught this session` and `## Growth: notebook diff` trailer sections for the **immediately following** agent response only. Domain notes are still written; only the chat-visible trailer is hidden. State is not modified. The next user turn restores normal trailer behavior.
+
+**The config file** is the state surface. `.claude/growth/config.json` persists the level and focus across sessions. It is created on first `/growth on` invocation and is not present in a freshly cloned repository. Its schema:
 
 ```json
 {
   "enabled": true,
   "level": "junior",
-  "scope": {
-    "architect": true,
-    "implementer": true,
-    "test-runner": true,
-    "code-reviewer": true,
-    "orchestrator": true,
-    "product-manager": true,
-    "market-analyst": true,
-    "monetization-strategist": true,
-    "ui-ux-designer": true,
-    "docs-researcher": true,
-    "linter": true,
-    "security-reviewer": true,
-    "performance-engineer": true,
-    "devops-engineer": true,
-    "technical-writer": true
-  }
+  "focus_domains": [],
+  "updatedAt": "2026-04-22T00:00:00Z"
 }
 ```
 
-Individual agents can be scoped to `false` if you want notes from only a subset of the team.
+- `enabled` — whether Growth Mode is on. A missing or unparseable config is treated as disabled.
+- `level` — `"junior"`, `"mid"`, or `"senior"`. Preserved across `/growth off` so the next `/growth on` restores it.
+- `focus_domains` — array of domain keys (e.g. `["architecture", "testing-discipline"]`). When non-empty, agents write full enrichment entries for teaching moments in these domains; teaching moments in other domains are written only when genuinely load-bearing. This is a soft priority signal, not a per-agent on/off switch — all 15 agents continue to participate.
+- `updatedAt` — ISO 8601 timestamp written by the `/growth` Skill on every state change.
 
-**The CLAUDE.md pointer** is the discovery surface. It is a single line in `.claude/CLAUDE.md` telling you the feature exists and how to activate it. You do not need to edit CLAUDE.md to use Growth Mode; the pointer is there so you do not have to remember the invocation.
+**The CLAUDE.md pointer** is the discovery surface. It is a short pointer section in `.claude/CLAUDE.md` telling you the feature exists, where its runtime files live, and how to activate it. You do not need to edit CLAUDE.md to use Growth Mode; the pointer is there so you do not have to remember the invocation.
 
 ### 6. Your first session with Growth Mode on
 
@@ -331,12 +325,13 @@ Growth Notes are brief, but the domain notes files take the space they need. A n
 │   │   ├── devops-engineer.md
 │   │   └── technical-writer.md
 │   ├── skills/
-│   │   └── growth/
-│   │       └── SKILL.md                   # /growth Claude Code Skill handler
-│   ├── growth/                            # all Growth Mode runtime files (gitignored by default)
-│   │   ├── config.json                    # enabled flag, level, per-agent scope
-│   │   ├── preamble.md                    # shared enrichment contract for all agents
-│   │   ├── notes/                         # 19 domain-organized knowledge files (the textbook)
+│   │   ├── growth/
+│   │   │   └── SKILL.md                   # /growth Claude Code Skill handler
+│   │   └── quiet/
+│   │       └── SKILL.md                   # /quiet per-invocation trailer suppression
+│   ├── growth/                            # Growth Mode runtime + shipped assets
+│   │   ├── preamble.md                    # shipped — shared enrichment contract for all agents
+│   │   ├── notes/                         # shipped — 19 seeded domain files (gitignored by default)
 │   │   │   ├── architecture.md
 │   │   │   ├── api-design.md
 │   │   │   ├── data-modeling.md
@@ -356,6 +351,7 @@ Growth Notes are brief, but the domain notes files take the space they need. A n
 │   │   │   ├── business-modeling.md
 │   │   │   ├── documentation-craft.md
 │   │   │   └── ui-ux-craft.md
+│   │   └── config.json                    # created on first /growth on (gitignored)
 │   ├── settings.json
 │   └── settings.local.json
 ├── .devcontainer/
@@ -394,7 +390,7 @@ Growth Notes are brief, but the domain notes files take the space they need. A n
 └── README.ja.md                           # Japanese translation
 ```
 
-Note: the `.claude/growth/` directory and its contents are created at runtime by the `/growth` Skill and agents. They are not present in the repository root before first use. `config.json` and `notes/` are gitignored by default; see the "Notes are private by default" section for the opt-in path.
+Note: the `.claude/growth/` directory ships with `preamble.md` (the enrichment contract) and `notes/` (the 19 pre-seeded domain files) already present in the template. Only `config.json` is created at runtime, on first `/growth on` invocation. Both `config.json` and `notes/` are gitignored by default so that personal state and private learning material do not leak into commits; see the "Notes are private by default" section for the opt-in path if your team wants to share notes.
 
 ---
 
