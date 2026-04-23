@@ -1,7 +1,7 @@
 ---
 name: technical-writer
 description: Technical documentation specialist for README, API docs, user guides, changelogs, and bilingual (English source / Japanese translation) docs. Use to write or keep documentation in sync with code changes.
-model: haiku
+model: sonnet
 ---
 
 # Technical Writer Agent

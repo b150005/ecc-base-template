@@ -79,6 +79,22 @@ All agents are ecosystem-agnostic. They detect the project's language and framew
 
 Each agent's domain ownership is declared in a `## Growth Domains` section at the top of its prompt body. See [ADR-002](docs/en/adr/002-growth-domains-location.md) for why the declaration lives in the body rather than in frontmatter. Secondary domains and the full taxonomy are in [docs/en/growth/domain-taxonomy.md](docs/en/growth/domain-taxonomy.md).
 
+### Model tiers
+
+Each agent declares its model in frontmatter. The template ships a mixed fleet — the right model for the job rather than a single floor — with the rule of thumb that agents whose output is consumed directly (authoritative prose, citations, translations) get Sonnet or Opus, while agents that wrap deterministic tools (linters, test runners) can safely use Haiku because the tool's own output is the ground truth.
+
+**Opus 4.5** — deepest reasoning for decisions with the highest downstream cost:
+architect, security-reviewer, performance-engineer, monetization-strategist
+
+**Sonnet 4.6** — best all-around coding and writing, the default for authoritative output:
+product-manager, market-analyst, ui-ux-designer, docs-researcher, implementer, code-reviewer, devops-engineer, technical-writer
+
+**Haiku 4.5** — lightweight, for tool-wrapping agents with a deterministic downstream oracle:
+linter, test-runner
+
+**Inherit** — follows the orchestrating session's model:
+orchestrator
+
 ---
 
 ## Project structure

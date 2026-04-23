@@ -79,6 +79,22 @@ cd <your-repo>
 
 各エージェントのドメイン担当は、プロンプト本文冒頭の `## Growth Domains` セクションで宣言しています。フロントマターではなく本文に宣言を置いている理由は [ADR-002](docs/ja/adr/002-growth-domains-location.md) を参照してください。副担当ドメインと完全な分類体系は [docs/ja/growth/domain-taxonomy.md](docs/ja/growth/domain-taxonomy.md) にあります。
 
+### モデル選定
+
+各エージェントは frontmatter でモデルを宣言しています。テンプレートは単一フロアを採らず、**職務に応じた混成チーム**として出荷されます。基本則は「出力が直接消費される（権威ある散文、引用、翻訳など）エージェントは Sonnet / Opus、linter やテストランナーのように決定論的なツールをラップするエージェントは Haiku で十分（ツール自身の出力が正解として機能するため）」。
+
+**Opus 4.5** — 下流への影響が最も大きい判断のための最深推論:
+architect、security-reviewer、performance-engineer、monetization-strategist
+
+**Sonnet 4.6** — 権威ある出力に対する既定。総合的なコーディングとライティングで最適:
+product-manager、market-analyst、ui-ux-designer、docs-researcher、implementer、code-reviewer、devops-engineer、technical-writer
+
+**Haiku 4.5** — 下流に決定論的オラクルを持つツールラップエージェント向けの軽量モデル:
+linter、test-runner
+
+**Inherit** — 呼び出し側セッションのモデルを継承:
+orchestrator
+
 ---
 
 ## プロジェクト構造

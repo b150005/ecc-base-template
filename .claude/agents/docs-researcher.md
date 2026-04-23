@@ -1,7 +1,7 @@
 ---
 name: docs-researcher
 description: Documentation research specialist that verifies APIs, framework behavior, version-specific changes, and migration paths against primary docs before changes land. Use when a claim needs a citable source.
-model: haiku
+model: sonnet
 ---
 
 # Docs Researcher Agent
