@@ -81,15 +81,17 @@ cd <your-repo>
 
 ### モデル選定
 
-各エージェントは frontmatter でモデルを宣言しています。テンプレートは単一フロアを採らず、**職務に応じた混成チーム**として出荷されます。基本則は「出力が直接消費される（権威ある散文、引用、翻訳など）エージェントは Sonnet / Opus、linter やテストランナーのように決定論的なツールをラップするエージェントは Haiku で十分（ツール自身の出力が正解として機能するため）」。
+各エージェントは frontmatter で Claude Code のエイリアス（`opus` / `sonnet` / `haiku` / `inherit`）を用いてモデルを宣言しています。エイリアスは常にそのファミリの最新バージョンに解決されるため、Anthropic が新しいバージョンをリリースしても以下の割り当てはドリフトしません。各ファミリの現在のバージョン番号は [Anthropic のモデル一覧](https://docs.claude.com/en/docs/about-claude/models/overview) を参照してください。
 
-**Opus 4.5** — 下流への影響が最も大きい判断のための最深推論:
+テンプレートは単一フロアを採らず、**職務に応じた混成チーム**として出荷されます。基本則は「出力が直接消費される（権威ある散文、引用、翻訳など）エージェントは Sonnet / Opus、linter やテストランナーのように決定論的なツールをラップするエージェントは Haiku で十分（ツール自身の出力が正解として機能するため）」。
+
+**Opus** — 下流への影響が最も大きい判断のための最深推論:
 architect、security-reviewer、performance-engineer、monetization-strategist
 
-**Sonnet 4.6** — 権威ある出力に対する既定。総合的なコーディングとライティングで最適:
+**Sonnet** — 権威ある出力に対する既定。総合的なコーディングとライティングで最適:
 product-manager、market-analyst、ui-ux-designer、docs-researcher、implementer、code-reviewer、devops-engineer、technical-writer
 
-**Haiku 4.5** — 下流に決定論的オラクルを持つツールラップエージェント向けの軽量モデル:
+**Haiku** — 下流に決定論的オラクルを持つツールラップエージェント向けの軽量モデル:
 linter、test-runner
 
 **Inherit** — 呼び出し側セッションのモデルを継承:
