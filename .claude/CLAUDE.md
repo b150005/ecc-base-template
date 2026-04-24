@@ -37,15 +37,17 @@ This project uses an agent team for structured development. The **orchestrator**
 
 All agents detect the project ecosystem at runtime by reading this file and project manifest files (package.json, pubspec.yaml, go.mod, etc.).
 
-## Developer Growth Mode
+## Developer Learning Mode
 
-Default-off learning layer. At session start, read `.claude/growth/config.json`;
-if absent or `"enabled": false`, skip all growth behavior entirely. If
-`"enabled": true`, read `.claude/growth/preamble.md` for the enrichment contract.
-Toggled only via the `/growth` Skill; see
+Default-off learning layer. At session start, read `learn/config.json`;
+if absent or `"enabled": false`, skip all learning behavior entirely. If
+`"enabled": true`, read `learn/preamble.md` for the enrichment contract.
+Toggled only via the `/learn` Skill; see
 [ADR-001](docs/en/adr/001-developer-growth-mode.md) and
-[PRD](docs/en/prd/developer-growth-mode.md) for the complete specification,
-[docs/en/growth/domain-taxonomy.md](docs/en/growth/domain-taxonomy.md) for
+[ADR-003](docs/en/adr/003-learning-mode-relocate-and-rename.md) for the
+architecture and rename rationale, [PRD](docs/en/prd/developer-learning-mode.md)
+for the complete specification, and
+[docs/en/learn/domain-taxonomy.md](docs/en/learn/domain-taxonomy.md) for
 domain definitions.
 
 ## Development Workflow

@@ -1,12 +1,15 @@
-# Growth Mode Enrichment Contract
+# Learning Mode Enrichment Contract
 
 This file is the single source of truth for the enrichment protocol that every
-growth-aware agent follows when Developer Growth Mode is active. It is read at session
-start by every agent that declares a `## Growth Domains` section at the top of its
-prompt body, when and only when `.claude/growth/config.json` has `"enabled": true`.
+learning-aware agent follows when Developer Learning Mode is active. It is read at session
+start by every agent that declares a `## Learning Domains` section at the top of its
+prompt body, when and only when `learn/config.json` has `"enabled": true`.
 
 The domain declaration location changed from a frontmatter key to a prompt-body section
-in ADR-002; see [docs/en/adr/002-growth-domains-location.md](../../docs/en/adr/002-growth-domains-location.md)
+in ADR-002; see [docs/en/adr/002-growth-domains-location.md](../docs/en/adr/002-growth-domains-location.md)
+for the rationale. The feature was renamed from "Growth Mode" to "Learning Mode" and the
+output directory was relocated from `.claude/growth/notes/` to `learn/knowledge/` in ADR-003;
+see [docs/en/adr/003-learning-mode-relocate-and-rename.md](../docs/en/adr/003-learning-mode-relocate-and-rename.md)
 for the rationale.
 
 ---
@@ -16,26 +19,26 @@ for the rationale.
 Agents read this file only when the following condition is true:
 
 ```
-.claude/growth/config.json exists
+learn/config.json exists
 AND config.json is valid JSON
 AND config.enabled === true
 ```
 
 When any of those conditions fails — config is absent, `enabled` is `false`, or the file
-is not valid JSON — agents behave as if Growth Mode does not exist. No reads of this file.
-No reads of domain files. No writes to `.claude/growth/notes/`. No `## Growth:` trailing
+is not valid JSON — agents behave as if Learning Mode does not exist. No reads of this file.
+No reads of domain files. No writes to `learn/knowledge/`. No `## Learning:` trailing
 sections. The primary artifact and all agent output are byte-identical to what they would
-be if Growth Mode were not installed.
+be if Learning Mode were not installed.
 
 This is the default-off invariant. It is the load-bearing claim of the feature. Any
-deviation from byte-identical output when Growth Mode is disabled is a defect.
+deviation from byte-identical output when Learning Mode is disabled is a defect.
 
-**Read sequence at session start (Growth Mode ON):**
+**Read sequence at session start (Learning Mode ON):**
 
-1. Read `.claude/growth/config.json`. Check `enabled`.
+1. Read `learn/config.json`. Check `enabled`.
 2. If `enabled: true`, read this file (`preamble.md`) for the enrichment protocol.
 3. At session start, this agent does NOT pre-load any domain file. It identifies candidate
-   domains from its own `## Growth Domains` section (already present in its prompt body) so
+   domains from its own `## Learning Domains` section (already present in its prompt body) so
    it knows which domains are relevant, but it reads a domain file only when a teaching
    moment actually arises for that domain.
    This keeps session-start context cost minimal and avoids loading files the agent will
@@ -45,20 +48,20 @@ deviation from byte-identical output when Growth Mode is disabled is a defect.
 
 Each agent performs this sequence independently. The orchestrator does not pre-parse the
 config or pre-read domain files on an agent's behalf. Each agent is responsible for its
-own Growth Mode read path.
+own Learning Mode read path.
 
 ---
 
 ## 2. The Enrichment Operation Contract
 
-Every growth-aware agent, when it has a teaching moment, follows this five-step contract
+Every learning-aware agent, when it has a teaching moment, follows this five-step contract
 against the target domain file.
 
 ### Step 1: Identify the target domain
 
-Map the teaching moment to a domain key the agent owns (see the `## Growth Domains`
+Map the teaching moment to a domain key the agent owns (see the `## Learning Domains`
 section at the top of this agent's prompt body). Domain key definitions are in
-`docs/en/growth/domain-taxonomy.md`.
+`docs/en/learn/domain-taxonomy.md`.
 
 If the teaching moment spans two domains, pick the one where the concept is most
 foundational. Place the primary explanation there. In the secondary domain file, write a
@@ -77,11 +80,11 @@ or cross-section of existing domains — propose a new domain in the diff report
 format:
 
 ```
-## Growth: notebook diff
-- PROPOSED NEW DOMAIN: <key> — <one-sentence rationale>. Confirm with /growth domain new <key>.
+## Learning: knowledge diff
+- PROPOSED NEW DOMAIN: <key> — <one-sentence rationale>. Confirm with /learn domain new <key>.
 ```
 
-Agents never auto-create domain files without learner confirmation via `/growth domain new <key>`.
+Agents never auto-create domain files without learner confirmation via `/learn domain new <key>`.
 
 ### Step 2: Read the current domain file
 
@@ -145,7 +148,7 @@ their understanding evolved. A session three months later that corrects the same
 again adds a second supersession marker above the first corrected version. All historical
 versions accumulate in order.
 
-**New domain** — Only after learner confirmation via `/growth domain new <key>`. See
+**New domain** — Only after learner confirmation via `/learn domain new <key>`. See
 Step 1 for the proposal format.
 
 ### Step 4: Apply the change non-destructively
@@ -162,7 +165,7 @@ Rewrite the domain file with the change integrated. The following invariants hol
   places the correction below.
 - If the domain file has grown past approximately 1200 lines or 8 top-level H2 sections,
   flag this in the diff report (`FLAG: file approaching split threshold`) rather than
-  reorganizing unilaterally. The technical-writer's `/growth review` command handles
+  reorganizing unilaterally. The technical-writer's `/learn review` command handles
   reorganization on demand.
 
 Update the front matter `last-updated` date to today's date when writing the file.
@@ -173,27 +176,27 @@ At the end of the agent's chat response — always after the primary artifact, n
 before — emit the two trailing sections:
 
 ```
-## Growth: taught this session
+## Learning: taught this session
 - <concept-name>: <one-sentence summary at the declared level>
 
-## Growth: notebook diff
-- notes/<domain>.md → <operation> on `## <section-heading>`: <one-sentence change summary>
+## Learning: knowledge diff
+- knowledge/<domain>.md → <operation> on `## <section-heading>`: <one-sentence change summary>
 ```
 
 Multiple teaching moments in the same response produce multiple bullet lines in each
 section. When a new domain was proposed but not created, use the format:
 
 ```
-## Growth: notebook diff
-- PROPOSED NEW DOMAIN: <key> — <rationale>. Confirm with /growth domain new <key>.
+## Learning: knowledge diff
+- PROPOSED NEW DOMAIN: <key> — <rationale>. Confirm with /learn domain new <key>.
 ```
 
 These sections are visible in the agent's chat response. They are not written to any
-file. They are the provenance record the learner uses to audit notebook evolution.
+file. They are the provenance record the learner uses to audit knowledge evolution.
 
-**These headers must be absent when Growth Mode is off.** When `config.json` is absent
-or has `enabled: false`, the agent's guard branch must skip all growth steps before any
-`## Growth:` text is produced.
+**These headers must be absent when Learning Mode is off.** When `config.json` is absent
+or has `enabled: false`, the agent's guard branch must skip all learning steps before any
+`## Learning:` text is produced.
 
 ---
 
@@ -203,11 +206,11 @@ The trailing sections use exactly these Markdown H2 headings, with a blank line 
 each. No variation in capitalization or punctuation.
 
 ```
-## Growth: taught this session
+## Learning: taught this session
 - <concept-name>: <one-sentence summary>
 
-## Growth: notebook diff
-- notes/<domain-file>.md → <operation> on `## <section-heading>`: <change-summary>
+## Learning: knowledge diff
+- knowledge/<domain-file>.md → <operation> on `## <section-heading>`: <change-summary>
 ```
 
 Valid operation strings: `add`, `deepen`, `refine`, `correct`.
@@ -215,26 +218,26 @@ Valid operation strings: `add`, `deepen`, `refine`, `correct`.
 When multiple entries exist:
 
 ```
-## Growth: taught this session
+## Learning: taught this session
 - Repository Pattern: a boundary object that abstracts data access so callers never see
   the database query shape.
 - Error Propagation: errors cross the persistence boundary as domain error types, not
   database-specific error types.
 
-## Growth: notebook diff
-- notes/architecture.md → add on `## Repository Pattern`: introduced pattern with
+## Learning: knowledge diff
+- knowledge/architecture.md → add on `## Repository Pattern`: introduced pattern with
   first-principles explanation; includes Go worked example.
-- notes/error-handling.md → deepen on `## Boundary Crossing`: added note on translating
+- knowledge/error-handling.md → deepen on `## Boundary Crossing`: added note on translating
   database errors at the repository boundary.
 ```
 
 When a proposed new domain is included:
 
 ```
-## Growth: notebook diff
-- notes/error-handling.md → deepen on `## Boundary Crossing`: added note.
+## Learning: knowledge diff
+- knowledge/error-handling.md → deepen on `## Boundary Crossing`: added note.
 - PROPOSED NEW DOMAIN: observability — teaching moment involved tracing patterns that do
-  not fit cleanly into operational-awareness. Confirm with /growth domain new observability.
+  not fit cleanly into operational-awareness. Confirm with /learn domain new observability.
 ```
 
 Detection rule: `/quiet` triggers trailer suppression only when it appears in the current
@@ -249,18 +252,19 @@ Specifically:
 - The detector is case-sensitive: `/QUIET` does not trigger.
 
 When this rule matches, these sections are entirely absent. No empty blocks. No
-placeholder lines. Nothing. The notebook is still updated; only the chat-visible trailer
-is omitted. The next user turn restores normal trailer behavior — no state is persisted.
+placeholder lines. Nothing. The knowledge files are still updated; only the chat-visible
+trailer is omitted. The next user turn restores normal trailer behavior — no state is persisted.
 
 ---
 
 ## 4. Level Semantics
 
 Levels control the angle and density of foundational context. They determine which
-decisions clear the threshold for a note and how much scaffolding accompanies each note.
-They do not set a token budget or a note count cap. Depth follows from the concept.
+decisions clear the threshold for a knowledge entry and how much scaffolding accompanies
+each entry. They do not set a token budget or an entry count cap. Depth follows from the
+concept.
 
-All three levels write into the same domain files. The notebook does not fork by level.
+All three levels write into the same domain files. The knowledge base does not fork by level.
 
 ### junior
 
@@ -306,10 +310,10 @@ sessions), trade-off reasoning at the bottom (from senior sessions).
 
 ### Levels do not soften severity
 
-The code-reviewer's growth content must not soften, hedge, or dilute severity labels on
-findings. CRITICAL means CRITICAL at all three levels. A growth note at `junior` that
+The code-reviewer's learning content must not soften, hedge, or dilute severity labels on
+findings. CRITICAL means CRITICAL at all three levels. A learning note at `junior` that
 explains why a finding is CRITICAL is permitted and encouraged; that explanation does not
-change the severity label. Growth content is additive to the finding, not a gloss on it.
+change the severity label. Learning content is additive to the finding, not a gloss on it.
 
 ---
 
@@ -327,7 +331,7 @@ the front matter `last-updated` date.
 
 If an agent finds itself wanting to reorder sections, rename headings, or reformat
 surrounding content, the correct action is to make a note in the diff report: "file
-organization could be improved; trigger /growth review via technical-writer." The agent
+organization could be improved; trigger /learn review via technical-writer." The agent
 does not reorganize unilaterally.
 
 ### Correction: supersede, never delete
@@ -355,10 +359,10 @@ When an entry is correct in substance but imprecise in phrasing:
 ### No summarization or compression
 
 An agent must never summarize or compress prior entries to reclaim space. Compressing
-prior content destroys exactly the kind of information that makes the notebook valuable
-months later: the exact wording of an earlier understanding, the specific example that
-was used, the naive framing that was corrected. Superseded entries accumulate with their
-markers. This is the design, not a cost to optimize around.
+prior content destroys exactly the kind of information that makes the knowledge base
+valuable months later: the exact wording of an earlier understanding, the specific example
+that was used, the naive framing that was corrected. Superseded entries accumulate with
+their markers. This is the design, not a cost to optimize around.
 
 ---
 
@@ -406,8 +410,8 @@ Agents never auto-create domain files. The invariant:
 
 1. Agent identifies a teaching moment with no matching canonical domain.
 2. Agent proposes the domain in the diff report using the format in Step 1 above.
-3. Learner runs `/growth domain new <key>`.
-4. The `/growth` Skill creates the seeded file with front matter and a Placeholder section.
+3. Learner runs `/learn domain new <key>`.
+4. The `/learn` Skill creates the seeded file with front matter and a Placeholder section.
 5. On the next session where the agent has a teaching moment for that domain, the agent
    reads the (now existing) file and applies the enrichment protocol normally.
 
@@ -415,7 +419,7 @@ Between Step 2 and Step 5, the teaching moment is captured in the diff report as
 proposal. The content is not lost — the learner can see what would have been written and
 choose whether to create the domain.
 
-The seeded file shape the `/growth` Skill creates:
+The seeded file shape the `/learn` Skill creates:
 
 ```markdown
 ---
@@ -427,16 +431,16 @@ contributing-agents: []
 # <Title-Cased Key>
 
 This is a custom domain opened by the learner. It covers concepts that do not fit
-cleanly into the 19 canonical domains defined in docs/en/growth/domain-taxonomy.md.
+cleanly into the 19 canonical domains defined in docs/en/learn/domain-taxonomy.md.
 
-Agents contribute here only when their Growth Domains section includes this key.
-The enrichment protocol is defined in .claude/growth/preamble.md.
+Agents contribute here only when their Learning Domains section includes this key.
+The enrichment protocol is defined in learn/preamble.md.
 
 ## Placeholder
 
 This section is seeded empty. The first agent with a teaching moment in this domain
 will replace this placeholder with a real section following the enrichment protocol
-in .claude/growth/preamble.md.
+in learn/preamble.md.
 ```
 
 Agents replace the Placeholder section with the first real section. The Placeholder
@@ -452,42 +456,44 @@ These prohibitions apply unconditionally at every level and for every domain.
 ### No pedagogical content in code or artifacts
 
 Do not modify code comments, inline documentation, generated artifacts, or any file
-outside `.claude/growth/notes/` and `.claude/growth/` to add pedagogical content. If a
-teaching moment belongs in a code comment, put it in the domain notes and cross-reference
-it from the diff report. The production code files are not the notebook.
+outside `learn/knowledge/` and `learn/` to add pedagogical content. Additionally, do not
+read, cite, or write under `docs/en/learn/examples/` or `docs/ja/learn/examples/` — these
+are read-only worked-example references for forkers, not part of the live learner surface.
+If a teaching moment belongs in a code comment, put it in the domain knowledge file and
+cross-reference it from the diff report. The production code files are not the knowledge base.
 
 ### No softening of review severity
 
 Do not soften, hedge, qualify, or dilute severity labels on code-reviewer findings. A
-CRITICAL finding is CRITICAL at junior, mid, and senior levels. A growth note that
+CRITICAL finding is CRITICAL at junior, mid, and senior levels. A learning note that
 explains why a finding is CRITICAL is additive and encouraged; it does not change the
-severity label. The growth section appears after the finding, not as a qualification of it.
+severity label. The learning section appears after the finding, not as a qualification of it.
 
 ### No affirmation filler
 
 Do not include "Great question", "Well done", "Excellent work", "Good catch", or any
-variant of affirmation language in any output. Growth content is informational. The
+variant of affirmation language in any output. Learning content is informational. The
 learner's behavior is not being evaluated by the agent.
 
-### No session-specific narration in notes
+### No session-specific narration in knowledge files
 
 Do not write session-specific context into domain files. "In this session we decided...",
 "While debugging the cache miss...", "Today we encountered..." are session logs, not
-domain notes. Extract the principle from the session event and write the principle. The
+domain knowledge. Extract the principle from the session event and write the principle. The
 per-response diff report is the only session-level record; domain files contain distilled
 understanding.
 
 ### No quizzes or comprehension checks
 
 Do not ask the learner to answer a question before presenting the deliverable. Do not
-structure growth content as a question. Do not gate the artifact on a learning prompt.
-The artifact is always first. Growth sections always follow. The learner is not asked to
+structure learning content as a question. Do not gate the artifact on a learning prompt.
+The artifact is always first. Learning sections always follow. The learner is not asked to
 demonstrate understanding before proceeding.
 
 ### No curriculum or sequencing
 
-Do not order growth contributions for pedagogical progression. Domain files are organized
-by concept, not by learning sequence. Each note is a standalone entry in the relevant
+Do not order learning contributions for pedagogical progression. Domain files are organized
+by concept, not by learning sequence. Each entry is a standalone record in the relevant
 section. There is no curriculum.
 
 ---
@@ -498,7 +504,7 @@ When `config.focus_domains` is a non-empty array, the following rules apply to t
 moment decisions.
 
 **In-focus primary domain:** Full enrichment entry at the declared level. Behavior
-identical to unfocused Growth Mode.
+identical to unfocused Learning Mode.
 
 **Out-of-focus primary domain, genuinely load-bearing moment:** Write normally. A
 teaching moment is load-bearing if omitting it would leave a gap that the learner is
@@ -513,46 +519,46 @@ domain is worked. Deferring means writing nothing for this moment — not writin
 shorter version of what would have been written.
 
 The judgment call — load-bearing versus marginal — is made per teaching moment, not per
-domain. An agent whose primary domain is not in focus may write zero notes in a session,
-or may write one genuinely load-bearing note, or may write several if the work happened
+domain. An agent whose primary domain is not in focus may write zero entries in a session,
+or may write one genuinely load-bearing entry, or may write several if the work happened
 to involve non-default choices in that domain.
 
 **Cross-references are always written** regardless of focus. A cross-reference link from
 an out-of-focus domain to an in-focus domain costs one line and preserves navigability.
-The rule against marginal notes does not suppress cross-references.
+The rule against marginal entries does not suppress cross-references.
 
 This focus model means the learner can say "I am studying concurrency this month" and
-the notebook intensifies teaching effort in `concurrency-and-async` without going silent
-on everything else. Genuinely important teaching moments from any domain remain visible.
-The focus signal changes the threshold for what counts as worth recording outside the
-focus list, not what counts as worth understanding.
+the knowledge base intensifies teaching effort in `concurrency-and-async` without going
+silent on everything else. Genuinely important teaching moments from any domain remain
+visible. The focus signal changes the threshold for what counts as worth recording outside
+the focus list, not what counts as worth understanding.
 
 ---
 
 ## 10. Orchestrator Serialization for Concurrent Domain Writes
 
 When the orchestrator delegates to two or more agents in a single workflow turn, and
-those agents have overlapping Growth Domains, they must not write to the same domain
+those agents have overlapping Learning Domains, they must not write to the same domain
 file in parallel. The invariant: a domain file write is a read-modify-write cycle, and
 two concurrent read-modify-write cycles that start from the same pre-edit file will lose
 one agent's contribution when the second write commits.
 
 **The rule the orchestrator follows:**
 
-Before dispatching agents in parallel, inspect the Growth Domains lists of all agents
+Before dispatching agents in parallel, inspect the Learning Domains lists of all agents
 to be dispatched. If any two agents share at least one domain key, the agents that share
 domains must run sequentially — the first agent completes its full enrichment cycle
 (including writing the domain file), then the second agent starts from the updated file.
 
-Agents with entirely disjoint Growth Domains may run in parallel without restriction.
+Agents with entirely disjoint Learning Domains may run in parallel without restriction.
 Their domain file writes cannot conflict.
 
 **Example:**
 
 Architect (Primary: `architecture, api-design, data-modeling`) and
 code-reviewer (Secondary includes `architecture`) share `architecture`. The orchestrator
-must sequence their growth-writing phases: architect writes first, code-reviewer reads the
-updated `architecture.md` before writing its own contribution.
+must sequence their learning-writing phases: architect writes first, code-reviewer reads
+the updated `architecture.md` before writing its own contribution.
 
 **This is an orchestrator-side concern.** This preamble documents the rule so agents
 understand why they may be sequenced rather than parallelized, but enforcement is the
@@ -585,9 +591,9 @@ it by number. Do not generate Tier 2 citations for ADRs that have not been writt
 the decision has not been formally recorded, note that the reasoning is local convention
 and flag it as a candidate for an ADR.
 
-**Tier 3 — Prior domain notes:** Entries already in `.claude/growth/notes/` from prior
+**Tier 3 — Prior domain entries:** Entries already in `learn/knowledge/` from prior
 sessions. Use to build on what exists and to add cross-references. Tier 3 is the lowest
-authority; prior notes establish what the learner has already encountered, not ground
+authority; prior entries establish what the learner has already encountered, not ground
 truth.
 
 ---
@@ -643,14 +649,20 @@ cost of eventual consistency").
 
 ## 14. Cross-Reference to Supporting Files
 
-- **Config:** `.claude/growth/config.json` — state file read at session start.
-- **Toggle Skill:** `.claude/skills/growth/SKILL.md` — the only surface through which
+- **Config:** `learn/config.json` — state file read at session start.
+- **Toggle Skill:** `.claude/skills/learn/SKILL.md` — the only surface through which
   config is written.
-- **Domain files:** `.claude/growth/notes/<domain>.md` — 19 canonical domains plus any
-  learner-opened custom domains.
-- **Domain taxonomy (authoritative):** `docs/en/growth/domain-taxonomy.md` — canonical
+- **Domain files:** `learn/knowledge/<domain>.md` — 19 canonical domains plus any
+  learner-opened custom domains; files are lazy-materialized on first teaching moment.
+- **Domain taxonomy (authoritative):** `docs/en/learn/domain-taxonomy.md` — canonical
   definitions, scope boundaries, and per-agent ownership matrix.
-- **Architecture decision record:** `docs/en/adr/001-developer-growth-mode.md` — design
-  decisions, rationale, and implementation notes for this feature.
-- **CLAUDE.md pointer:** `.claude/CLAUDE.md` — the `## Developer Growth Mode` block that
+- **Worked examples (read-only references):** `docs/en/learn/examples/<domain>.md` —
+  realistic populated knowledge files from a shared fictional project (Meridian).
+  Shipping in v2.1.0 (PR #2); not present in the v2.0.0 tree. Agents never read, cite,
+  or write under this tree when it exists.
+- **Architecture decision records:** `docs/en/adr/001-developer-growth-mode.md` (original
+  design, partially superseded), `docs/en/adr/002-growth-domains-location.md` (prompt-body
+  declaration), `docs/en/adr/003-learning-mode-relocate-and-rename.md` (v2.0.0 rename and
+  relocation).
+- **CLAUDE.md pointer:** `.claude/CLAUDE.md` — the `## Developer Learning Mode` block that
   agents discover on session start.

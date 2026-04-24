@@ -1,25 +1,25 @@
-# .gitignore.example — Developer Growth Mode sharing options
+# .gitignore.example — Developer Learning Mode sharing options
 
-# Default (mirrored in .gitignore): notes and config are gitignored.
-# Notes contain a learner's mistakes, prior understanding, and revision history.
+# Default (mirrored in .gitignore): knowledge files and config are gitignored.
+# Knowledge files contain a learner's mistakes, prior understanding, and revision history.
 # That is private learning material by default.
-.claude/growth/notes/
-.claude/growth/config.json
+learn/knowledge/
+learn/config.json
 
-# --- OPT-IN: Share the team textbook ---
+# --- OPT-IN: Share the team knowledge base ---
 #
-# If your team wants a shared domain-organized textbook that accumulates across
-# everyone's sessions, remove the `.claude/growth/notes/` line above and add
+# If your team wants a shared domain-organized knowledge base that accumulates across
+# everyone's sessions, remove the `learn/knowledge/` line above and add
 # the inversion pattern below to your real .gitignore.
 #
 # The config.json remains gitignored even in shared mode — level and focus are
 # per-developer preferences, not team state.
 #
-# !.claude/growth/notes/
-# !.claude/growth/notes/**
+# !learn/knowledge/
+# !learn/knowledge/**
 #
 # Considerations before opting in:
-#   - Notes will contain revision history ("Superseded 2026-05-14: ...") visible to the team.
-#   - A junior's foundational notes and a senior's trade-off notes will coexist.
-#     That is the point of the layered textbook, but the team should be ready for it.
-#   - Notes reveal the team's mistakes over time. Psychological safety matters.
+#   - Knowledge files will contain revision history ("Superseded 2026-05-14: ...") visible to the team.
+#   - A junior's foundational entries and a senior's trade-off entries will coexist.
+#     That is the point of the layered knowledge base, but the team should be ready for it.
+#   - Knowledge files reveal the team's mistakes over time. Psychological safety matters.

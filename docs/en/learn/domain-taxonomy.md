@@ -1,20 +1,22 @@
-# Domain Taxonomy: Developer Growth Mode Notes
+# Domain Taxonomy: Developer Learning Mode
 
-This document defines the canonical knowledge domains into which Growth Mode notes accumulate, the agents that contribute to each domain, and the structure that domain files follow as they grow over time.
+> **Partially superseded.** [ADR-003](../adr/003-learning-mode-relocate-and-rename.md) (2026-04-24) renamed the feature from "Growth Mode" to "Learning Mode," moved domain files from `.claude/growth/notes/` to `learn/knowledge/`, and replaced the terms "notes/notebook" with "knowledge." The domain definitions, ownership matrix, and enrichment protocol in this document remain current. This file has been updated to reflect the new terminology and paths. The prior location of this file was `docs/en/growth/domain-taxonomy.md`.
 
-Developer Growth Mode is not a feature with a fixed curriculum. It is a mechanism for capturing teaching moments as they arise during real work. Notes are organized by domain, not by date. Over time, a domain file becomes a personal reference text built incrementally across many sessions — what this project calls a "textbook-in-progress."
+This document defines the canonical knowledge domains into which Learning Mode knowledge accumulates, the agents that contribute to each domain, and the structure that domain files follow as they grow over time.
+
+Developer Learning Mode is not a feature with a fixed curriculum. It is a mechanism for capturing teaching moments as they arise during real work. Knowledge is organized by domain, not by date. Over time, a domain file becomes a personal reference text built incrementally across many sessions — what this project calls a "textbook-in-progress."
 
 ---
 
 ## Purpose and Design Philosophy
 
-### What Growth Notes Are
+### What Learning Notes Are
 
-A Growth Note is a short, verifiable explanation attached to agent output that teaches *why* a decision was made. It names a pattern, cites a trade-off, or points to canonical documentation. Growth Notes never alter the artifact; they are post-deliverable annotations.
+A Learning Note is a short, verifiable explanation attached to agent output that teaches *why* a decision was made. It names a pattern, cites a trade-off, or points to canonical documentation. Learning Notes never alter the artifact; they are post-deliverable annotations.
 
-### What Notes Become
+### What Knowledge Becomes
 
-Individual notes accumulate in domain files under `.claude/growth/notes/`. A domain file is not a journal (chronological, session-keyed), not a wiki (curated by editors), and not a curriculum (ordered by pedagogical sequence). It is a **domain-organized reference text** where entries deepen, refine, and occasionally supersede each other over time. A developer who revisits a domain file weeks or months later should find it richer and more confident than the last time they read it.
+Individual knowledge entries accumulate in domain files under `learn/knowledge/`. A domain file is not a journal (chronological, session-keyed), not a wiki (curated by editors), and not a curriculum (ordered by pedagogical sequence). It is a **domain-organized reference text** where entries deepen, refine, and occasionally supersede each other over time. A developer who revisits a domain file weeks or months later should find it richer and more confident than the last time they read it.
 
 ### Why Domains, Not Sessions
 
@@ -24,7 +26,7 @@ Session-keyed notes (e.g., "2026-04-22 session notes") are useful for reflection
 
 ## Canonical Domain List (19 domains)
 
-Each domain is a distinct knowledge area that grows as agents contribute during their work. Domains are listed here with their file names, scope definitions, and the lens by which each experience level learns in that domain. Beyond these 19 canonical domains, learners may open custom domain files as needed (e.g., "on-call-readiness," "accessibility-audit") organized under `.claude/growth/notes/custom/`.
+Each domain is a distinct knowledge area that grows as agents contribute during their work. Domains are listed here with their file names, scope definitions, and the lens by which each experience level learns in that domain. Beyond these 19 canonical domains, learners may open custom domain files as needed (e.g., "on-call-readiness," "accessibility-audit") organized under `learn/knowledge/custom/`.
 
 ### 1. architecture
 
@@ -403,7 +405,7 @@ This table maps each of the 15 agents to the domains they primarily enrich (✓ 
 - **Docs-researcher** leads ecosystem-fluency (verifying framework behavior) and supports dependency-management (checking package docs).
 - **Devops-engineer** owns release-and-deployment and operational-awareness, with secondary dependency-management (for deployment supply chain).
 - **Market-analyst** leads market-reasoning and supports business-modeling; **monetization-strategist** leads business-modeling.
-- **Technical-writer** owns documentation-craft, the sole primary owner of that domain; other agents support secondarily through their own notes.
+- **Technical-writer** owns documentation-craft, the sole primary owner of that domain; other agents support secondarily through their own knowledge entries.
 - **Architect** informs architecture, api-design, and data-modeling but delegates implementation details to implementer and reviewer.
 - **UI-UX-designer** owns ui-ux-craft, the sole primary owner of design quality and user interface principles; provides secondary input to architecture and implementation on design integration.
 
@@ -574,7 +576,7 @@ End of worked example.
 
 ## Enrichment Protocol
 
-This section describes how agents and the developer maintain and refine domain notes.
+This section describes how agents and the developer maintain and refine domain knowledge files.
 
 ### When to Create, Deepen, Refine, or Correct
 
@@ -620,7 +622,7 @@ This creates a web of connections without requiring a separate index. A develope
 
 ### Voice and Tense for Long-Term Readability
 
-Write domain notes as if the reader will re-read them months later, out of session context:
+Write domain knowledge files as if the reader will re-read them months later, out of session context:
 
 - **Voice**: Neutral, explanatory, not session-personal. Avoid "we discussed," "I discovered." Use "the project," "this pattern," "research shows."
 - **Tense**: Present tense for enduring truths ("event sourcing separates writes from reads"), past tense for project decisions ("this project chose PostgreSQL over MongoDB in 2025 because...").
@@ -641,7 +643,7 @@ Do NOT include:
 
 ## Domain Lens: What Each Level Learns
 
-For each domain, this section describes what junior, mid, and senior developers are learning when they encounter Growth Notes in that domain.
+For each domain, this section describes what junior, mid, and senior developers are learning when they encounter Learning Notes in that domain.
 
 | Domain | Junior Lens | Mid Lens | Senior Lens |
 |--------|-------------|----------|-------------|
@@ -673,10 +675,10 @@ To make the taxonomy concrete, here are two example "state of notes" snapshots a
 
 ### Example 1: Flutter Mobile App
 
-After ~20 sessions working on a Flutter mobile app, the `.claude/growth/notes/` directory looks like:
+After ~20 sessions working on a Flutter mobile app, the `learn/knowledge/` directory looks like:
 
 ```
-.claude/growth/notes/
+learn/knowledge/
 ├── architecture.md
 │   - Widget composition patterns (inherited from Flutter conventions)
 │   - State management: when Riverpod, when local State<T>
@@ -725,7 +727,7 @@ Domains like `api-design` and `security-mindset` exist but are sparse (API desig
 After ~20 sessions on a Go backend service:
 
 ```
-.claude/growth/notes/
+learn/knowledge/
 ├── architecture.md
 │   - Interfaces for dependency injection
 │   - When to split services: monolith to microservice
@@ -800,7 +802,7 @@ In both cases, the domains are the same, but the content and depth reflect the p
 
 ---
 
-## What NOT to Put in Notes
+## What NOT to Put in Knowledge Files
 
 Agents and developers should explicitly exclude:
 
@@ -809,24 +811,24 @@ Agents and developers should explicitly exclude:
 - **User PII** — No customer names, email addresses, internal identifiers.
 - **Private secrets** — No API keys, passwords, or private configuration values.
 - **Dated references to "current" state** — "As of April 2026, the framework doesn't support X." In 6 months, that may be false. Say instead, "The framework historically lacked X; if this has changed, update this section."
-- **Session-specific narration** — "In this session we decided…" phrasing. Domain notes are distilled into timeless concepts; the per-response notebook diff is the only session-level record.
+- **Session-specific narration** — "In this session we decided…" phrasing. Domain knowledge files are distilled into timeless concepts; the per-response knowledge diff is the only session-level record.
 - **Blame or emotion** — "The old code was terrible." Instead: "Earlier versions used [pattern]; this was replaced because [reason]."
 - **Quizzes or homework** — "Can you think of why we use event sourcing?" No. Explain the reason.
 - **Affirmation or praise** — "Great job recognizing this pattern!" Stick to facts.
 
 ---
 
-## Relationship to Other Growth Mode Files
+## Relationship to Other Learning Mode Files
 
 This taxonomy document is the **reference**. Alongside it exist:
 
-- **`.claude/growth/config.json`** — User's active level and per-agent scope. Not a knowledge file. Gitignored by default.
-- **`.claude/growth/preamble.md`** — The enrichment contract shared by all 15 growth-aware agents. It references this taxonomy.
-- **`.claude/growth/notes/<domain>.md`** — The 19 canonical domain files plus any learner-opened custom domains. Pre-seeded at install; enriched, deepened, and refined by agents over time. Gitignored by default; opt-in to share via `.gitignore.example`.
+- **`learn/config.json`** — User's active level and per-agent scope. Not a knowledge file. Gitignored by default.
+- **`learn/preamble.md`** — The enrichment contract shared by all 15 learning-aware agents. It references this taxonomy.
+- **`learn/knowledge/<domain>.md`** — The 19 canonical domain files plus any learner-opened custom domains. Created lazily on first teaching moment; enriched, deepened, and refined by agents over time. Gitignored by default; opt-in to share via `.gitignore.example`.
 
 The flow is: **Agent encounters a teaching moment → Agent reads the relevant domain file → Agent decides add/deepen/refine/correct/new-domain → Agent applies the change non-destructively and reports the diff in its response → Future sessions open the same domain file and layer on further understanding.**
 
-There is no chronological journal. The per-response "notebook diff" in the chat output is the session-level provenance record; git history is the long-term audit trail.
+There is no chronological journal. The per-response "knowledge diff" in the chat output is the session-level provenance record; git history is the long-term audit trail.
 
 ---
 
@@ -842,17 +844,17 @@ Changes to the taxonomy are recorded in this file's revision history, and ADRs a
 
 ---
 
-## Getting Started: First Session with Growth Mode
+## Getting Started: First Session with Learning Mode
 
-A developer enabling growth mode for the first time should:
+A developer enabling Learning Mode for the first time should:
 
 1. Read this taxonomy document to understand what domains exist.
-2. Run `/growth on junior` to activate.
-3. Work normally; agents will enrich the domain files as teaching moments arise.
-4. At the end of a session, review the per-response "notebook diff" trailers to see which domain files were touched.
-5. Open `.claude/growth/notes/<domain>.md` for any domain that was enriched to read the accumulated material.
+2. Run `/learn on junior` to activate.
+3. Work normally; agents will create and enrich domain knowledge files as teaching moments arise.
+4. At the end of a session, review the per-response "knowledge diff" trailers to see which domain files were touched.
+5. Open `learn/knowledge/<domain>.md` for any domain that was enriched to read the accumulated material.
 
-The 19 canonical domain files are pre-seeded at install time with a minimal placeholder. They fill out as agents encounter teaching moments in the domains they own.
+Domain files do not exist on a fresh clone; `learn/knowledge/` is empty until agents encounter real teaching moments. The first enrichment for a domain creates the file using the seed shape defined in `learn/preamble.md`.
 
 ---
 
@@ -862,11 +864,11 @@ The 19 canonical domain files are pre-seeded at install time with a minimal plac
 A: Domains are organized by concern, not by artifact type. There will be some overlap (e.g., "error handling" and "testing discipline" both care about exception safety). That is expected. Link between them. If you find yourself constantly jumping between two domains and they feel like one concept, raise the question: should they be merged?
 
 **Q: Who maintains the domain files?**  
-A: Anyone can contribute — agents during their work, developers reflecting on sessions, code reviewers surfacing patterns. There is no centralized curator. The repository is the owner; PRs review changes to domain files the same way they review code.
+A: Anyone can contribute — agents during their work, developers reflecting on sessions, code reviewers surfacing patterns. There is no centralized curator. The repository is the owner; PRs review changes to knowledge files the same way they review code.
 
 **Q: Can I delete a domain if it becomes irrelevant?**  
 A: Domains are rarely deleted. Instead, mark them deprecated in the taxonomy and archive the file. A future project or team might find value in that knowledge.
 
 **Q: What if an agent's understanding of a domain is wrong?**  
-A: The domain file is not an agent's source of truth; it is a record of the team's understanding so far. If an agent (or a developer) finds a section inaccurate, open it, write the corrected version, and archive the old one in "Prior Understanding." The file evolves toward truth over time.
+A: The domain file is not an agent's source of truth; it is a record of the team's understanding so far. If an agent (or a developer) finds a section inaccurate, open it, write the corrected version, and archive the old one in "Prior Understanding." The knowledge base evolves toward truth over time.
 

@@ -4,6 +4,10 @@
 
 Proposed (stabilized). Supersedes earlier drafts of this ADR per owner decisions recorded 2026-04-22.
 
+> **Partially superseded 2026-04-24 by [ADR-003](003-learning-mode-relocate-and-rename.md):** the directory layout (`.claude/growth/notes/` → `learn/knowledge/`), the feature name ("Growth Mode" → "Learning Mode"), the Skill command (`/growth` → `/learn`), and the terms "notes/notebook" → "knowledge" are revised in ADR-003. The architectural substance (levels, enrichment contract, trailers, default-off invariant) remains governed by this ADR.
+>
+> **Note on links below.** The Metadata section and body of this ADR intentionally preserve their v1.x path references (`docs/en/prd/developer-growth-mode.md`, `docs/en/growth/domain-taxonomy.md`, `docs/en/growth-mode-explained.md`, `scripts/check-growth-invariants.sh`, etc.) as a historical record. Those files were renamed in v2.0.0 per ADR-003; use the current paths in [ADR-003](003-learning-mode-relocate-and-rename.md) or [docs/en/index.md](../index.md) to navigate to the live equivalents.
+
 ## Metadata
 
 - Date: 2026-04-22

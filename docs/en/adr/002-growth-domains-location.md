@@ -4,6 +4,8 @@
 
 Accepted. 2026-04-23.
 
+> **Partially superseded 2026-04-24 by [ADR-003](003-learning-mode-relocate-and-rename.md):** the `## Growth Domains` section marker in agent prompt bodies is renamed to `## Learning Domains` (and the feature is renamed from "Growth Mode" to "Learning Mode"). The architectural decision recorded here — prompt-body declaration, CI re-anchor, schema compliance — remains governed by this ADR.
+
 ## Metadata
 
 - Date: 2026-04-23

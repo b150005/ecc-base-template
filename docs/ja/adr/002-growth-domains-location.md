@@ -1,3 +1,5 @@
+> **2026-04-24 に [ADR-003](003-learning-mode-relocate-and-rename.md) により部分的に supersede されました:** `## Growth Domains` セクションマーカーは `## Learning Domains` に改名されました (機能名も Learning Mode に改名)。設計上の決定 (prompt body 宣言、CI 再アンカー) は本 ADR が引き続き管理します。
+
 # ADR-002: `growth_domains` を sub-agent フロントマターから外す
 
 > English source: [docs/en/adr/002-growth-domains-location.md](../../en/adr/002-growth-domains-location.md)
