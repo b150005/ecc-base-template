@@ -47,7 +47,7 @@ New paths added in v2.0.0 with no v1.x equivalent:
 If you have never run `/growth on` (v1.x command) or `/learn on` (v2.0.0 command), your fork has no accumulated knowledge files and no `config.json`. The migration is documentation-only:
 
 1. Pull the v2.0.0 template changes into your fork.
-2. Confirm that `learn/knowledge/` exists as an empty directory and is listed in `.gitignore`.
+2. Confirm that `.gitignore` lists `learn/knowledge/` and `learn/config.json`. The `learn/knowledge/` directory does **not** exist on disk yet — per the lazy-materialize invariant in [ADR-003 §4](../adr/003-learning-mode-relocate-and-rename.md), it is created on the first teaching moment after `/learn on`.
 3. No further action is required. The feature remains off by default.
 
 ## If Your Fork Has Enabled Learning Mode and Accumulated Knowledge

@@ -18,7 +18,7 @@ The two sections are `## Learning: taught this session` and `## Learning: knowle
 
 Note depth follows the concept being explained, not an artificial budget. A junior-level explanation of a foundational pattern is several paragraphs because it needs to build scaffolding from first principles. A senior-level trade-off note may be a single paragraph because that is what the decision demands. There are no length caps — no token budgets, no note counts, no sentence limits. The artifact — the code, the architecture document, the test file, the security report — is always first. The Learning trailers always follow.
 
-To see what a fully populated knowledge file looks like after many sessions on a real project, refer to the worked examples at `docs/en/learn/examples/<domain>.md`. These are read-only references grounded in a shared fictional project; agents never read or write to them. They exist so you can calibrate expectations before your own `learn/knowledge/` directory accumulates real content.
+To see what a fully populated knowledge file looks like after many sessions on a real project, refer to the worked examples at `docs/en/learn/examples/<domain>.md` (shipping in v2.1.0 — see [ADR-003 §5](adr/003-learning-mode-relocate-and-rename.md)). These are read-only references grounded in a shared fictional project; agents never read or write to them. They exist so you can calibrate expectations before your own `learn/knowledge/` directory accumulates real content.
 
 ---
 
@@ -218,4 +218,4 @@ Learning Notes are brief, but the domain knowledge files take the space they nee
 - [PRD](prd/developer-learning-mode.md) — functional requirements, non-functional requirements, and acceptance criteria.
 - [Domain taxonomy](learn/domain-taxonomy.md) — authoritative list of the 19 canonical domains and their owners.
 - `learn/preamble.md` — the enrichment contract every learning-aware agent follows at runtime.
-- `docs/en/learn/examples/<domain>.md` — read-only worked examples showing what populated knowledge files look like, grounded in the Meridian reference project.
+- `docs/en/learn/examples/<domain>.md` — read-only worked examples showing what populated knowledge files look like, grounded in the Meridian reference project *(shipping in v2.1.0)*.

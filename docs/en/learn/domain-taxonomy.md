@@ -405,7 +405,7 @@ This table maps each of the 15 agents to the domains they primarily enrich (✓ 
 - **Docs-researcher** leads ecosystem-fluency (verifying framework behavior) and supports dependency-management (checking package docs).
 - **Devops-engineer** owns release-and-deployment and operational-awareness, with secondary dependency-management (for deployment supply chain).
 - **Market-analyst** leads market-reasoning and supports business-modeling; **monetization-strategist** leads business-modeling.
-- **Technical-writer** owns documentation-craft, the sole primary owner of that domain; other agents support secondarily through their own notes.
+- **Technical-writer** owns documentation-craft, the sole primary owner of that domain; other agents support secondarily through their own knowledge entries.
 - **Architect** informs architecture, api-design, and data-modeling but delegates implementation details to implementer and reviewer.
 - **UI-UX-designer** owns ui-ux-craft, the sole primary owner of design quality and user interface principles; provides secondary input to architecture and implementation on design integration.
 
@@ -576,7 +576,7 @@ End of worked example.
 
 ## Enrichment Protocol
 
-This section describes how agents and the developer maintain and refine domain notes.
+This section describes how agents and the developer maintain and refine domain knowledge files.
 
 ### When to Create, Deepen, Refine, or Correct
 

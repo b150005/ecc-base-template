@@ -4,7 +4,11 @@
 
 > **想定読者**: Learning Mode を有効化する前に挙動を理解しておきたい学習者やチームリード、あるいは既に有効化していて、ある応答がなぜそのトレーラーを出したのかを理解したい読者。[README.ja.md](../../README.ja.md) 内の短い紹介に対するロングフォーム版です。
 >
-> **Source of Truth**: 正典の設計は [ADR-001](adr/001-developer-growth-mode.md)、機能仕様は [PRD](prd/developer-learning-mode.md)、ドメイン一覧は [ドメイン分類体系](learn/domain-taxonomy.md) にあります。本解説はこれらを学習者向けに言い換えたもので、新しいポリシーを追加しません。
+> **Source of Truth**: 正典の設計は [ADR-001](adr/001-developer-growth-mode.md)（[ADR-003](adr/003-learning-mode-relocate-and-rename.md) により一部 supersede）、機能仕様は [PRD](prd/developer-learning-mode.md)、ドメイン一覧は [ドメイン分類体系](learn/domain-taxonomy.md) にあります。本解説はこれらを学習者向けに言い換えたもので、新しいポリシーを追加しません。
+
+---
+
+> **v2.0.0 移行ノート**: 本機能は v2.0.0 で "Developer Growth Mode" から "Developer Learning Mode" に改名され、ナレッジディレクトリが再配置されました（詳細は [ADR-003](adr/003-learning-mode-relocate-and-rename.md) を参照）。v1.x で本機能を有効化しており、`.claude/growth/notes/` 配下にコンテンツを蓄積していた場合は、移行ガイド [`docs/ja/migration/v1-to-v2.md`](migration/v1-to-v2.md) に従って、ナレッジファイルを新しい配置 `learn/knowledge/` へ移動してください。
 
 ---
 

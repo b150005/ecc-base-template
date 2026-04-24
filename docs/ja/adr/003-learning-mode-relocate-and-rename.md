@@ -67,14 +67,16 @@ v1.x は `.claude/growth/notes/*.md` に 19 個のプレースホルダーファ
 
 ### 5. 別途読み取り専用の参考ファイルとして作業事例を提供する
 
-学習者がポピュレートされた knowledge ファイルの見た目をすぐに把握できるよう、v2.0.0 では 19 個の作業事例を `docs/en/learn/examples/<domain>.md`（および日本語ミラーを `docs/ja/learn/examples/`）に同梱します。これらは以下の性質を持ちます。
+> **実装は v2.1.0（PR #2）に延期されました。** 読み取り専用リファレンスとしての作業事例を `docs/en/learn/examples/<domain>.md` に配置するという決定は、ADR-003 の設計の一部として本文書に記録されています。19 個の Meridian に基づくファイルは、coaching pillar（ADR-004）と合わせて後続 PR（v2.1.0）で作成・同梱されます。v2.0.0 PR（#6）はすでに大規模で、事例は 48 エージェント時間程度の執筆が必要なためです。これらの存在に依存する挙動はありません — 遅延マテリアライズ不変式（§4）は単独で成立します。
+
+学習者がポピュレートされた knowledge ファイルの見た目をすぐに把握できるよう、v2.1.0 では 19 個の作業事例を `docs/en/learn/examples/<domain>.md`（および日本語ミラーを `docs/ja/learn/examples/`）に同梱します。これらは以下の性質を持ちます。
 
 - **読み取り専用のリファレンス。** エージェントは `docs/en/learn/examples/` の下を読んだり引用したり書き込んだりしません。preamble の読み書き対象は、このツリーを明示的に除外しています（§8）。
 - **共通の架空プロジェクトに基づいている。** 19 個の事例すべてが *Meridian*（B2B タスク管理 SaaS：Go + Gin + PostgreSQL + Redis バックエンド、React + TanStack Query フロントエンド、Kubernetes + GitHub Actions デプロイ）を参照します。ドメインをまたいだ参照が自然に感じられるよう設計されています。
 - **レベルを意識している。** 各コンセプトエントリには、ADR-001 の 3 段階推論ラダーに合わせて `[JUNIOR]`、`[MID]`、`[SENIOR]` のマークが付いています。
 - **ライブコンテンツと明確に区別されている。** すべての事例ファイルは、それが読み取り専用のリファレンスであってユーザーが生成したファイルではないことを明示するバナーで始まります。
 
-事例は遅延マテリアライズとの共存を意図しています。フレッシュなフォークは `learn/knowledge/` が空で、`docs/en/learn/examples/` に 19 個のポピュレートされたファイルがある状態になります。学習者は事例を読んでフォーマットを理解し、学びの機会が発生するにつれて自分自身の知識ベースを育てていきます。
+事例は遅延マテリアライズとの共存を意図しています。v2.1.0 が出荷された後は、フレッシュなフォークは `learn/knowledge/` が空で、`docs/en/learn/examples/` に 19 個のポピュレートされたファイルがある状態になります。学習者は事例を読んでフォーマットを理解し、学びの機会が発生するにつれて自分自身の知識ベースを育てていきます。v2.1.0 出荷前（すなわち v2.0.0 と v2.1.0 の間）は `docs/en/learn/examples/` ツリーは存在せず、学習者は preamble と解説のみを参照することになります。
 
 ## 検討した代替案
 
@@ -134,18 +136,20 @@ v1.x は `.claude/growth/notes/*.md` に 19 個のプレースホルダーファ
 8. **ADR-001 および ADR-002。** 両方に supersession ヘッダーと用語パスを追加。歴史的記録を保全するため本文の書き直しは行わない。
 9. **README.md および README.ja.md。** 用語とパスのパス、v2.0.0 破壊的変更バナーをトップに追加。
 10. **CLAUDE.md。** プロジェクトテンプレートの指示ブロックを Learning Mode と新しいパスを参照するよう更新。
-11. **ファイルシステムのマイグレーション。** `.claude/growth/notes/`（19 個のプレースホルダー全体）を削除。`learn/config.json` と `learn/preamble.md` を旧ロケーションから作成。19 個の Meridian に基づく事例ファイルで `docs/en/learn/examples/` を作成。
+11. **ファイルシステムのマイグレーション。** `.claude/growth/notes/`（19 個のプレースホルダー全体）を削除。`learn/config.json` と `learn/preamble.md` を旧ロケーションから再配置。19 個の Meridian に基づく事例ファイルによる `docs/en/learn/examples/` の作成は **v2.1.0（PR #2）に延期**（下記「作業事例の成果物」を参照）。
 12. **CHANGELOG.md。** 破壊的変更バナーとマイグレーションガイドへのリンクを含む v2.0.0 エントリ。
 13. **マイグレーションガイド。** `docs/en/migration/v1-to-v2.md`（および `docs/ja/migration/v1-to-v2.md`）——散文のみ。機能を有効化してナレッジを commit しているフォーク向けに `git mv` と検索置換の手順をカバーする。
 
-### 作業事例の成果物
+### 作業事例の成果物（v2.1.0 / PR #2 に延期）
+
+> **ステータス:** 決定は本文書に記録されているが、実装は v2.0.0 から v2.1.0（PR #2）へ coaching pillar と合わせて延期。以下に列挙するファイルは v2.0.0 のツリーには存在せず、後続 PR で作成される。
 
 - 19 ファイルを `docs/en/learn/examples/<domain>.md` に配置。各ファイル 350〜500 行、1 ファイルにつき 3〜5 個のコンセプトエントリ。
 - 共通参照プロジェクト: **Meridian**（B2B タスク管理 SaaS、Go + Gin + PostgreSQL + Redis バックエンド、React + TanStack Query フロントエンド、Kubernetes + GitHub Actions）。
 - technical-writer が共通テンプレートと 5 つのリファレンス事例（testing-discipline、api-design、architecture、error-handling、market-reasoning）を品質基準として作成。
 - ドメイン担当エージェントが残り 14 件を作成し、リファレンス事例を引用する。
 - technical-writer が最終的な声の一貫性パスを実施。
-- 日本語ミラーを `docs/ja/learn/examples/` に同一 PR で作成。
+- 日本語ミラーを `docs/ja/learn/examples/` に同一後続 PR で作成。
 
 ### ADR-003 のスコープ外
 

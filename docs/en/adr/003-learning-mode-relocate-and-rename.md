@@ -65,14 +65,16 @@ v1.x shipped 19 placeholder files at `.claude/growth/notes/*.md`. v2.0.0 ships *
 
 ### 5. Ship worked examples as a separate, read-only reference
 
-To give learners an immediate sense of what a populated knowledge file looks like, v2.0.0 ships 19 worked examples at `docs/en/learn/examples/<domain>.md` (and Japanese mirrors at `docs/ja/learn/examples/`). These are:
+> **Implementation deferred to v2.1.0 (PR #2).** The decision to ship worked examples as read-only references at `docs/en/learn/examples/<domain>.md` is recorded here as part of ADR-003's design. The 19 Meridian-grounded files are authored and landed in a follow-up PR (v2.1.0) alongside the coaching pillar (ADR-004), because the v2.0.0 PR (#6) was already large and the examples require ~48 agent-hours of authoring. No behavior depends on their presence — the lazy-materialize invariant (§4) stands alone.
+
+To give learners an immediate sense of what a populated knowledge file looks like, v2.1.0 ships 19 worked examples at `docs/en/learn/examples/<domain>.md` (and Japanese mirrors at `docs/ja/learn/examples/`). These are:
 
 - **Read-only references.** Agents never read, cite, or write under `docs/en/learn/examples/`. The preamble's read/write surface explicitly excludes this tree (§8).
 - **Grounded in a shared fictional project.** All 19 examples reference *Meridian*, a B2B task-management SaaS (Go + Gin + PostgreSQL + Redis backend, React + TanStack Query frontend, Kubernetes + GitHub Actions deployment). Cross-domain references feel earned rather than invented.
 - **Level-aware.** Each concept entry is marked `[JUNIOR]`, `[MID]`, or `[SENIOR]` to match the three-level reasoning ladder from ADR-001.
 - **Clearly distinguished from live content.** Every example file opens with a banner stating it is a read-only reference and not a user-generated file.
 
-The examples are coexistence-friendly with lazy-materialize: a fresh fork has an empty `learn/knowledge/` and 19 populated `docs/en/learn/examples/` files. Learners read the examples to understand the format, then grow their own knowledge base as teaching moments fire.
+The examples are coexistence-friendly with lazy-materialize: after v2.1.0 ships, a fresh fork has an empty `learn/knowledge/` and 19 populated `docs/en/learn/examples/` files. Learners read the examples to understand the format, then grow their own knowledge base as teaching moments fire. Before v2.1.0 ships (i.e., between v2.0.0 and v2.1.0), the `docs/en/learn/examples/` tree does not exist; learners rely on the preamble and explainer alone.
 
 ## Alternatives Considered
 
@@ -132,18 +134,20 @@ This is PR #1 of the v2.0.0 release. The coaching pillar (Output Styles–compat
 8. **ADR-001 and ADR-002.** Both get supersession headers and terminology passes. Body rewrites are avoided to preserve historical record.
 9. **README.md and README.ja.md.** Terminology and path pass; v2.0.0 breaking-change banner at top.
 10. **CLAUDE.md.** Project template instruction block updates to reference Learning Mode and new paths.
-11. **Filesystem migration.** Delete `.claude/growth/notes/` (all 19 placeholders). Create `learn/config.json` and `learn/preamble.md` from their old locations. Create `docs/en/learn/examples/` with 19 Meridian-grounded example files.
+11. **Filesystem migration.** Delete `.claude/growth/notes/` (all 19 placeholders). Relocate `learn/config.json` and `learn/preamble.md` from their old locations. Creation of `docs/en/learn/examples/` with 19 Meridian-grounded example files is **deferred to v2.1.0 (PR #2)** — see the "Worked examples deliverable" subsection below.
 12. **CHANGELOG.md.** v2.0.0 entry with breaking-change banner and link to migration guide.
 13. **Migration guide.** `docs/en/migration/v1-to-v2.md` (and `docs/ja/migration/v1-to-v2.md`) — prose-only, covers the `git mv` and search/replace steps for forks that have enabled the feature and committed knowledge.
 
-### Worked examples deliverable
+### Worked examples deliverable (deferred to v2.1.0 / PR #2)
+
+> **Status:** Decision recorded here; implementation deferred from v2.0.0 to v2.1.0 (PR #2) alongside the coaching pillar. The files listed below do not exist in the v2.0.0 tree and will be authored in the follow-up PR.
 
 - 19 files at `docs/en/learn/examples/<domain>.md`, 350–500 lines each, 3–5 concept entries per file.
 - Shared reference project: **Meridian** (B2B task-management SaaS, Go + Gin + PostgreSQL + Redis backend, React + TanStack Query frontend, Kubernetes + GitHub Actions).
 - technical-writer authors the universal template and 5 reference examples (testing-discipline, api-design, architecture, error-handling, market-reasoning) as the quality bar.
 - Per-domain owning agents author the remaining 14, citing the reference examples.
 - technical-writer performs a final voice-consistency pass.
-- Japanese mirrors at `docs/ja/learn/examples/` authored in the same PR.
+- Japanese mirrors at `docs/ja/learn/examples/` authored in the same follow-up PR.
 
 ### Out of scope for ADR-003
 

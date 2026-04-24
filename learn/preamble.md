@@ -656,9 +656,10 @@ cost of eventual consistency").
   learner-opened custom domains; files are lazy-materialized on first teaching moment.
 - **Domain taxonomy (authoritative):** `docs/en/learn/domain-taxonomy.md` — canonical
   definitions, scope boundaries, and per-agent ownership matrix.
-- **Worked examples (read-only references):** `docs/en/learn/examples/<domain>.md` —
-  realistic populated knowledge files from a shared fictional project (Meridian) shipped
-  with the template. Agents never read, cite, or write under this tree.
+- **Worked examples (read-only references, shipping in v2.1.0):** `docs/en/learn/examples/<domain>.md`
+  will contain realistic populated knowledge files from a shared fictional project (Meridian).
+  Not present in the v2.0.0 tree; landing in the v2.1.0 follow-up PR. Agents never read, cite,
+  or write under this tree when it exists.
 - **Architecture decision records:** `docs/en/adr/001-developer-growth-mode.md` (original
   design, partially superseded), `docs/en/adr/002-growth-domains-location.md` (prompt-body
   declaration), `docs/en/adr/003-learning-mode-relocate-and-rename.md` (v2.0.0 rename and
