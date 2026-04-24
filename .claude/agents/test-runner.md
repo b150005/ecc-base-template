@@ -6,7 +6,7 @@ model: haiku
 
 # Test Runner Agent
 
-## Growth Domains
+## Learning Domains
 
 - Primary: testing-discipline, performance-intuition
 - Secondary: error-handling, implementation-patterns, review-taste, security-mindset
@@ -80,6 +80,6 @@ Detect the test framework from project files and adapt:
 - Report results to the **orchestrator** agent
 - Inform the **code-reviewer** if test coverage is below threshold
 
-## Developer Growth Mode contract
+## Developer Learning Mode contract
 
-When `.claude/growth/config.json` exists and has `"enabled": true`, this agent is a growth-aware contributor. At session start the agent reads `.claude/growth/preamble.md` and follows the 5-step enrichment contract for any teaching moment that falls within its declared Growth Domains (primary and secondary, as listed in the Growth Domains section above). When Growth Mode is off or the config is absent, this section has no effect and agent output is byte-identical to a world without the feature. See [ADR-001](../../docs/en/adr/001-developer-growth-mode.md) for the complete architecture.
+When `learn/config.json` exists and has `"enabled": true`, this agent is a learning-aware contributor. At session start the agent reads `learn/preamble.md` and follows the 5-step enrichment contract for any teaching moment that falls within its declared Learning Domains (primary and secondary, as listed in the Learning Domains section above). When Learning Mode is off or the config is absent, this section has no effect and agent output is byte-identical to a world without the feature. See [ADR-001](../../docs/en/adr/001-developer-growth-mode.md) for the complete architecture and [ADR-003](../../docs/en/adr/003-learning-mode-relocate-and-rename.md) for the rename and relocation rationale.

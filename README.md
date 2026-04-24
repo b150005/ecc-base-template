@@ -1,6 +1,8 @@
 # ECC Base Template
 
-A framework-agnostic GitHub template that ships a 15-agent development team and an opt-in learning layer called **Developer Growth Mode**.
+> **v2.0.0 — Breaking Change:** Developer Growth Mode is renamed to **Developer Learning Mode** and the feature directory moves from `.claude/growth/` to `learn/`. If you have enabled this feature and committed knowledge files, follow the migration guide at [`docs/en/migration/v1-to-v2.md`](docs/en/migration/v1-to-v2.md) before upgrading.
+
+A framework-agnostic GitHub template that ships a 15-agent development team and an opt-in learning layer called **Developer Learning Mode**.
 
 [日本語版 README はこちら](README.ja.md)
 
@@ -9,8 +11,8 @@ A framework-agnostic GitHub template that ships a 15-agent development team and 
 ## What you get
 
 - **15 AI agents** covering the full product lifecycle — orchestrator, product-manager, architect, implementer, test-runner, code-reviewer, security-reviewer, performance-engineer, devops-engineer, technical-writer, and more. Ecosystem-agnostic: the agents detect your language and framework at runtime.
-- **Developer Growth Mode** (optional, default **off**) — when you turn it on, every agent appends two short trailer sections to its response explaining the decisions it made and updating a domain-organized knowledge base under `.claude/growth/notes/`. Over many sessions, the notebook becomes a personalized reference you built by shipping real features.
-- **Quality invariants in CI** — `scripts/check-growth-invariants.sh` enforces the default-off guarantee so Growth Mode never leaks into production artifacts.
+- **Developer Learning Mode** (optional, default **off**) — when you turn it on, every agent appends two short trailer sections to its response explaining the decisions it made and updating a domain-organized knowledge base under `learn/knowledge/`. Over many sessions, the knowledge base becomes a personalized reference you built by shipping real features.
+- **Quality invariants in CI** — `scripts/check-learn-invariants.sh` enforces the default-off guarantee so Learning Mode never leaks into production artifacts.
 
 ---
 
@@ -35,23 +37,23 @@ Open the repository in Claude Code (`claude` in the repo root).
 
 ### 4. Start working
 
-Give the orchestrator a real task. Specialists are invoked by the orchestrator or directly. Growth Mode stays off unless you opt in.
+Give the orchestrator a real task. Specialists are invoked by the orchestrator or directly. Learning Mode stays off unless you opt in.
 
-### 5. (Optional) Enable Growth Mode
+### 5. (Optional) Enable Learning Mode
 
 ```
-/growth on [junior|mid|senior]       Enable at the chosen level
-/growth off                          Disable
-/growth status                       Show current state
-/growth focus <domain>[,<domain>]    Narrow teaching effort to specific domains
-/growth unfocus                      Clear focus
-/growth level <junior|mid|senior>    Change level without toggling
-/growth domain new <key>             Create a custom domain (confirmation required)
+/learn on [junior|mid|senior]       Enable at the chosen level
+/learn off                          Disable
+/learn status                       Show current state
+/learn focus <domain>[,<domain>]    Narrow teaching effort to specific domains
+/learn unfocus                      Clear focus
+/learn level <junior|mid|senior>    Change level without toggling
+/learn domain new <key>             Create a custom domain (confirmation required)
 ```
 
-`/quiet` is a companion Skill that suppresses Growth trailers for a single agent response (notes are still updated).
+`/quiet` is a companion Skill that suppresses Learning Mode trailers for a single agent response (knowledge files are still updated).
 
-**Full explanation** of levels, the notebook, philosophy, and a side-by-side example is in [docs/en/growth-mode-explained.md](docs/en/growth-mode-explained.md). **Authoritative design** is in [ADR-001](docs/en/adr/001-developer-growth-mode.md).
+**Full explanation** of levels, the knowledge base, philosophy, and a side-by-side example is in [docs/en/learning-mode-explained.md](docs/en/learning-mode-explained.md). **Authoritative design** is in [ADR-001](docs/en/adr/001-developer-growth-mode.md). **Rename and relocation rationale** is in [ADR-003](docs/en/adr/003-learning-mode-relocate-and-rename.md).
 
 ---
 
@@ -59,7 +61,7 @@ Give the orchestrator a real task. Specialists are invoked by the orchestrator o
 
 All agents are ecosystem-agnostic. They detect the project's language and framework at runtime by reading `.claude/CLAUDE.md` and the project's manifest files (`package.json`, `pubspec.yaml`, `go.mod`, `Cargo.toml`, etc.). The orchestrator coordinates the team; the specialists are invoked by the orchestrator or directly by the developer.
 
-| Agent | Phase | Role | Primary growth domains |
+| Agent | Phase | Role | Primary learning domains |
 |-------|-------|------|----------------|
 | **orchestrator** | All | Analyzes issues, plans work, delegates to specialists, coordinates the session | release-and-deployment |
 | **product-manager** | Planning | PRD authoring, user stories, acceptance criteria, backlog prioritization | api-design |
@@ -77,7 +79,7 @@ All agents are ecosystem-agnostic. They detect the project's language and framew
 | **devops-engineer** | Release | CI/CD, deployment strategy, release management | operational-awareness, release-and-deployment |
 | **technical-writer** | Release | Documentation, changelog, bilingual docs maintenance | documentation-craft |
 
-Each agent's domain ownership is declared in a `## Growth Domains` section at the top of its prompt body. See [ADR-002](docs/en/adr/002-growth-domains-location.md) for why the declaration lives in the body rather than in frontmatter. Secondary domains and the full taxonomy are in [docs/en/growth/domain-taxonomy.md](docs/en/growth/domain-taxonomy.md).
+Each agent's domain ownership is declared in a `## Learning Domains` section at the top of its prompt body. See [ADR-002](docs/en/adr/002-growth-domains-location.md) for why the declaration lives in the body rather than in frontmatter. Secondary domains and the full taxonomy are in [docs/en/learn/domain-taxonomy.md](docs/en/learn/domain-taxonomy.md).
 
 ### Model tiers
 
@@ -107,12 +109,8 @@ orchestrator
 │   ├── CLAUDE.md                          # project instructions the agents read
 │   ├── agents/                            # 15 agent definition files
 │   ├── skills/
-│   │   ├── growth/SKILL.md                # /growth toggle Skill
+│   │   ├── learn/SKILL.md                 # /learn toggle Skill
 │   │   └── quiet/SKILL.md                 # /quiet trailer-suppression Skill
-│   ├── growth/                            # Growth Mode runtime + shipped assets
-│   │   ├── preamble.md                    # shipped — shared enrichment contract
-│   │   ├── notes/                         # shipped — 19 seeded domain files (gitignored)
-│   │   └── config.json                    # created on first /growth on (gitignored)
 │   ├── settings.json
 │   └── settings.local.json
 ├── .devcontainer/
@@ -127,21 +125,26 @@ orchestrator
 │   ├── en/                                # English source of truth
 │   │   ├── adr/                           # architecture decisions
 │   │   ├── prd/                           # product requirements
-│   │   ├── growth/                        # growth domain taxonomy
-│   │   ├── growth-mode-explained.md       # long-form Growth Mode explainer
+│   │   ├── learn/                         # learning domain taxonomy and examples
+│   │   ├── migration/                     # upgrade guides (e.g., v1-to-v2.md)
+│   │   ├── learning-mode-explained.md     # long-form Learning Mode explainer
 │   │   └── (template-usage.md, etc.)
 │   └── ja/                                # Japanese translations (link to English source)
+├── learn/
+│   ├── preamble.md                        # shipped — shared enrichment contract
+│   ├── config.json                        # created on first /learn on (gitignored)
+│   └── knowledge/                         # lazy-materialized — created per domain on first teaching moment (gitignored)
 ├── scripts/
-│   └── check-growth-invariants.sh         # CI check for default-off invariants
+│   └── check-learn-invariants.sh          # CI check for default-off invariants
 ├── .env.example
 ├── .gitignore
-├── .gitignore.example                     # shows the opt-in inversion for sharing notes
+├── .gitignore.example                     # shows the opt-in inversion for sharing knowledge files
 ├── LICENSE
 ├── README.md                              # this file (English)
 └── README.ja.md                           # Japanese translation
 ```
 
-Note: `.claude/growth/preamble.md` and the 19 seeded notes under `.claude/growth/notes/` ship with the template. `config.json` alone is runtime-created on first `/growth on`. Both `config.json` and `notes/` are gitignored by default so personal state and private learning material do not leak into commits; see [growth-mode-explained.md](docs/en/growth-mode-explained.md#notes-are-private-by-default) for the opt-in path.
+Note: `learn/preamble.md` ships with the template. `learn/knowledge/` is lazy-materialized — no files exist on disk until a teaching moment earns content for a domain. `learn/config.json` is runtime-created on first `/learn on`. Both `config.json` and `learn/knowledge/` are gitignored by default so personal state and private learning material do not leak into commits; see [learning-mode-explained.md](docs/en/learning-mode-explained.md#knowledge-files-are-private-by-default) for the opt-in path.
 
 ---
 
@@ -150,10 +153,11 @@ Note: `.claude/growth/preamble.md` and the 19 seeded notes under `.claude/growth
 Significant decisions are recorded as ADRs in `docs/en/adr/`. Current ADRs:
 
 - [`000-template.md`](docs/en/adr/000-template.md) — ADR format template
-- [`001-developer-growth-mode.md`](docs/en/adr/001-developer-growth-mode.md) — Growth Mode design decision
-- [`002-growth-domains-location.md`](docs/en/adr/002-growth-domains-location.md) — why Growth Domains live in the prompt body
+- [`001-developer-growth-mode.md`](docs/en/adr/001-developer-growth-mode.md) — Learning Mode design decision (originally named Growth Mode; superseded in part by ADR-003)
+- [`002-growth-domains-location.md`](docs/en/adr/002-growth-domains-location.md) — why Learning Domains live in the prompt body
+- [`003-learning-mode-relocate-and-rename.md`](docs/en/adr/003-learning-mode-relocate-and-rename.md) — rename to Learning Mode and relocation to `learn/`
 
-Product requirements are in [`docs/en/prd/`](docs/en/prd/). The PRD for Developer Growth Mode is the authoritative functional specification.
+Product requirements are in [`docs/en/prd/`](docs/en/prd/). The PRD for Developer Learning Mode is the authoritative functional specification.
 
 When working on the template itself, the same agent workflow applies: the orchestrator coordinates, the architect records decisions as ADRs, and the implementer works against the PRD's acceptance criteria.
 

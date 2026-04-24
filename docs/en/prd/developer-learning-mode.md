@@ -1,14 +1,16 @@
-# Developer Growth Mode
+# Developer Learning Mode
+
+> **Version history.** Originally specified for v1.1.0 as "Developer Growth Mode." Directory layout, feature name, and terminology revised in [ADR-003](../adr/003-learning-mode-relocate-and-rename.md) / v2.0.0 (2026-04-24). All paths, commands, and terminology below reflect the v2.0.0 state.
 
 ## Metadata
 
 | Field | Value |
 |-------|-------|
-| Status | Proposed |
-| Target release | Next minor |
+| Status | Accepted |
+| Target release | v2.0.0 (breaking) |
 | Owner | Agent Team |
 | Created | 2026-04-22 |
-| Last updated | 2026-04-22 |
+| Last updated | 2026-04-24 |
 
 ---
 
@@ -24,9 +26,9 @@ Three observation categories capture most of the loss:
 - **Context blindness.** The agent made a choice that diverges from the default. The developer does not notice, because the output is correct and the review passes. The divergence is load-bearing: understanding it matters the next time a similar decision arises.
 - **Knowledge fragmentation.** Teaching moments are scattered across sessions — a note here, an inline comment there — but never organized into a reference the developer can consult when a new task touches the same concept. Fragments do not accumulate into a mental model.
 
-Developer Growth Mode addresses all three. It is an opt-in annotation layer that exposes reasoning alongside output, calibrated to the declared experience level, and accumulates that reasoning over time into an organized domain-keyed knowledge base the developer built by shipping real features. It does not alter the artifacts. It does not gate the work. It does not infer the developer's level or change it without explicit action.
+Developer Learning Mode addresses all three. It is an opt-in annotation layer that exposes reasoning alongside output, calibrated to the declared experience level, and accumulates that reasoning over time into an organized domain-keyed knowledge base the developer built by shipping real features. It does not alter the artifacts. It does not gate the work. It does not infer the developer's level or change it without explicit action.
 
-The default experience — Growth Mode off — is unchanged for developers who do not want it.
+The default experience — Learning Mode off — is unchanged for developers who do not want it.
 
 ---
 
@@ -36,28 +38,28 @@ The default experience — Growth Mode off — is unchanged for developers who d
 
 The following goals are testable. Each states an observable condition and the measurement method.
 
-1. **All-agent coverage.** When Growth Mode is active, all 15 agents in the team participate in knowledge enrichment according to their declared domain responsibilities. Measurable: inspect the `## Growth Domains` sections across all 15 agent files and confirm each agent's enrichment contract is exercised by a session that exercises that agent's primary task.
+1. **All-agent coverage.** When Learning Mode is active, all 15 agents in the team participate in knowledge enrichment according to their declared domain responsibilities. Measurable: inspect the `## Learning Domains` sections across all 15 agent files and confirm each agent's enrichment contract is exercised by a session that exercises that agent's primary task.
 
-2. **Default-off invariant.** When Growth Mode is inactive (default), agent responses contain no growth-mode artifacts — no `## Growth:` sections, no `[Growth Note]` markers — and no file under `.claude/growth/notes/` is created or modified. This is a design claim about where the logic branches in agent prompts, not an output-equivalence claim (LLM outputs are non-deterministic across runs, model versions, and prompt compaction events; treating them as hashable against golden files is an antipattern). Verified: `scripts/check-growth-invariants.sh` asserts the three enforcement preconditions on every PR — `disable-model-invocation: true` on the growth Skill, the guard branch in every growth-aware agent prompt, and the gitignore posture.
+2. **Default-off invariant.** When Learning Mode is inactive (default), agent responses contain no learning-mode artifacts — no `## Learning:` sections, no `[Learning Note]` markers — and no file under `learn/knowledge/` is created or modified. This is a design claim about where the logic branches in agent prompts, not an output-equivalence claim (LLM outputs are non-deterministic across runs, model versions, and prompt compaction events; treating them as hashable against golden files is an antipattern). Verified: `scripts/check-learn-invariants.sh` asserts the three enforcement preconditions on every PR — `disable-model-invocation: true` on the learn Skill, the guard branch in every learning-aware agent prompt, and the gitignore posture.
 
-3. **Knowledge base accumulates by domain.** After a session where an agent encounters at least one teaching moment, the relevant domain file under `.claude/growth/notes/` contains a new or deepened section. Observable: diff the notes directory before and after a session; at least one domain file shows a net content addition.
+3. **Knowledge base accumulates by domain.** After a session where an agent encounters at least one teaching moment, the relevant domain file under `learn/knowledge/` contains a new or deepened section. Observable: diff the knowledge directory before and after a session; at least one domain file shows a net content addition.
 
-4. **Non-destructive editing.** An enrichment operation never silently removes content from a domain file that existed before the operation. This is a design goal spelled out in `.claude/growth/preamble.md` and enforced by PR review when changes touch the preamble or agent prompts — not by automated assertion against agent output.
+4. **Non-destructive editing.** An enrichment operation never silently removes content from a domain file that existed before the operation. This is a design goal spelled out in `learn/preamble.md` and enforced by PR review when changes touch the preamble or agent prompts — not by automated assertion against agent output.
 
-5. **Severity preservation.** Code-reviewer findings are reported at their true severity regardless of Growth Mode level. A CRITICAL finding is labeled CRITICAL at `junior`, `mid`, and `senior` levels. This is a design requirement in agent prompts, verified by PR review when the code-reviewer prompt changes — not by fixture-based output matching.
+5. **Severity preservation.** Code-reviewer findings are reported at their true severity regardless of Learning Mode level. A CRITICAL finding is labeled CRITICAL at `junior`, `mid`, and `senior` levels. This is a design requirement in agent prompts, verified by PR review when the code-reviewer prompt changes — not by fixture-based output matching.
 
-6. **Skill toggles state correctly.** `/growth on junior`, `/growth off`, `/growth status`, `/growth focus <domain>`, and `/quiet` all produce the documented config change or suppression effect in the same session. Measurable: acceptance test per command form.
+6. **Skill toggles state correctly.** `/learn on junior`, `/learn off`, `/learn status`, `/learn focus <domain>`, and `/quiet` all produce the documented config change or suppression effect in the same session. Measurable: acceptance test per command form.
 
 ### Non-Goals
 
-1. Growth Mode does not change, gate, delay, or alter the code or artifacts generated by any agent. It is an annotation and enrichment layer only.
-2. Growth Mode does not infer or auto-escalate a developer's level based on behavior signals. The declared level is the level.
-3. Growth Mode does not include any sharing or export feature for domain notes in this release.
-4. Growth Mode does not include progress scoring, completion markers, badges, streaks, or any gamification element.
-5. Growth Mode does not auto-level-infer from session content, commit history, or any behavioral proxy.
-6. Growth Mode does not merge or synchronize notes across multiple developers. Domain files are personal learning artifacts.
-7. Growth Mode does not translate domain notes into Japanese or any other language in this release.
-8. Growth Mode does not apply to orchestrator delegation logic — the orchestrator's growth responsibility is limited to declaring domain ownership in its frontmatter and following the enrichment protocol when its own response contains a teaching moment.
+1. Learning Mode does not change, gate, delay, or alter the code or artifacts generated by any agent. It is an annotation and enrichment layer only.
+2. Learning Mode does not infer or auto-escalate a developer's level based on behavior signals. The declared level is the level.
+3. Learning Mode does not include any sharing or export feature for domain knowledge files in this release.
+4. Learning Mode does not include progress scoring, completion markers, badges, streaks, or any gamification element.
+5. Learning Mode does not auto-level-infer from session content, commit history, or any behavioral proxy.
+6. Learning Mode does not merge or synchronize knowledge files across multiple developers. Domain files are personal learning artifacts.
+7. Learning Mode does not translate domain knowledge files into Japanese or any other language in this release.
+8. Learning Mode does not apply to orchestrator delegation logic — the orchestrator's learning responsibility is limited to declaring domain ownership in its prompt body and following the enrichment protocol when its own response contains a teaching moment.
 
 ---
 
@@ -77,9 +79,9 @@ These three segments define the population. The feature does not assume any part
 
 ## 4. Level Semantics
 
-Growth Mode has three levels: `junior`, `mid`, and `senior`. Levels control the angle and density of foundational context — what the agent assumes the developer already knows, and which decisions are worth noting at all. Levels are not a verbosity knob. They do not set a token budget or a note count cap. Depth is a property of the concept; the level determines which concepts clear the threshold for a note.
+Learning Mode has three levels: `junior`, `mid`, and `senior`. Levels control the angle and density of foundational context — what the agent assumes the developer already knows, and which decisions are worth noting at all. Levels are not a verbosity knob. They do not set a token budget or a note count cap. Depth is a property of the concept; the level determines which concepts clear the threshold for a note.
 
-All three levels write into the same domain files. The notebook does not fork by level. A junior-level foundational explanation from session one and a senior-level trade-off refinement from session twelve coexist in the same section, layered — foundations on top, idiomatic variation in the middle, trade-off reasoning at the bottom.
+All three levels write into the same domain files. The knowledge base does not fork by level. A junior-level foundational explanation from session one and a senior-level trade-off refinement from session twelve coexist in the same section, layered — foundations on top, idiomatic variation in the middle, trade-off reasoning at the bottom.
 
 ### junior
 
@@ -145,7 +147,7 @@ Each sample is realistic agent output. The examples cover seven agents across th
 #### Code-reviewer — review-taste domain
 
 **Junior:**
-> The mutation on line 14 is flagged as CRITICAL. The consequence is not just about this function: when a function mutates its argument, the caller's reference changes state without the caller knowing it happened. In a synchronous single-threaded flow, this can be traced. Across async boundaries or when the object is shared across components, the mutation becomes invisible and hard to diagnose. The fix is to return a new copy. This is the immutability rule in `rules/common/coding-style.md`. Growth note: the rule exists because hidden state change is one of the most common sources of bugs in large codebases that are hard to reproduce.
+> The mutation on line 14 is flagged as CRITICAL. The consequence is not just about this function: when a function mutates its argument, the caller's reference changes state without the caller knowing it happened. In a synchronous single-threaded flow, this can be traced. Across async boundaries or when the object is shared across components, the mutation becomes invisible and hard to diagnose. The fix is to return a new copy. This is the immutability rule in `rules/common/coding-style.md`. Learning note: the rule exists because hidden state change is one of the most common sources of bugs in large codebases that are hard to reproduce.
 
 **Mid:**
 > The nested conditional on lines 22-31 exceeds the project's 4-level nesting limit. This is labeled HIGH rather than style because deep nesting degrades test coverage effectiveness: branches inside deeply nested conditionals are harder to reach independently. The preferred refactor is to extract the inner branch into a named predicate, which also makes the intent visible at the call site. Naming the predicate is not cosmetic — it documents the condition's business meaning.
@@ -198,10 +200,10 @@ Each sample is realistic agent output. The examples cover seven agents across th
 
 ### FR-001: Skill Definition
 
-Growth Mode is toggled via a Claude Code Skill. The Skill file lives at:
+Learning Mode is toggled via a Claude Code Skill. The Skill file lives at:
 
 ```
-.claude/skills/growth/SKILL.md
+.claude/skills/learn/SKILL.md
 ```
 
 The Skill's YAML frontmatter must include:
@@ -213,13 +215,13 @@ arguments: [action, level]
 ---
 ```
 
-`disable-model-invocation: true` ensures the Skill can only be triggered by a user action (`/growth ...`), never auto-invoked by the model itself.
+`disable-model-invocation: true` ensures the Skill can only be triggered by a user action (`/learn ...`), never auto-invoked by the model itself.
 
-The `arguments` field maps positional tokens so that `/growth on junior` resolves to `$action=on` and `$level=junior`.
+The `arguments` field maps positional tokens so that `/learn on junior` resolves to `$action=on` and `$level=junior`.
 
-The Skill body implements the command dispatch logic: it reads `.claude/growth/config.json`, applies the requested state change, and writes the updated config back. On first invocation when no config file exists, it creates the file.
+The Skill body implements the command dispatch logic: it reads `learn/config.json`, applies the requested state change, and writes the updated config back. On first invocation when no config file exists, it creates the file.
 
-The Skill is the only surface through which Growth Mode state changes. Agents read the config file; they do not write it directly (except for the notes enrichment step, which writes domain files, not config).
+The Skill is the only surface through which Learning Mode state changes. Agents read the config file; they do not write it directly (except for the knowledge enrichment step, which writes domain files, not config).
 
 ### FR-002: Skill Command Forms
 
@@ -227,24 +229,24 @@ The following invocation forms must be supported:
 
 | Command | Effect |
 |---------|--------|
-| `/growth on` | Enable at the level stored in config; default to `junior` if no level is stored |
-| `/growth on junior` | Enable at `junior` level; write `enabled: true`, `level: "junior"` to config |
-| `/growth on mid` | Enable at `mid` level |
-| `/growth on senior` | Enable at `senior` level |
-| `/growth off` | Disable; set `enabled: false`; preserve `level` and `focus_domains` for the next enable |
-| `/growth status` | Report current enabled state, level, focus_domains, and the last ten notebook-diff report summaries; does not modify config |
-| `/growth focus <domain>` | Set `focus_domains` to a single domain; agents prioritize teaching moments in this domain |
-| `/growth focus <domain>,<domain>` | Set `focus_domains` to multiple comma-separated domains |
-| `/growth focus clear` | Clear `focus_domains`; agents treat all domains equally |
-| `/growth level junior\|mid\|senior` | Change level without toggling enabled state |
-| `/growth domain new <key>` | Prompt the learner to confirm a new custom domain key; on confirmation, create the seeded domain file and update config |
+| `/learn on` | Enable at the level stored in config; default to `junior` if no level is stored |
+| `/learn on junior` | Enable at `junior` level; write `enabled: true`, `level: "junior"` to config |
+| `/learn on mid` | Enable at `mid` level |
+| `/learn on senior` | Enable at `senior` level |
+| `/learn off` | Disable; set `enabled: false`; preserve `level` and `focus_domains` for the next enable |
+| `/learn status` | Report current enabled state, level, focus_domains, and the last ten knowledge-diff report summaries; does not modify config |
+| `/learn focus <domain>` | Set `focus_domains` to a single domain; agents prioritize teaching moments in this domain |
+| `/learn focus <domain>,<domain>` | Set `focus_domains` to multiple comma-separated domains |
+| `/learn focus clear` | Clear `focus_domains`; agents treat all domains equally |
+| `/learn level junior\|mid\|senior` | Change level without toggling enabled state |
+| `/learn domain new <key>` | Prompt the learner to confirm a new custom domain key; on confirmation, create the seeded domain file and update config |
 | `/quiet` | One-shot suppression for the immediately following agent invocation; does not modify config |
 
 Unknown subcommands return a short usage message. They do not halt the session.
 
 ### FR-003: Config Schema
 
-Growth Mode state persists in `.claude/growth/config.json`. The schema:
+Learning Mode state persists in `learn/config.json`. The schema:
 
 ```json
 {
@@ -264,26 +266,26 @@ Field semantics:
 
 The file must be valid JSON. A parse error is treated as `enabled: false`. Unknown keys are preserved on write (forward compatibility).
 
-The file is created on first `/growth on` invocation. It does not exist in the repository before first use.
+The file is created on first `/learn on` invocation. It does not exist in the repository before first use.
 
 ### FR-004: State Persistence and Agent Read Path
 
-Config is read at session start by every growth-aware agent. The read sequence:
+Config is read at session start by every learning-aware agent. The read sequence:
 
-1. Read `.claude/growth/config.json`. If absent or `enabled: false`, skip all growth steps entirely. No reads of preamble, no reads of domain files, no modifications of any file under `.claude/growth/notes/`.
-2. If `enabled: true`, read `.claude/growth/preamble.md` for the enrichment protocol.
-3. Identify which domain files are relevant to the current task by mapping the task to domain keys from the agent's declared Growth Domains section.
+1. Read `learn/config.json`. If absent or `enabled: false`, skip all learning steps entirely. No reads of preamble, no reads of domain files, no modifications of any file under `learn/knowledge/`.
+2. If `enabled: true`, read `learn/preamble.md` for the enrichment protocol.
+3. Identify which domain files are relevant to the current task by mapping the task to domain keys from the agent's declared Learning Domains section.
 4. Read those domain files so the agent knows what is already recorded and does not duplicate.
 5. Proceed with the primary task. When a teaching moment arises, follow the enrichment protocol.
 
 This read path is executed independently by each agent. The orchestrator does not propagate a pre-parsed config; each agent is responsible for its own read.
 
-### FR-005: Notes Directory Structure
+### FR-005: Knowledge Directory Structure
 
-The domain-organized knowledge base lives at `.claude/growth/notes/`. One file per domain. The 19 canonical domain files are pre-seeded at feature install time:
+The domain-organized knowledge base lives at `learn/knowledge/`. One file per domain. No files are pre-seeded; the directory is empty on a fresh clone and is gitignored by default. The 19 canonical domain files are created lazily by agents when their first teaching moment fires:
 
 ```
-.claude/growth/notes/
+learn/knowledge/
 ├── architecture.md
 ├── api-design.md
 ├── data-modeling.md
@@ -305,7 +307,7 @@ The domain-organized knowledge base lives at `.claude/growth/notes/`. One file p
 └── ui-ux-craft.md
 ```
 
-Each seed file contains YAML front matter (domain key, owners, last-updated) and one placeholder section that agents replace on first enrichment. The placeholder shape:
+When a domain file is created for the first time, the agent uses the seed shape defined in `learn/preamble.md` §7. The seed shape:
 
 ```markdown
 ---
@@ -318,21 +320,15 @@ updated: 2026-04-22
 
 This domain covers test strategy, structure, fixture hygiene, and the test pyramid.
 Agents contribute entries as teaching moments arise during real sessions.
-
-## Placeholder
-
-This section is seeded empty. The first agent with a teaching moment in this domain
-will replace this placeholder with a real section following the enrichment protocol
-in `.claude/growth/preamble.md`.
 ```
 
-Custom domains opened via `/growth domain new <key>` follow the same shape and live in the same directory. They are not in a subdirectory.
+The first agent with a teaching moment writes its section directly after the seed front matter; there is no intermediate placeholder. Custom domains opened via `/learn domain new <key>` follow the same shape and live in the same directory. They are not in a subdirectory.
 
 ### FR-006: Per-Agent Domain Ownership
 
-Every agent file in `.claude/agents/` carries a `## Growth Domains` section at the top of its prompt body. Every agent has at least one primary domain. There is no exempt list — all 15 agents participate in growth enrichment.
+Every agent file in `.claude/agents/` carries a `## Learning Domains` section at the top of its prompt body. Every agent has at least one primary domain. There is no exempt list — all 15 agents participate in learning enrichment.
 
-The 19-domain ownership map (aligned to the canonical taxonomy in `docs/en/growth/domain-taxonomy.md` and ADR-001):
+The 19-domain ownership map (aligned to the canonical taxonomy in `docs/en/learn/domain-taxonomy.md` and ADR-001):
 
 | Agent | Primary domains | Secondary domains |
 |-------|-----------------|-------------------|
@@ -352,15 +348,15 @@ The 19-domain ownership map (aligned to the canonical taxonomy in `docs/en/growt
 | devops-engineer | operational-awareness, release-and-deployment | dependency-management, persistence-strategy, security-mindset |
 | technical-writer | documentation-craft | — |
 
-The Growth Domains section is a list of domain keys combining primary and secondary. Ownership does not restrict writing — multiple agents can write into the same domain — but it defines primary responsibility and the default expectation for which agent will produce the most thorough contributions to that domain.
+The Learning Domains section is a list of domain keys combining primary and secondary. Ownership does not restrict writing — multiple agents can write into the same domain — but it defines primary responsibility and the default expectation for which agent will produce the most thorough contributions to that domain.
 
 ### FR-007: Enrichment Operation Contract
 
-The contract every growth-aware agent follows when a teaching moment arises. The canonical definition lives in `.claude/growth/preamble.md`. Every agent references that file by path; agents do not inline it.
+The contract every learning-aware agent follows when a teaching moment arises. The canonical definition lives in `learn/preamble.md`. Every agent references that file by path; agents do not inline it.
 
 Five-step contract:
 
-1. **Identify the target domain.** Map the teaching moment to a domain key from the agent's Growth Domains section. If the moment spans two domains, choose the one where the concept is most foundational and add a cross-reference link in the secondary domain. If no existing domain fits, propose a new one and wait for learner confirmation via `/growth domain new <key>`; do not auto-create domain files.
+1. **Identify the target domain.** Map the teaching moment to a domain key from the agent's Learning Domains section. If the moment spans two domains, choose the one where the concept is most foundational and add a cross-reference link in the secondary domain. If no existing domain fits, propose a new one and wait for learner confirmation via `/learn domain new <key>`; do not auto-create domain files.
 
 2. **Read the current domain file.** The agent reads the existing file before deciding how to contribute. This is non-negotiable. A contribution made without reading the current file risks duplicating content, contradicting an earlier entry without marking the supersession, or fragmenting a concept that already has a home.
 
@@ -376,42 +372,42 @@ Five-step contract:
 5. **Report the diff.** At the end of its response, the agent emits two trailing sections visible in the chat response (not written to any file):
 
 ```
-## Growth: taught this session
+## Learning: taught this session
 - [concept-name]: [one-sentence summary at the declared level]
 
-## Growth: notebook diff
-- notes/<domain>.md → <operation> on `## <section-heading>`: <one-sentence change summary>
+## Learning: knowledge diff
+- knowledge/<domain>.md → <operation> on `## <section-heading>`: <one-sentence change summary>
 ```
 
-These sections are the provenance record the developer uses to audit notebook evolution. They are also the signal that any manual spot-check of default-off behavior looks for — these headers must be absent when Growth Mode is off.
+These sections are the provenance record the developer uses to audit knowledge base evolution. They are also the signal that any manual spot-check of default-off behavior looks for — these headers must be absent when Learning Mode is off.
 
 ### FR-008: CLAUDE.md Pointer
 
-`.claude/CLAUDE.md` must contain a `## Developer Growth Mode` section. The section is unconditional — present in CLAUDE.md regardless of whether Growth Mode is currently enabled. Its content:
+`.claude/CLAUDE.md` must contain a `## Developer Learning Mode` section. The section is unconditional — present in CLAUDE.md regardless of whether Learning Mode is currently enabled. Its content:
 
 ```markdown
-## Developer Growth Mode
+## Developer Learning Mode
 
-Growth Mode is a default-off learning layer. When enabled via `/growth on [junior|mid|senior]`,
-every agent contributes to a domain-organized knowledge base at `.claude/growth/notes/`. The
+Learning Mode is a default-off learning layer. When enabled via `/learn on [junior|mid|senior]`,
+every agent contributes to a domain-organized knowledge base at `learn/knowledge/`. The
 knowledge base grows and is refined over many sessions into a personalized reference built by
-shipping real features. Configuration lives at `.claude/growth/config.json`; the enrichment
-protocol every agent follows is defined in `.claude/growth/preamble.md`. Run `/growth status`
+shipping real features. Configuration lives at `learn/config.json`; the enrichment
+protocol every agent follows is defined in `learn/preamble.md`. Run `/learn status`
 to see current state.
 ```
 
-No agent prompt instructions for Growth Mode live in CLAUDE.md. No growth-mode content other than this block is in CLAUDE.md.
+No agent prompt instructions for Learning Mode live in CLAUDE.md. No learning-mode content other than this block is in CLAUDE.md.
 
-Agents discover the notes directory and config path from this block on session start. The block is short enough that it does not materially add to context overhead for default-off sessions.
+Agents discover the knowledge directory and config path from this block on session start. The block is short enough that it does not materially add to context overhead for default-off sessions.
 
-### FR-009: Git Stance for Notes
+### FR-009: Git Stance for Knowledge Files
 
-`.claude/growth/notes/` is gitignored by default. The repository ships:
+`learn/knowledge/` is gitignored by default. The repository ships:
 
-1. A `.gitignore` entry that excludes `.claude/growth/notes/` and `.claude/growth/config.json` from version control.
-2. A `.gitignore.example` file (or a comment block in the existing `.gitignore`) that shows the exact lines to comment out or remove if the developer chooses to commit their notes.
+1. A `.gitignore` entry that excludes `learn/knowledge/` and `learn/config.json` from version control.
+2. A `.gitignore.example` file (or a comment block in the existing `.gitignore`) that shows the exact lines to comment out or remove if the developer chooses to commit their knowledge files.
 
-The rationale for gitignore-by-default: domain notes contain the developer's mistakes, superseded understandings, and revision history. That is private learning data. A developer who wants to share their notes — for example, as a team learning commitment or a public study journal — makes that choice explicitly by editing `.gitignore`. The repository does not make it for them.
+The rationale for gitignore-by-default: domain knowledge files contain the developer's mistakes, superseded understandings, and revision history. That is private learning data. A developer who wants to share their knowledge base — for example, as a team learning commitment or a public study journal — makes that choice explicitly by editing `.gitignore`. The repository does not make it for them.
 
 The README documents both paths: default private, opt-in shared. The README does not editorialize about which path is better.
 
@@ -419,7 +415,7 @@ The README documents both paths: default private, opt-in shared. The README does
 
 ### FR-010: Per-Session One-Shot Suppression
 
-`/quiet` suppresses growth annotations for the immediately following agent invocation. It does not modify `config.json`. After the suppressed call, the next invocation from any agent resumes normal growth behavior. The `/quiet` flag can be appended to any agent invocation form.
+`/quiet` suppresses learning annotations for the immediately following agent invocation. It does not modify `config.json`. After the suppressed call, the next invocation from any agent resumes normal learning behavior. The `/quiet` flag can be appended to any agent invocation form.
 
 ### FR-011: Focus Domain Preference
 
@@ -431,34 +427,34 @@ When `focus_domains` is non-empty in config, agents use it as a soft priority si
 
 ### NFR-001: Default-Off Invariant
 
-When `.claude/growth/config.json` is absent, or when `enabled` is `false`, or when the file is unparseable, every agent's response must contain none of the following growth-mode artifacts:
+When `learn/config.json` is absent, or when `enabled` is `false`, or when the file is unparseable, every agent's response must contain none of the following learning-mode artifacts:
 
-- No `## Growth:` sections appear in agent responses.
-- No `[Growth Note]` markers appear.
-- No files under `.claude/growth/notes/` are created or modified.
-- No reads of `.claude/growth/preamble.md` occur.
+- No `## Learning:` sections appear in agent responses.
+- No `[Learning Note]` markers appear.
+- No files under `learn/knowledge/` are created or modified.
+- No reads of `learn/preamble.md` occur.
 
 This is the load-bearing claim of the feature. It is enforced by three deterministic preconditions, not by output-equivalence assertion against agent responses (LLM outputs are non-deterministic; golden-file regression against them degrades to flaky tests):
 
-1. `disable-model-invocation: true` on `.claude/skills/growth/SKILL.md`.
-2. A guard branch in every growth-aware agent prompt that reads `config.json` and skips all growth steps when absent or disabled.
-3. `.claude/growth/notes/` and `.claude/growth/config.json` are gitignored so that artefacts from accidental activation do not leak into commits.
+1. `disable-model-invocation: true` on `.claude/skills/learn/SKILL.md`.
+2. A guard branch in every learning-aware agent prompt that reads `config.json` and skips all learning steps when absent or disabled.
+3. `learn/knowledge/` and `learn/config.json` are gitignored so that artifacts from accidental activation do not leak into commits.
 
-All three are verified by `scripts/check-growth-invariants.sh` on every PR. The script uses grep-based static checks; no LLM is in the loop.
+All three are verified by `scripts/check-learn-invariants.sh` on every PR. The script uses grep-based static checks; no LLM is in the loop.
 
 ### NFR-002: No Gating UX
 
-Growth annotations and notebook enrichment must never block, delay, or precede the primary deliverable. The artifact — code, design document, review, security report — is always the first substantive content in any response. Growth sections always follow. The developer is not prompted to acknowledge, confirm, or respond to growth content before the next agent invocation. No pre-response quizzes or comprehension checks.
+Learning annotations and knowledge enrichment must never block, delay, or precede the primary deliverable. The artifact — code, design document, review, security report — is always the first substantive content in any response. Learning sections always follow. The developer is not prompted to acknowledge, confirm, or respond to learning content before the next agent invocation. No pre-response quizzes or comprehension checks.
 
 ### NFR-003: Depth-Appropriate Explanation
 
-There are no arbitrary caps on note length, note count, or token count for growth content. The governing principle is: as systematic and complete as the concept requires, as specific to the code in front of the agent as possible. An explanation that omits the "when not to use this" case to stay under a length cap is worse than a longer explanation that includes it.
+There are no arbitrary caps on entry length, entry count, or token count for learning content. The governing principle is: as systematic and complete as the concept requires, as specific to the code in front of the agent as possible. An explanation that omits the "when not to use this" case to stay under a length cap is worse than a longer explanation that includes it.
 
 What is not permitted is length without load: verbose recaps of the artifact content in prose, repetition of content already in the domain file, or explanatory filler that the developer would skip. Length is earned by substance.
 
 ### NFR-004: Severity Preservation
 
-The code-reviewer's Growth Mode output must not soften, hedge, qualify, or dilute severity labels on findings. CRITICAL means CRITICAL at all three levels. A Growth Note that explains why a CRITICAL finding is CRITICAL is permitted and encouraged at `junior` level; that explanation does not change the severity label. The Growth section is additive to the finding, not a replacement or a softening gloss on it.
+The code-reviewer's Learning Mode output must not soften, hedge, qualify, or dilute severity labels on findings. CRITICAL means CRITICAL at all three levels. A Learning Note that explains why a CRITICAL finding is CRITICAL is permitted and encouraged at `junior` level; that explanation does not change the severity label. The Learning section is additive to the finding, not a replacement or a softening gloss on it.
 
 ### NFR-005: Non-Destructive Editing Under Pressure
 
@@ -470,13 +466,13 @@ Domain files are standard Markdown. No proprietary format. Organization is by co
 
 ### NFR-007: Serialization for Overlapping Domain Writes
 
-When the orchestrator delegates to two or more agents in a single workflow, and both agents have Growth Domains that overlap, the orchestrator runs them sequentially rather than in parallel for the growth-writing phase. When Growth Domains do not overlap, parallel execution is permitted. This preserves the read-modify-write invariant for the notebook. The serialization rule is encoded in the orchestrator's agent prompt.
+When the orchestrator delegates to two or more agents in a single workflow, and both agents have Learning Domains that overlap, the orchestrator runs them sequentially rather than in parallel for the knowledge-writing phase. When Learning Domains do not overlap, parallel execution is permitted. This preserves the read-modify-write invariant for the knowledge base. The serialization rule is encoded in the orchestrator's agent prompt.
 
 ---
 
 ## 7. Knowledge Layer Specification
 
-Growth Notes and domain file entries draw from three tiers of knowledge. Agents use the most specific applicable tier. Citations must be verifiable by the developer.
+Learning Notes and domain file entries draw from three tiers of knowledge. Agents use the most specific applicable tier. Citations must be verifiable by the developer.
 
 ### Tier 1: External Canonical Documentation
 
@@ -488,15 +484,15 @@ Freshness constraint: agents must not synthesize new canonical documentation fro
 
 Records in `docs/en/adr/`. A contribution citing Tier 2 must reference the ADR by number and short title (e.g., "ADR-007: use-option-over-null"). Agents must not generate a Tier 2 citation for an ADR that does not exist. If the decision has not been formally recorded, the agent may note that the reasoning is local convention and flag it as a candidate for an ADR.
 
-### Tier 3: Prior Domain Notes
+### Tier 3: Prior Domain Knowledge
 
-Entries already in `.claude/growth/notes/` from prior sessions. An agent may reference a prior domain note when a concept was already introduced and the current session adds a nuance or a cross-reference. Tier 3 is the lowest authority; it is used to build on what exists rather than to establish new claims. Cross-references use relative Markdown links.
+Entries already in `learn/knowledge/` from prior sessions. An agent may reference a prior domain knowledge entry when a concept was already introduced and the current session adds a nuance or a cross-reference. Tier 3 is the lowest authority; it is used to build on what exists rather than to establish new claims. Cross-references use relative Markdown links.
 
 ### What Must Not Be Generated
 
-- A `docs/growth/` directory tree of any kind.
+- A `docs/learn/` directory tree of any kind beyond the read-only examples at `docs/en/learn/examples/`.
 - Generated wiki pages, learning modules, or curriculum files.
-- Any file outside `.claude/growth/` produced by a growth operation (domain files are under `.claude/growth/notes/`; preamble and config are under `.claude/growth/`).
+- Any file outside `learn/` produced by a learning operation (domain files are under `learn/knowledge/`; preamble and config are under `learn/`). The Skill itself remains in `.claude/skills/learn/`.
 - Inline educational comments added to production code files solely for pedagogical purposes.
 - Session-specific context in domain files ("we were debugging the cache miss when..."). Domain files contain extracted principles, not session logs.
 
@@ -506,31 +502,31 @@ Entries already in `.claude/growth/notes/` from prior sessions. An agent may ref
 
 ### The Guarantee
 
-When `.claude/growth/config.json` is absent, or when the file has `"enabled": false`, or when the file is not valid JSON, the agent response for any prompt contains none of the growth-mode artifacts defined in NFR-001: no `## Growth:` sections, no `[Growth Note]` markers, no writes to `.claude/growth/notes/`.
+When `learn/config.json` is absent, or when the file has `"enabled": false`, or when the file is not valid JSON, the agent response for any prompt contains none of the learning-mode artifacts defined in NFR-001: no `## Learning:` sections, no `[Learning Note]` markers, no writes to `learn/knowledge/`.
 
 This is a claim about agent-prompt logic, not about byte-level output equivalence. LLM output is non-deterministic across runs, model versions, and prompt compaction events. Any attempt to hash agent responses against golden files will flake and be disabled. The design addresses this by placing the invariant's enforcement into deterministic, LLM-free checks rather than into output comparison.
 
 ### Enforcement
 
-Three deterministic preconditions enforce the invariant. All three are checked by `scripts/check-growth-invariants.sh` on every PR.
+Three deterministic preconditions enforce the invariant. All three are checked by `scripts/check-learn-invariants.sh` on every PR.
 
-1. **Skill flag check.** `.claude/skills/growth/SKILL.md` contains `disable-model-invocation: true`. This prevents the model from flipping `enabled: true` on the user's behalf. One line of grep.
+1. **Skill flag check.** `.claude/skills/learn/SKILL.md` contains `disable-model-invocation: true`. This prevents the model from flipping `enabled: true` on the user's behalf. One line of grep.
 
-2. **Agent guard-branch check.** Every file under `.claude/agents/` that declares a `## Growth Domains` section also contains the guard-branch text — reading `config.json`, skipping all growth steps when absent or disabled. One regex per agent file.
+2. **Agent guard-branch check.** Every file under `.claude/agents/` that declares a `## Learning Domains` section also contains the guard-branch text — reading `config.json`, skipping all learning steps when absent or disabled. One regex per agent file.
 
-3. **Gitignore posture check.** `.gitignore` ignores `.claude/growth/notes/` and `.claude/growth/config.json`. `.gitignore.example` contains the opt-in inversion comment block. Two greps.
+3. **Gitignore posture check.** `.gitignore` ignores `learn/knowledge/` and `learn/config.json`. `.gitignore.example` contains the opt-in inversion comment block. Two greps.
 
 If any of the three fails, the CI job fails and the PR cannot merge.
 
 ### Design goals verified by PR review
 
-Three additional properties are design goals rather than automated checks. Attempting to test them against agent output would hit the same non-determinism problem. They are enforced by reviewer inspection when a PR touches `.claude/growth/preamble.md` or agent prompts:
+Three additional properties are design goals rather than automated checks. Attempting to test them against agent output would hit the same non-determinism problem. They are enforced by reviewer inspection when a PR touches `learn/preamble.md` or agent prompts:
 
 - **Non-destructive editing.** A `deepen` operation preserves the original section byte-for-byte and appends rather than interleaves. A `refine` operation keeps the original as a superseded block. A `correct` operation leaves the superseded text visible below the marker.
 - **Supersession history.** Multiple `correct` operations on the same section accumulate with markers; no version is silently dropped.
 - **Severity preservation.** A CRITICAL code-reviewer finding stays CRITICAL at every level.
 
-These are spelled out in `.claude/growth/preamble.md` and in the code-reviewer agent prompt. Reviewers enforce them when a change touches those files.
+These are spelled out in `learn/preamble.md` and in the code-reviewer agent prompt. Reviewers enforce them when a change touches those files.
 
 ---
 
@@ -540,19 +536,19 @@ All criteria must be satisfied for this feature to be considered shippable. The 
 
 ### Skill and Configuration
 
-- [ ] `/growth on junior` creates `.claude/growth/config.json` with `enabled: true`, `level: "junior"`, `focus_domains: []`, and a valid `updatedAt` timestamp.
-- [ ] `/growth off` sets `enabled: false` in config; subsequent agent responses in the same session contain no `## Growth:` sections.
-- [ ] `/growth status` reports enabled state, level, focus_domains, and last-ten diff summaries without modifying any file.
-- [ ] A missing or malformed `config.json` is treated as disabled; no error is surfaced to the developer; subsequent agent behavior is unchanged from no-growth-mode behavior.
-- [ ] `/growth on` without a level argument uses the previously stored level; if no level is stored, defaults to `junior`.
-- [ ] `/growth level senior` changes the level field in config without changing the `enabled` field.
-- [ ] `/growth focus architecture,testing-discipline` sets `focus_domains: ["architecture", "testing-discipline"]` in config.
-- [ ] `/growth focus clear` resets `focus_domains` to `[]`.
-- [ ] `/growth domain new observability` prompts for confirmation, creates `.claude/growth/notes/observability.md` with seed content after confirmation.
+- [ ] `/learn on junior` creates `learn/config.json` with `enabled: true`, `level: "junior"`, `focus_domains: []`, and a valid `updatedAt` timestamp.
+- [ ] `/learn off` sets `enabled: false` in config; subsequent agent responses in the same session contain no `## Learning:` sections.
+- [ ] `/learn status` reports enabled state, level, focus_domains, and last-ten diff summaries without modifying any file.
+- [ ] A missing or malformed `config.json` is treated as disabled; no error is surfaced to the developer; subsequent agent behavior is unchanged from no-learning-mode behavior.
+- [ ] `/learn on` without a level argument uses the previously stored level; if no level is stored, defaults to `junior`.
+- [ ] `/learn level senior` changes the level field in config without changing the `enabled` field.
+- [ ] `/learn focus architecture,testing-discipline` sets `focus_domains: ["architecture", "testing-discipline"]` in config.
+- [ ] `/learn focus clear` resets `focus_domains` to `[]`.
+- [ ] `/learn domain new observability` prompts for confirmation, creates `learn/knowledge/observability.md` with seed content after confirmation.
 
 ### All-Agent Coverage
 
-- [ ] Every agent file in `.claude/agents/` has a `## Growth Domains` section at the top of its prompt body.
+- [ ] Every agent file in `.claude/agents/` has a `## Learning Domains` section at the top of its prompt body.
 - [ ] A session invoking the architect produces at least one domain file enrichment in `architecture.md` or `api-design.md` when a non-trivial design decision is involved.
 - [ ] A session invoking the security-reviewer produces at least one enrichment in `security-mindset.md` when a security finding is present.
 - [ ] A session invoking the devops-engineer produces at least one enrichment in `operational-awareness.md` or `release-and-deployment.md` when a deployment pattern is used.
@@ -566,69 +562,69 @@ All criteria must be satisfied for this feature to be considered shippable. The 
 - [ ] A `correct` operation marks the prior entry with `> Superseded YYYY-MM-DD: <reason>` and appends the corrected version below it; the superseded text remains in the file.
 - [ ] A `refine` operation produces a `Prior Understanding (revised YYYY-MM-DD)` block with the prior phrasing and the new phrasing in the active position.
 - [ ] No enrichment operation deletes any content from a domain file.
-- [ ] An agent proposes a new domain via the diff report; it does not auto-create a domain file without `/growth domain new <key>` confirmation.
+- [ ] An agent proposes a new domain via the diff report; it does not auto-create a domain file without `/learn domain new <key>` confirmation.
 
-### Notebook Diff Report
+### Knowledge Diff Report
 
-- [ ] After any enrichment, the agent response ends with `## Growth: taught this session` and `## Growth: notebook diff` sections.
+- [ ] After any enrichment, the agent response ends with `## Learning: taught this session` and `## Learning: knowledge diff` sections.
 - [ ] The diff report names the domain file, the operation, the section heading, and a one-sentence change summary.
-- [ ] The diff report does not appear when Growth Mode is off.
+- [ ] The diff report does not appear when Learning Mode is off.
 - [ ] The diff report does not appear when `/quiet` was issued for that invocation.
 
 ### Levels
 
 - [ ] A `junior`-level architect response on a non-trivial design task includes a full first-principles explanation of the pattern applied in the response's teaching sections.
 - [ ] A `senior`-level implementer response on a task with no non-default choices contributes zero notes (both in the response and in the diff report).
-- [ ] A `mid`-level code-reviewer response explains a non-obvious convention finding; a routine formatting finding has no growth content.
-- [ ] Growth content adjusts angle and density across levels without changing the correctness or completeness of the primary artifact.
+- [ ] A `mid`-level code-reviewer response explains a non-obvious convention finding; a routine formatting finding has no learning content.
+- [ ] Learning content adjusts angle and density across levels without changing the correctness or completeness of the primary artifact.
 
 ### Anti-Patterns
 
-- [ ] No growth content contains affirmation language ("Great question", "Well done", "Excellent work").
-- [ ] No growth content is phrased as a quiz or question directed at the developer.
-- [ ] No growth content restates the artifact in prose without adding reasoning.
-- [ ] A CRITICAL code-reviewer finding is labeled CRITICAL at all three levels; no growth section softens or qualifies the label.
-- [ ] No growth-related file is created outside `.claude/growth/`.
+- [ ] No learning content contains affirmation language ("Great question", "Well done", "Excellent work").
+- [ ] No learning content is phrased as a quiz or question directed at the developer.
+- [ ] No learning content restates the artifact in prose without adding reasoning.
+- [ ] A CRITICAL code-reviewer finding is labeled CRITICAL at all three levels; no learning section softens or qualifies the label.
+- [ ] No learning-related knowledge file is created outside `learn/knowledge/`.
 - [ ] No educational inline comment is added to a production code file.
 
 ### Per-Session Suppression
 
-- [ ] `/quiet` suppresses the `## Growth:` sections and the notebook diff for the immediately following invocation; the next invocation resumes normal behavior.
+- [ ] `/quiet` suppresses the `## Learning:` sections and the knowledge diff for the immediately following invocation; the next invocation resumes normal behavior.
 - [ ] `/quiet` does not modify `config.json`.
 
 ### Default-Off Enforcement
 
-- [ ] `scripts/check-growth-invariants.sh` asserts `disable-model-invocation: true` in `.claude/skills/growth/SKILL.md`.
-- [ ] `scripts/check-growth-invariants.sh` asserts every `.claude/agents/*.md` file that declares a `## Growth Domains` section also contains the guard-branch reference to `config.json`.
-- [ ] `scripts/check-growth-invariants.sh` asserts `.gitignore` contains entries for `.claude/growth/notes/` and `.claude/growth/config.json`.
+- [ ] `scripts/check-learn-invariants.sh` asserts `disable-model-invocation: true` in `.claude/skills/learn/SKILL.md`.
+- [ ] `scripts/check-learn-invariants.sh` asserts every `.claude/agents/*.md` file that declares a `## Learning Domains` section also contains the guard-branch reference to `config.json`.
+- [ ] `scripts/check-learn-invariants.sh` asserts `.gitignore` contains entries for `learn/knowledge/` and `learn/config.json`.
 - [ ] The script runs in CI on every PR and fails the build if any check fails.
 
 ### Git and Privacy
 
-- [ ] `.gitignore` includes entries that exclude `.claude/growth/notes/` and `.claude/growth/config.json`.
-- [ ] The repository includes a `.gitignore.example` or comment block showing the lines to modify to opt in to committing notes.
+- [ ] `.gitignore` includes entries that exclude `learn/knowledge/` and `learn/config.json`.
+- [ ] The repository includes a `.gitignore.example` or comment block showing the lines to modify to opt in to committing knowledge files.
 - [ ] The README documents the default-private and opt-in-shared paths without editorializing.
 
 ### CLAUDE.md
 
-- [ ] `.claude/CLAUDE.md` contains a `## Developer Growth Mode` section.
-- [ ] The section names `config.json`, `preamble.md`, and the `/growth` Skill.
-- [ ] No agent prompt instructions for Growth Mode appear in CLAUDE.md.
-- [ ] The section is the only growth-mode content in CLAUDE.md.
+- [ ] `.claude/CLAUDE.md` contains a `## Developer Learning Mode` section.
+- [ ] The section names `config.json`, `preamble.md`, and the `/learn` Skill.
+- [ ] No agent prompt instructions for Learning Mode appear in CLAUDE.md.
+- [ ] The section is the only learning-mode content in CLAUDE.md.
 
 ---
 
 ## 10. Success Metrics
 
-These metrics are observable without instrumentation inside agent internals. Vanity metrics (session count, note-impression count, `/growth on` invocation rate) are excluded.
+These metrics are observable without instrumentation inside agent internals. Vanity metrics (session count, knowledge-impression count, `/learn on` invocation rate) are excluded.
 
 | Metric | Measurement Method | Target |
 |--------|--------------------|--------|
-| Agent-output modify rate | Fraction of sessions where the developer edits agent-generated code within a few minutes of receipt (proxy: file diff on agent-touched files in rapid succession). A lower rate suggests less reflexive copy-paste. | 10% reduction at 60 days versus baseline for Growth Mode users. |
-| Reasoned push-back rate | Count of session turns where the developer challenges an agent decision by name ("why repository pattern here?" not "I don't like this"). Higher rate indicates growth notes are prompting engagement with reasoning, not just output. | 15% increase in named-pattern push-backs at 30 days for Growth Mode users at `junior` or `mid` level. |
+| Agent-output modify rate | Fraction of sessions where the developer edits agent-generated code within a few minutes of receipt (proxy: file diff on agent-touched files in rapid succession). A lower rate suggests less reflexive copy-paste. | 10% reduction at 60 days versus baseline for Learning Mode users. |
+| Reasoned push-back rate | Count of session turns where the developer challenges an agent decision by name ("why repository pattern here?" not "I don't like this"). Higher rate indicates learning notes are prompting engagement with reasoning, not just output. | 15% increase in named-pattern push-backs at 30 days for Learning Mode users at `junior` or `mid` level. |
 | Pattern-name active use | Count of sessions where the developer independently uses a pattern name introduced in the same session in a later prompt in that session. Indicates the names are being internalized. | At least 25% of `junior`-level sessions contain at least one pattern-name reuse by session end. |
-| Recurrence rate | Fraction of code-reviewer findings that appear in the same file within 14 days. A lower rate for findings with associated growth content suggests the explanations are being acted on. | 20% reduction in recurrence at 60 days for CRITICAL and HIGH findings that had a growth note. |
-| Notes file growth quality | Size and section-count trend per domain file across sessions. Growing section count with stable depth-per-section indicates the notebook is accumulating concepts rather than bloating. | Each active domain file shows at least one new top-level section per five sessions. |
+| Recurrence rate | Fraction of code-reviewer findings that appear in the same file within 14 days. A lower rate for findings with associated learning content suggests the explanations are being acted on. | 20% reduction in recurrence at 60 days for CRITICAL and HIGH findings that had a learning note. |
+| Knowledge file growth quality | Size and section-count trend per domain file across sessions. Growing section count with stable depth-per-section indicates the knowledge base is accumulating concepts rather than bloating. | Each active domain file shows at least one new top-level section per five sessions. |
 
 ---
 
@@ -636,11 +632,11 @@ These metrics are observable without instrumentation inside agent internals. Van
 
 | Risk | Likelihood | Impact | Mitigation |
 |------|------------|--------|------------|
-| A growth note fabricates a citation — cites an ADR that does not exist or misquotes a named pattern. | Medium — model hallucination is a known risk for citation-heavy tasks. | High — a wrong citation is worse than no citation; it builds incorrect mental models. | The preamble explicitly forbids fabricated ADR citations. Agents must verify that an ADR file exists before citing it by number. For external sources, the agent cites by named pattern rather than URL when the URL is not directly accessible; the developer is expected to verify. Fabricated citations are treated as defects and block merge. |
-| Non-destructive editing fails under pressure — an agent rewrites or compresses prior content to save space. | Medium — agents under cost pressure may optimize for brevity. | High — silent loss of prior understanding breaks the supersession-with-history model. | The preamble forbids rewrites of prior content. PR reviewers check the property whenever `.claude/growth/preamble.md` or agent prompts change. The `correct` operation is the only sanctioned mechanism for changing a prior entry; it always preserves the original. |
-| Guard-branch marker in an agent prompt is removed or edited in a way that breaks the grep check. | Medium — refactoring of agent prompts is routine. | High — the default-off invariant would silently break. | `scripts/check-growth-invariants.sh` fails the PR. The script's grep pattern is simple and stable; if a legitimate refactor needs to change it, the script is updated in the same PR and the reviewer checks that the new pattern still matches all fifteen agents. |
-| Two agents in the same workflow write to the same domain concurrently — the second write overwrites the first. | Medium — parallel agent execution is common in the orchestrator's delegation pattern. | Medium — lost enrichment is visible in the diff report but may not be caught until review. | The orchestrator serializes growth-writing agents when their Growth Domains overlap. The session contract's diff report makes lost operations visible in the same response. If serialization fails, the learner can ask the agent to retry the enrichment. |
-| Domain files grow large enough that agents load too much context per session when Growth Mode is on. | Medium — a mature project with 50+ sessions will produce domain files of meaningful size. | Low-Medium — large domain files slow agent reads and increase context cost. The feature is opt-in, so this cost is known. | The technical-writer's `/growth review` command triggers a reorganization proposal when a file exceeds the split threshold (see Open Questions). Content-contributing agents flag the threshold in the diff report rather than splitting unilaterally. |
+| A learning note fabricates a citation — cites an ADR that does not exist or misquotes a named pattern. | Medium — model hallucination is a known risk for citation-heavy tasks. | High — a wrong citation is worse than no citation; it builds incorrect mental models. | The preamble explicitly forbids fabricated ADR citations. Agents must verify that an ADR file exists before citing it by number. For external sources, the agent cites by named pattern rather than URL when the URL is not directly accessible; the developer is expected to verify. Fabricated citations are treated as defects and block merge. |
+| Non-destructive editing fails under pressure — an agent rewrites or compresses prior content to save space. | Medium — agents under cost pressure may optimize for brevity. | High — silent loss of prior understanding breaks the supersession-with-history model. | The preamble forbids rewrites of prior content. PR reviewers check the property whenever `learn/preamble.md` or agent prompts change. The `correct` operation is the only sanctioned mechanism for changing a prior entry; it always preserves the original. |
+| Guard-branch marker in an agent prompt is removed or edited in a way that breaks the grep check. | Medium — refactoring of agent prompts is routine. | High — the default-off invariant would silently break. | `scripts/check-learn-invariants.sh` fails the PR. The script's grep pattern is simple and stable; if a legitimate refactor needs to change it, the script is updated in the same PR and the reviewer checks that the new pattern still matches all fifteen agents. |
+| Two agents in the same workflow write to the same domain concurrently — the second write overwrites the first. | Medium — parallel agent execution is common in the orchestrator's delegation pattern. | Medium — lost enrichment is visible in the diff report but may not be caught until review. | The orchestrator serializes learning-writing agents when their Learning Domains overlap. The session contract's diff report makes lost operations visible in the same response. If serialization fails, the learner can ask the agent to retry the enrichment. |
+| Domain files grow large enough that agents load too much context per session when Learning Mode is on. | Medium — a mature project with 50+ sessions will produce domain files of meaningful size. | Low-Medium — large domain files slow agent reads and increase context cost. The feature is opt-in, so this cost is known. | The technical-writer's `/learn review` command triggers a reorganization proposal when a file exceeds the split threshold (see Open Questions). Content-contributing agents flag the threshold in the diff report rather than splitting unilaterally. |
 
 ---
 
@@ -648,19 +644,19 @@ These metrics are observable without instrumentation inside agent internals. Van
 
 The following questions are not decided by this PRD. Each is a candidate for a follow-on ADR or a future iteration. Items marked `[PRD-scope]` affect functional or non-functional requirements in this document and would require PRD amendment if resolved. Items marked `[ADR-scope]` are architectural and should be resolved in a follow-on ADR.
 
-1. **When should a domain file be split?** `[ADR-scope]` The ADR's tentative position is 1200 lines or 8 top-level sections, whichever comes first, triggered by the technical-writer on demand via `/growth review`. This PRD defers to that position but does not formalize the threshold as a requirement until the ADR resolves it.
+1. **When should a domain file be split?** `[ADR-scope]` The ADR's tentative position is 1200 lines or 8 top-level sections, whichever comes first, triggered by the technical-writer on demand via `/learn review`. This PRD defers to that position but does not formalize the threshold as a requirement until the ADR resolves it.
 
-2. **Should market-analyst and monetization-strategist write to `market-reasoning.md` and `business-modeling.md`?** `[CLOSED]` Resolved in favor of full participation. Both the taxonomy (ownership matrix, ✓ on their respective primary domains) and ADR-001 (Decision 1: all fifteen agents are growth-aware from release; per-agent table assigns market-analyst → `market-reasoning` primary and monetization-strategist → `business-modeling` primary) confirm these agents write to their matching domains. FR-006 reflects this. No further escalation needed.
+2. **Should market-analyst and monetization-strategist write to `market-reasoning.md` and `business-modeling.md`?** `[CLOSED]` Resolved in favor of full participation. Both the taxonomy (ownership matrix, ✓ on their respective primary domains) and ADR-001 (Decision 1: all fifteen agents are learning-aware from release; per-agent table assigns market-analyst → `market-reasoning` primary and monetization-strategist → `business-modeling` primary) confirm these agents write to their matching domains. FR-006 reflects this. No further escalation needed.
 
-3. **Should the notes directory be committed by default or gitignored by default?** `[CLOSED]` Resolved as gitignore-by-default. ADR-001 Decision 4 and the ADR's privacy-posture section both state this unambiguously. FR-009 of this PRD reflects the same stance. The `.gitignore.example` opt-in path is the mechanism for teams that want shared notes. No further escalation needed.
+3. **Should the knowledge directory be committed by default or gitignored by default?** `[CLOSED]` Resolved as gitignore-by-default. ADR-001 Decision 4 and ADR-003 both state this unambiguously. FR-009 of this PRD reflects the same stance. The `.gitignore.example` opt-in path is the mechanism for teams that want shared knowledge files. No further escalation needed.
 
-4. **How does level change mid-project affect existing domain notes?** `[ADR-scope]` Tentative position per ADR: new contributions follow the new level; existing entries are not rewritten. The foundational scaffolding from `junior` sessions remains and is layered by `senior` refinements. This PRD inherits that position.
+4. **How does level change mid-project affect existing domain knowledge files?** `[ADR-scope]` Tentative position per ADR: new contributions follow the new level; existing entries are not rewritten. The foundational scaffolding from `junior` sessions remains and is layered by `senior` refinements. This PRD inherits that position.
 
-5. **Interaction with parallel agent execution.** `[ADR-scope]` The serialization rule for overlapping Growth Domains is specified in NFR-007 of this PRD and in the ADR. Verification that the orchestrator correctly detects domain overlap before dispatch is an implementation concern; the mechanism for overlap detection is not yet specified.
+5. **Interaction with parallel agent execution.** `[ADR-scope]` The serialization rule for overlapping Learning Domains is specified in NFR-007 of this PRD and in the ADR. Verification that the orchestrator correctly detects domain overlap before dispatch is an implementation concern; the mechanism for overlap detection is not yet specified.
 
-6. **i18n of Growth Notes.** `[PRD-scope]` Notes are English-only in this release. For teams whose primary working language is not English, this limits effectiveness. Machine translation is not addressed here; it is explicitly out of scope.
+6. **i18n of Learning Notes.** `[PRD-scope]` Knowledge files are English-only in this release. For teams whose primary working language is not English, this limits effectiveness. Machine translation is not addressed here; it is explicitly out of scope.
 
-7. **Interaction with existing CI hooks.** `[ADR-scope]` The project's `PostToolUse` hooks run linting and type-checking after edits. Growth Mode writes to `.claude/growth/notes/` domain files. Those files are Markdown; the existing ESLint/TypeScript hooks do not run on Markdown. No conflict is anticipated, but it is not verified.
+7. **Interaction with existing CI hooks.** `[ADR-scope]` The project's `PostToolUse` hooks run linting and type-checking after edits. Learning Mode writes to `learn/knowledge/` domain files. Those files are Markdown; the existing ESLint/TypeScript hooks do not run on Markdown. No conflict is anticipated, but it is not verified.
 
 ---
 
@@ -668,18 +664,18 @@ The following questions are not decided by this PRD. Each is a candidate for a f
 
 The following items are explicitly deferred. They are named here to prevent scope creep during implementation.
 
-- Any sharing or export feature for domain notes (exporting to a gist, publishing to a team wiki, syncing across repositories).
-- Multi-user notes merging or collaboration on domain files.
+- Any sharing or export feature for domain knowledge files (exporting to a gist, publishing to a team wiki, syncing across repositories).
+- Multi-user knowledge file merging or collaboration on domain files.
 - Progress scoring, learning completion markers, concept mastery indicators, or any form of gamification.
 - Automatic level inference from session content, commit history, or behavioral signals of any kind.
-- Translation or localization of Growth Notes or domain files.
+- Translation or localization of Learning Notes or domain knowledge files.
 - A structured curriculum, lesson plan, or sequenced concept progression across sessions.
-- A UI viewer or summary command for domain notes beyond `/growth status`.
+- A UI viewer or summary command for domain knowledge files beyond `/learn status`.
 - Retroactive annotation of prior session output.
 - Integration with external LMS systems, team analytics dashboards, or reporting tools.
-- Japanese translation of domain files (`docs/ja/growth/notes/` does not exist in this release).
-- Suppression of growth annotations in CI environments (annotations only appear in interactive agent responses; this is assumed, not specified).
-- A `/growth review` command for technical-writer-triggered reorganization (described in ADR open questions; not implemented in this release).
+- Japanese translation of domain knowledge files (`docs/ja/learn/knowledge/` does not exist in this release).
+- Suppression of learning annotations in CI environments (annotations only appear in interactive agent responses; this is assumed, not specified).
+- A `/learn review` command for technical-writer-triggered reorganization (described in ADR open questions; not implemented in this release).
 
 ---
 
@@ -689,24 +685,24 @@ The owner's intent is a clean release, not adoption maximization. The plan below
 
 ### Phase 1: Dark
 
-Ship the feature with the default-off invariant verified by CI. Present in repositories derived from the template from the first clone: the `/growth` Skill at `.claude/skills/growth/SKILL.md`, the `/quiet` companion Skill at `.claude/skills/quiet/SKILL.md`, the enrichment contract at `.claude/growth/preamble.md`, and the 19 pre-seeded canonical domain files under `.claude/growth/notes/` (consistent with FR-005). CLAUDE.md contains the pointer block. `scripts/check-growth-invariants.sh` runs in CI and passes for all three checks (Skill flag, agent guard branches, gitignore posture).
+Ship the feature with the default-off invariant verified by CI. Present in repositories derived from the template from the first clone: the `/learn` Skill at `.claude/skills/learn/SKILL.md`, the `/quiet` companion Skill at `.claude/skills/quiet/SKILL.md`, and the enrichment contract at `learn/preamble.md`. No domain files are pre-seeded; `learn/knowledge/` is empty and gitignored. CLAUDE.md contains the pointer block. `scripts/check-learn-invariants.sh` runs in CI and passes for all three checks (Skill flag, agent guard branches, gitignore posture).
 
-Created at runtime on the learner's first `/growth on` invocation: `.claude/growth/config.json` only. Additional `.claude/growth/notes/<key>.md` files are created only when the learner opens a custom domain via `/growth domain new <key>`.
+Created at runtime on the learner's first `/learn on` invocation: `learn/config.json` only. Domain files under `learn/knowledge/<key>.md` are created lazily on first teaching moment per domain, or on explicit `/learn domain new <key>` confirmation for custom domains.
 
-Both `.claude/growth/config.json` and `.claude/growth/notes/` are gitignored by default. The shipped `preamble.md` and seeded notes files are not hidden from the repository — they are part of the template — but any enrichment a learner accumulates under `notes/` stays local unless the learner inverts the gitignore entry.
+Both `learn/config.json` and `learn/knowledge/` are gitignored by default. The shipped `learn/preamble.md` is not hidden from the repository — it is part of the template — but any knowledge a learner accumulates stays local unless the learner inverts the gitignore entry.
 
 The feature is available to any developer who runs the Skill. It is not mentioned in release notes beyond the ADR and PRD existing in the repository.
 
 ### Phase 2: Available
 
-Release the minor version containing the feature. The changelog records the feature in a single line. The repository is the documentation. Developers who discover the Skill via CLAUDE.md or direct invocation can use it. No announcement. No feature flag. No staged rollout by user segment. This is a template repository; every fork benefits immediately from the next minor version when they update their template reference.
+Release the v2.0.0 breaking version containing the feature. The changelog records the feature and the breaking change. The repository is the documentation. Developers who discover the Skill via CLAUDE.md or direct invocation can use it. No feature flag. No staged rollout by user segment. This is a template repository; every fork benefits immediately from the next version when they update their template reference.
 
 The goals of Phase 2 are: confirm that no default-off regressions surface in real usage, and confirm that the enrichment protocol behaves as specified on real projects.
 
 ### Phase 3: Documented
 
-After Phase 2 signal is clean — no default-off regressions, no open CRITICAL issues from the open-questions list, at least one real project using Growth Mode for several weeks — add a section to `docs/en/template-usage.md` describing the feature and its three levels. Add a corresponding Japanese translation in `docs/ja/`. Add a more prominent mention in README.md.
+After Phase 2 signal is clean — no default-off regressions, no open CRITICAL issues from the open-questions list, at least one real project using Learning Mode for several weeks — add a section to `docs/en/template-usage.md` describing the feature and its three levels. Add a corresponding Japanese translation in `docs/ja/`. Add a more prominent mention in README.md.
 
 No changes to the feature itself are required for Phase 3. The announcement is documentation only.
 
-No migration step is required at any phase. The default behavior is unchanged. No existing repository derived from the template is affected until a developer explicitly runs `/growth on`.
+Forks that were on v1.x and had enabled the feature should follow the migration guide at `docs/en/migration/v1-to-v2.md` to move their knowledge files from `.claude/growth/notes/` to `learn/knowledge/`.

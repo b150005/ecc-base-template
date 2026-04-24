@@ -4,6 +4,8 @@
 
 Proposed (stabilized). Supersedes earlier drafts of this ADR per owner decisions recorded 2026-04-22.
 
+> **Partially superseded 2026-04-24 by [ADR-003](003-learning-mode-relocate-and-rename.md):** the directory layout (`.claude/growth/notes/` → `learn/knowledge/`), the feature name ("Growth Mode" → "Learning Mode"), the Skill command (`/growth` → `/learn`), and the terms "notes/notebook" → "knowledge" are revised in ADR-003. The architectural substance (levels, enrichment contract, trailers, default-off invariant) remains governed by this ADR.
+
 ## Metadata
 
 - Date: 2026-04-22

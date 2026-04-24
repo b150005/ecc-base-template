@@ -1,9 +1,9 @@
 ---
 name: quiet
 description: >
-  Suppress trailer sections (teaching-provenance and notebook-diff) from the
-  immediately following agent response without disabling Growth Mode writes or
-  any other agent behavior. Works when Growth Mode is on (suppresses growth
+  Suppress trailer sections (teaching-provenance and knowledge-diff) from the
+  immediately following agent response without disabling Learning Mode writes or
+  any other agent behavior. Works when Learning Mode is on (suppresses learning
   trailers) and generalizes to any future Skill that appends ## <prefix>:
   trailer sections — /quiet suppresses all of them for that one response.
 disable-model-invocation: true
@@ -19,13 +19,13 @@ arguments: []
 single response being produced. No state is written. The next user turn
 automatically restores normal trailer behavior.
 
-When Growth Mode is on, the suppressed sections are:
+When Learning Mode is on, the suppressed sections are:
 
-- `## Growth: taught this session`
-- `## Growth: notebook diff`
+- `## Learning: taught this session`
+- `## Learning: knowledge diff`
 
-The domain files under `.claude/growth/notes/` are still updated normally.
-Growth Mode is still on. The enrichment protocol runs as usual. Only the
+The domain files under `learn/knowledge/` are still updated normally.
+Learning Mode is still on. The enrichment protocol runs as usual. Only the
 chat-visible trailer is omitted.
 
 ---
@@ -40,7 +40,7 @@ and applies suppression to its response.
 /quiet
 
 Please review this PR and apply the enrichment protocol as usual, but I do not
-need the growth trailer in this response.
+need the learning trailer in this response.
 ```
 
 or inline:
@@ -59,8 +59,8 @@ of the user message and is not parsed as an argument.
 Any trailing section whose heading matches the pattern `## <Word>: <rest>`
 at the end of a response. Currently:
 
-- `## Growth: taught this session` — the per-concept teaching summary
-- `## Growth: notebook diff` — the per-file operation report
+- `## Learning: taught this session` — the per-concept teaching summary
+- `## Learning: knowledge diff` — the per-file operation report
 
 Future Skill trailers that follow the same `## <Prefix>:` heading convention
 are also suppressed, so `/quiet` remains useful as new features add trailers.
@@ -79,27 +79,27 @@ without any action from the learner.
 
 ---
 
-## Interaction With Growth Mode
+## Interaction With Learning Mode
 
-| Growth Mode state | `/quiet` present | Trailers appear? | Notebook updated? |
-|-------------------|-----------------|-----------------|-------------------|
-| off               | no              | no              | no                |
-| off               | yes             | no              | no                |
-| on                | no              | yes             | yes               |
-| on                | yes             | no              | yes               |
+| Learning Mode state | `/quiet` present | Trailers appear? | Knowledge base updated? |
+|---------------------|-----------------|-----------------|-------------------------|
+| off                 | no              | no              | no                      |
+| off                 | yes             | no              | no                      |
+| on                  | no              | yes             | yes                     |
+| on                  | yes             | no              | yes                     |
 
-When Growth Mode is off there are no trailers to suppress, so `/quiet` is
-effectively a no-op for growth trailers. It remains defined behavior and
+When Learning Mode is off there are no trailers to suppress, so `/quiet` is
+effectively a no-op for learning trailers. It remains defined behavior and
 does not produce an error.
 
 ---
 
 ## What /quiet Does NOT Do
 
-- Does not write to `.claude/growth/config.json` or any other file.
-- Does not prevent the agent from reading `.claude/growth/preamble.md`.
-- Does not prevent the agent from reading or updating domain notes files.
-- Does not disable Growth Mode for the current or any future turn.
+- Does not write to `learn/config.json` or any other file.
+- Does not prevent the agent from reading `learn/preamble.md`.
+- Does not prevent the agent from reading or updating domain knowledge files.
+- Does not disable Learning Mode for the current or any future turn.
 - Does not clear `focus_domains` or any other config setting.
 - Does not carry over to the next user turn — scope is strictly one response.
 
@@ -107,12 +107,12 @@ does not produce an error.
 
 ## Why /quiet Is a Separate Skill
 
-`/growth` controls whether the notebook is maintained. `/quiet` controls
+`/learn` controls whether the knowledge base is maintained. `/quiet` controls
 whether the trailer is rendered. These are orthogonal decisions. A learner
-may want silent background enrichment — the notebook accumulates, the response
-stays uncluttered — which is different from wanting Growth Mode off entirely.
-Keeping `/quiet` separate also lets it suppress trailers from future Skills
-without becoming a grab-bag subcommand of `/growth`.
+may want silent background enrichment — the knowledge base accumulates, the
+response stays uncluttered — which is different from wanting Learning Mode off
+entirely. Keeping `/quiet` separate also lets it suppress trailers from future
+Skills without becoming a grab-bag subcommand of `/learn`.
 
 The `disable-model-invocation: true` flag means the model cannot invoke
 `/quiet` on its own. Suppressing the trailer is a learner preference, not
@@ -145,7 +145,7 @@ of a longer identifier**. Specifically:
 
 ## Cross-References
 
-- Growth Mode toggle: `.claude/skills/growth/SKILL.md`
-- Enrichment contract (what the notebook update does): `.claude/growth/preamble.md`
+- Learning Mode toggle: `.claude/skills/learn/SKILL.md`
+- Enrichment contract (what the knowledge base update does): `learn/preamble.md`
 - Architecture decision: `docs/en/adr/001-developer-growth-mode.md` — `/quiet` section
-- Config schema (does not include a quiet field): `.claude/growth/config.json`
+- Config schema (does not include a quiet field): `learn/config.json`

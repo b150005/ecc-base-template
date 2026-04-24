@@ -1,6 +1,8 @@
 # ECC Base Template
 
-15 エージェントの開発チームと、**Developer Growth Mode** というオプトイン式の学習レイヤーを備えたフレームワーク非依存の GitHub テンプレートです。
+> **v2.0.0 — 破壊的変更:** Developer Growth Mode は **Developer Learning Mode** に改名され、機能ディレクトリが `.claude/growth/` から `learn/` に移動しました。この機能を有効化しておりかつナレッジファイルをコミット済みの場合は、アップグレード前に移行ガイド [`docs/en/migration/v1-to-v2.md`](docs/en/migration/v1-to-v2.md) をご確認ください。
+
+15 エージェントの開発チームと、**Developer Learning Mode** というオプトイン式の学習レイヤーを備えたフレームワーク非依存の GitHub テンプレートです。
 
 [English README is here](README.md)
 
@@ -9,8 +11,8 @@
 ## このテンプレートが提供するもの
 
 - **15 体の AI エージェント**: プロダクトライフサイクル全体を担当する。orchestrator、product-manager、architect、implementer、test-runner、code-reviewer、security-reviewer、performance-engineer、devops-engineer、technical-writer など。エコシステム非依存で、実行時にプロジェクトの言語とフレームワークを検出する。
-- **Developer Growth Mode**（任意、デフォルト **OFF**）: 有効化すると、各エージェントが応答の末尾に 2 つのトレーラー節を追加し、判断の根拠を説明するとともに、`.claude/growth/notes/` 配下のドメイン別知識ベースを更新する。セッションを重ねるほど、ノートブックは実機能を実装することで築き上げた個人用のリファレンスに育つ。
-- **CI 上の品質不変条件**: `scripts/check-growth-invariants.sh` が「デフォルト OFF 不変条件」を強制し、Growth Mode が本番成果物に滲み出さないことを保証する。
+- **Developer Learning Mode**（任意、デフォルト **OFF**）: 有効化すると、各エージェントが応答の末尾に 2 つのトレーラー節を追加し、判断の根拠を説明するとともに、`learn/knowledge/` 配下のドメイン別知識ベースを更新する。セッションを重ねるほど、知識ベースは実機能を実装することで築き上げた個人用のリファレンスに育つ。
+- **CI 上の品質不変条件**: `scripts/check-learn-invariants.sh` が「デフォルト OFF 不変条件」を強制し、Learning Mode が本番成果物に滲み出さないことを保証する。
 
 ---
 
@@ -35,23 +37,23 @@ cd <your-repo>
 
 ### 4. 作業を始める
 
-オーケストレーターに実際のタスクを与えます。スペシャリストはオーケストレーター経由でも直接でも呼び出せます。Growth Mode はあなたがオプトインするまで OFF のままです。
+オーケストレーターに実際のタスクを与えます。スペシャリストはオーケストレーター経由でも直接でも呼び出せます。Learning Mode はあなたがオプトインするまで OFF のままです。
 
-### 5.（任意）Growth Mode を有効化
+### 5.（任意）Learning Mode を有効化
 
 ```
-/growth on [junior|mid|senior]       指定レベルで有効化
-/growth off                          無効化
-/growth status                       現在の状態を表示
-/growth focus <domain>[,<domain>]    教示効果を特定ドメインに集中
-/growth unfocus                      focus を解除
-/growth level <junior|mid|senior>    有効/無効を切り替えずにレベルだけ変更
-/growth domain new <key>             カスタムドメインを作成（要確認）
+/learn on [junior|mid|senior]       指定レベルで有効化
+/learn off                          無効化
+/learn status                       現在の状態を表示
+/learn focus <domain>[,<domain>]    教示効果を特定ドメインに集中
+/learn unfocus                      focus を解除
+/learn level <junior|mid|senior>    有効/無効を切り替えずにレベルだけ変更
+/learn domain new <key>             カスタムドメインを作成（要確認）
 ```
 
-`/quiet` は、直後 1 回の応答の Growth トレーラーだけを抑止するコンパニオン Skill です（ノートは通常どおり更新されます）。
+`/quiet` は、直後 1 回の応答の Learning Mode トレーラーだけを抑止するコンパニオン Skill です（ナレッジファイルは通常どおり更新されます）。
 
-**レベル・ノートブック・設計思想の詳細および side-by-side 例**は [docs/ja/growth-mode-explained.md](docs/ja/growth-mode-explained.md) にあります。**正典の設計判断**は [ADR-001](docs/ja/adr/001-developer-growth-mode.md) を参照してください。
+**レベル・知識ベース・設計思想の詳細および side-by-side 例**は [docs/ja/learning-mode-explained.md](docs/ja/learning-mode-explained.md) にあります。**正典の設計判断**は [ADR-001](docs/ja/adr/001-developer-growth-mode.md) を、**改名・移動の経緯**は [ADR-003](docs/ja/adr/003-learning-mode-relocate-and-rename.md) を参照してください。
 
 ---
 
@@ -59,7 +61,7 @@ cd <your-repo>
 
 すべてのエージェントはエコシステムに依存しません。`.claude/CLAUDE.md` とプロジェクトのマニフェストファイル（`package.json`、`pubspec.yaml`、`go.mod`、`Cargo.toml` など）を読み込んで、実行時に言語とフレームワークを判別します。オーケストレーターがチーム全体を調整し、スペシャリストはオーケストレーター経由または開発者からの直接呼び出しで起動します。
 
-| エージェント | フェーズ | 役割 | 主担当 Growth ドメイン |
+| エージェント | フェーズ | 役割 | 主担当 Learning ドメイン |
 |-------------|---------|------|----------------|
 | **orchestrator** | 全体 | Issue を分析し、作業を計画し、スペシャリストに委任し、セッション全体を調整する | release-and-deployment |
 | **product-manager** | 企画 | PRD の作成、ユーザーストーリー、受け入れ基準、バックログの優先順位づけ | api-design |
@@ -77,7 +79,7 @@ cd <your-repo>
 | **devops-engineer** | リリース | CI/CD、デプロイ戦略、リリース管理 | operational-awareness, release-and-deployment |
 | **technical-writer** | リリース | ドキュメント、CHANGELOG、バイリンガルドキュメントの管理 | documentation-craft |
 
-各エージェントのドメイン担当は、プロンプト本文冒頭の `## Growth Domains` セクションで宣言しています。フロントマターではなく本文に宣言を置いている理由は [ADR-002](docs/ja/adr/002-growth-domains-location.md) を参照してください。副担当ドメインと完全な分類体系は [docs/ja/growth/domain-taxonomy.md](docs/ja/growth/domain-taxonomy.md) にあります。
+各エージェントのドメイン担当は、プロンプト本文冒頭の `## Learning Domains` セクションで宣言しています。フロントマターではなく本文に宣言を置いている理由は [ADR-002](docs/ja/adr/002-growth-domains-location.md) を参照してください。副担当ドメインと完全な分類体系は [docs/ja/learn/domain-taxonomy.md](docs/ja/learn/domain-taxonomy.md) にあります。
 
 ### モデル選定
 
@@ -107,12 +109,8 @@ orchestrator
 │   ├── CLAUDE.md                          # エージェントが読み込むプロジェクト指示
 │   ├── agents/                            # 15 エージェントの定義ファイル
 │   ├── skills/
-│   │   ├── growth/SKILL.md                # /growth トグル Skill
+│   │   ├── learn/SKILL.md                 # /learn トグル Skill
 │   │   └── quiet/SKILL.md                 # /quiet トレーラー抑止 Skill
-│   ├── growth/                            # Growth Mode の実行時ファイル + 同梱アセット
-│   │   ├── preamble.md                    # 同梱 — 拡充コントラクト
-│   │   ├── notes/                         # 同梱 — 19 の seed 済ドメインファイル（gitignore）
-│   │   └── config.json                    # 最初の /growth on で作成（gitignore）
 │   ├── settings.json
 │   └── settings.local.json
 ├── .devcontainer/
@@ -127,21 +125,26 @@ orchestrator
 │   ├── en/                                # 英語の Source of Truth
 │   │   ├── adr/                           # アーキテクチャ判断
 │   │   ├── prd/                           # プロダクト要件
-│   │   ├── growth/                        # Growth ドメイン分類体系
-│   │   ├── growth-mode-explained.md       # Growth Mode のロングフォーム解説
+│   │   ├── learn/                         # Learning ドメイン分類体系とサンプル
+│   │   ├── migration/                     # アップグレードガイド（例: v1-to-v2.md）
+│   │   ├── learning-mode-explained.md     # Learning Mode のロングフォーム解説
 │   │   └── (template-usage.md など)
 │   └── ja/                                # 日本語訳（英語ソースへのリンクを冒頭に持つ）
+├── learn/
+│   ├── preamble.md                        # 同梱 — 拡充コントラクト
+│   ├── config.json                        # 最初の /learn on で作成（gitignore）
+│   └── knowledge/                         # 遅延生成 — 初回の教示瞬間にドメインごとに作成（gitignore）
 ├── scripts/
-│   └── check-growth-invariants.sh         # デフォルト OFF 不変条件を強制する CI チェック
+│   └── check-learn-invariants.sh          # デフォルト OFF 不変条件を強制する CI チェック
 ├── .env.example
 ├── .gitignore
-├── .gitignore.example                     # ノートを共有したい場合のオプトイン反転の例
+├── .gitignore.example                     # ナレッジファイルを共有したい場合のオプトイン反転の例
 ├── LICENSE
 ├── README.md                              # 英語
 └── README.ja.md                           # このファイル（日本語）
 ```
 
-補足: `.claude/growth/preamble.md` と `.claude/growth/notes/` 配下の 19 の seed 済ノートはテンプレートに同梱されています。実行時に作成されるのは `config.json` のみで、最初の `/growth on` 呼び出し時に作られます。`config.json` と `notes/` はいずれも既定で gitignore されており、個人の状態や私的な学習素材がコミットに紛れ込まないようになっています。共有したい場合のオプトイン手順は [growth-mode-explained.md の「ノートはデフォルトで非公開」](docs/ja/growth-mode-explained.md#ノートはデフォルトで非公開) を参照してください。
+補足: `learn/preamble.md` はテンプレートに同梱されています。`learn/knowledge/` は遅延生成であり、ドメインごとにコンテンツが獲得された初回の教示瞬間に作成されます。実行時に作成されるのは `learn/config.json` のみで、最初の `/learn on` 呼び出し時に作られます。`config.json` と `learn/knowledge/` はいずれも既定で gitignore されており、個人の状態や私的な学習素材がコミットに紛れ込まないようになっています。共有したい場合のオプトイン手順は [learning-mode-explained.md の「ナレッジファイルはデフォルトで非公開」](docs/ja/learning-mode-explained.md#ナレッジファイルはデフォルトで非公開) を参照してください。
 
 ---
 
@@ -150,10 +153,11 @@ orchestrator
 重要な判断は `docs/en/adr/` の ADR として記録しています。現時点の ADR 一覧:
 
 - [`000-template.md`](docs/ja/adr/000-template.md) — ADR のフォーマットテンプレート
-- [`001-developer-growth-mode.md`](docs/ja/adr/001-developer-growth-mode.md) — Growth Mode の設計判断
-- [`002-growth-domains-location.md`](docs/ja/adr/002-growth-domains-location.md) — Growth Domains をプロンプト本文に置く理由
+- [`001-developer-growth-mode.md`](docs/ja/adr/001-developer-growth-mode.md) — Learning Mode の設計判断（旧名 Growth Mode; ADR-003 により一部更新）
+- [`002-growth-domains-location.md`](docs/ja/adr/002-growth-domains-location.md) — Learning Domains をプロンプト本文に置く理由
+- [`003-learning-mode-relocate-and-rename.md`](docs/ja/adr/003-learning-mode-relocate-and-rename.md) — Learning Mode への改名と `learn/` への移動
 
-プロダクト要件は [`docs/ja/prd/`](docs/ja/prd/) にあります。Developer Growth Mode の PRD は本機能に関する正典の機能仕様です。
+プロダクト要件は [`docs/ja/prd/`](docs/ja/prd/) にあります。Developer Learning Mode の PRD は本機能に関する正典の機能仕様です。
 
 テンプレート自体に手を入れる場合も同じエージェントワークフローが適用されます。オーケストレーターが作業を調整し、アーキテクトが判断を ADR として記録し、implementer が PRD の受け入れ基準に対して実装を進めます。
 

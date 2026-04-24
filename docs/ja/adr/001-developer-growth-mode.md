@@ -1,5 +1,7 @@
 > このドキュメントは `docs/en/adr/001-developer-growth-mode.md` の日本語訳です。英語版が原文（Source of Truth）です。
 
+> **2026-04-24 に [ADR-003](003-learning-mode-relocate-and-rename.md) により部分的に supersede されました:** ディレクトリレイアウト (`.claude/growth/notes/` → `learn/knowledge/`)、機能名 ("Growth Mode" → "Learning Mode")、Skill コマンド (`/growth` → `/learn`)、用語 "notes/notebook" → "knowledge" は ADR-003 で改訂されました。設計上の実体 (レベル体系、enrichment 契約、trailer、default-off 不変式) は本 ADR が引き続き管理します。
+
 # ADR-001: Developer Growth Mode — ドメイン別に構成された生きたノートブック
 
 ## ステータス
