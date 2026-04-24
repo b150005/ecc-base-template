@@ -39,16 +39,24 @@ All agents detect the project ecosystem at runtime by reading this file and proj
 
 ## Developer Learning Mode
 
-Default-off learning layer. At session start, read `learn/config.json`;
-if absent or `"enabled": false`, skip all learning behavior entirely. If
-`"enabled": true`, read `learn/preamble.md` for the enrichment contract.
-Toggled only via the `/learn` Skill; see
-[ADR-001](docs/en/adr/001-developer-growth-mode.md) and
-[ADR-003](docs/en/adr/003-learning-mode-relocate-and-rename.md) for the
-architecture and rename rationale, [PRD](docs/en/prd/developer-learning-mode.md)
-for the complete specification, and
-[docs/en/learn/domain-taxonomy.md](docs/en/learn/domain-taxonomy.md) for
-domain definitions.
+Default-off learning layer with two orthogonal pillars: the **knowledge pillar**
+(agents contribute teaching moments to a domain-organized knowledge base) and the
+**coaching pillar** (agents change how they work during implementation based on a
+chosen coaching style). At session start, read `learn/config.json`; if absent or
+`"enabled": false`, skip all learning behavior entirely. If `"enabled": true`, read
+`learn/preamble.md` for the enrichment contract. Also read `coach.style` from
+`learn/config.json`; if non-`default` and the style file exists at
+`.claude/skills/learn/coach-styles/<style>.md`, load and apply the `behavior-rule`
+for this turn.
+
+Toggled only via the `/learn` Skill. Use `/learn coach <style>` to set the coaching
+style; `/learn coach list` to see available styles. See
+[ADR-001](docs/en/adr/001-developer-growth-mode.md),
+[ADR-003](docs/en/adr/003-learning-mode-relocate-and-rename.md), and
+[ADR-004](docs/en/adr/004-coaching-pillar.md) for the architecture and coaching
+pillar design. [PRD](docs/en/prd/developer-learning-mode.md) for the complete
+specification, and [docs/en/learn/domain-taxonomy.md](docs/en/learn/domain-taxonomy.md)
+for domain definitions.
 
 ## Development Workflow
 

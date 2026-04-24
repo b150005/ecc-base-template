@@ -6,7 +6,7 @@
 
 ---
 
-> **v2.0.0 migration note.** This feature was renamed from "Developer Growth Mode" to "Developer Learning Mode" and the knowledge directory was relocated in v2.0.0 (see [ADR-003](adr/003-learning-mode-relocate-and-rename.md)). If you enabled the feature in v1.x and accumulated content under `.claude/growth/notes/`, follow the migration guide at `docs/en/migration/v1-to-v2.md` to move your knowledge files to the new location at `learn/knowledge/`.
+> **v2.0.0/v2.1.0 migration note.** This feature was renamed from "Developer Growth Mode" to "Developer Learning Mode" and the knowledge directory was relocated in v2.0.0 (see [ADR-003](adr/003-learning-mode-relocate-and-rename.md)). If you enabled the feature in v1.x and accumulated content under `.claude/growth/notes/`, follow the migration guide at `docs/en/migration/v1-to-v2.md` to move your knowledge files to the new location at `learn/knowledge/`. v2.1.0 adds the coaching pillar — five active-coaching styles plus `default` — as an orthogonal second axis alongside the knowledge pillar. Existing v2.0.0 installs upgrade transparently: a config file with no `coach` key resolves to `coach.style = "default"` and behavior is byte-identical to v2.0.0.
 
 ---
 
@@ -18,7 +18,7 @@ The two sections are `## Learning: taught this session` and `## Learning: knowle
 
 Note depth follows the concept being explained, not an artificial budget. A junior-level explanation of a foundational pattern is several paragraphs because it needs to build scaffolding from first principles. A senior-level trade-off note may be a single paragraph because that is what the decision demands. There are no length caps — no token budgets, no note counts, no sentence limits. The artifact — the code, the architecture document, the test file, the security report — is always first. The Learning trailers always follow.
 
-To see what a fully populated knowledge file looks like after many sessions on a real project, refer to the worked examples at `docs/en/learn/examples/<domain>.md` (shipping in v2.1.0 — see [ADR-003 §5](adr/003-learning-mode-relocate-and-rename.md)). These are read-only references grounded in a shared fictional project; agents never read or write to them. They exist so you can calibrate expectations before your own `learn/knowledge/` directory accumulates real content.
+To see what a fully populated knowledge file looks like after many sessions on a real project, refer to the worked examples at `docs/en/learn/examples/<domain>.md` (shipping in v2.2.0 — see [ADR-003 §5](adr/003-learning-mode-relocate-and-rename.md)). These are read-only references grounded in a shared fictional project; agents never read or write to them. They exist so you can calibrate expectations before your own `learn/knowledge/` directory accumulates real content.
 
 ---
 
@@ -76,6 +76,129 @@ This mirrors how expertise actually works. A developer who has worked on a codeb
 ## Knowledge is private by default
 
 `learn/knowledge/` is gitignored by default, and so is `learn/config.json`. The reason is deliberate: knowledge files contain the learner's mistakes, prior misunderstandings, and the revision history of their mental model. That is private learning material, not documentation intended for a team's shared repository. Teams who want a shared textbook — where accumulated domain knowledge is checked in and visible to all contributors — can opt in by inverting the gitignore pattern. A `.gitignore.example` file in the repository shows the exact pattern to add.
+
+---
+
+## The coaching pillar
+
+### Two pillars, one feature
+
+Learning Mode v2.0.0 shipped with one pillar: **knowledge accumulation**. Every time a teaching moment arises, the agent records it in a domain file under `learn/knowledge/`. The record is post-hoc — the agent finishes its work and then writes down what it taught. Your accumulated knowledge grows across sessions without changing how the agents work in the moment.
+
+v2.1.0 adds a second pillar: **coaching**. Coaching is a different axis entirely. Where the knowledge pillar changes what gets recorded, the coaching pillar changes how the agent works during the session. The two pillars are orthogonal — you can have the knowledge pillar on with no coaching, coaching on with no knowledge accumulation, both on together, or neither. Mixing and matching is first-class behavior.
+
+### The six coaching styles
+
+The coaching pillar defines six mutually exclusive styles. Exactly one is active at any time. Switching takes effect on the next agent turn, with no session restart required.
+
+| Style | One-line description | When to reach for it |
+|---|---|---|
+| `default` | Agent works normally. No withholding, no extra teaching. Equivalent to coach-off. | You do not need active coaching for this session. |
+| `hints` | Agent names the next concrete step and the relevant pattern, then stops before writing the target function body. Emits a `## Coach: hint` block. May write scaffolding (imports, signatures, test stubs). | You want to write the load-bearing code yourself. |
+| `socratic` | Agent replies to a how/why question with exactly one focused question that, if answered, picks the design. Does not write code in the same turn. Resumes normal behavior after you answer. | You want help choosing a design, not a finished design handed to you. |
+| `pair` | Agent writes complete scaffolding with `// TODO(human): <one-line instruction>` markers at the decision points. Tests are written in full so you have a target to hit. Markers cap at roughly 30% of the changed lines. | You want structure but want to own the algorithm. |
+| `review-only` | Agent refuses to write production code. Reads code, runs tests, and produces a structured review of code you submit. May write tests if explicitly asked. | You are driving; you want the agent as a reviewer, not an author. |
+| `silent` | Agent works normally and suppresses every `## Learning:` and `## Coach:` trailing section for the lifetime of this style. The inverse of teaching-mode. | You are in flow and do not want pedagogy noise in the response. |
+
+### Concrete example: `default` vs. `hints`
+
+Task: "Add a login endpoint."
+
+**`default` style (or no coaching):**
+
+The implementer writes the complete login handler — route registration, credential validation, token generation, error responses, and tests. You receive a working endpoint and, if the knowledge pillar is on, a learning trailer explaining the pattern. Nothing is withheld.
+
+**`hints` style:**
+
+The implementer identifies the next concrete step — "validate credentials against the user store, returning a typed error for not-found vs. wrong-password" — names the relevant pattern ("boundary error taxonomy"), and writes the scaffolding:
+
+```typescript
+// auth/handler.ts
+export async function loginHandler(req: LoginRequest): Promise<LoginResult> {
+  // TODO(human): call userStore.verifyCredentials(req.email, req.password)
+  // and translate UserStore errors into LoginError variants
+}
+```
+
+```typescript
+// auth/handler.test.ts
+it('returns Unauthorized for wrong password', async () => {
+  const result = await loginHandler({ email: 'a@b.com', password: 'wrong' });
+  expect(result).toEqual({ ok: false, error: 'Unauthorized' });
+});
+```
+
+Then a hint block:
+
+```
+## Coach: hint
+
+**Next step**: Implement the credential-validation call and map store errors to login errors.
+**Pattern**: Boundary error taxonomy — translate storage-layer errors to caller-facing error variants at the module boundary, so storage details do not leak into the API layer.
+**Rationale**: Callers of loginHandler should not have to understand UserStore's internal error shapes; they get a stable contract.
+```
+
+The body of `loginHandler` is intentionally blank. You write it. The tests already define what you are aiming for.
+
+### How to switch styles
+
+Use the `/learn coach` subcommand group:
+
+| Command | Effect |
+|---|---|
+| `/learn coach hints` | Switch to `hints` style for this session. |
+| `/learn coach socratic` | Switch to `socratic` style. |
+| `/learn coach pair` | Switch to `pair` style. |
+| `/learn coach review-only` | Switch to `review-only` style. |
+| `/learn coach silent` | Suppress all trailers without disabling knowledge writes. |
+| `/learn coach off` | Return to `default` (equivalent to `/learn coach default`). |
+| `/learn coach list` | List all discovered style files with one-line descriptions. |
+| `/learn coach show hints` | Print the full behavior rule for a single style. |
+
+Only you can change the style. The `disable-model-invocation: true` flag on the `/learn` Skill extends to every `coach` subcommand — agents cannot switch their own coaching style on your behalf.
+
+### The `silent` style in detail
+
+`silent` is not the same as `/quiet`. `/quiet` suppresses trailers for a single agent invocation, then the next invocation resumes normal behavior. `silent` is a persistent-until-changed style: it suppresses all `## Learning:` and `## Coach:` trailing sections for the lifetime of the style.
+
+Crucially, `silent` does not stop the knowledge pillar from writing. If the knowledge pillar is on and a teaching moment arises, the agent still enriches `learn/knowledge/<domain>.md` — it just does not show the diff trailer in the chat. `/learn status` always reports the last knowledge diffs, so silent writes are never invisible if you go looking.
+
+Use `silent` when you are deep in a flow state and the trailers are noise. Use `/quiet` for a one-off suppression when you just need the agent to be brief once.
+
+### How coaching composes with knowledge
+
+The two pillars are fully orthogonal:
+
+| Knowledge pillar | Coaching pillar | Behavior |
+|---|---|---|
+| off | off (`default`) | Default state. Byte-identical to no Learning Mode at all. |
+| on | off (`default`) | v2.0.0 behavior: post-hoc knowledge accumulation, no in-session coaching. |
+| off | on (any style) | Active coaching during the session, no knowledge accumulation. |
+| on | on (any style) | Both layers stack. Coaching shapes the work; knowledge records the teaching moments. |
+
+One interaction worth noting: in `socratic` style, the agent's clarifying question can itself surface a load-bearing concept. If it does, and the knowledge pillar is on, the agent writes to `learn/knowledge/` in the same response where the question is asked.
+
+Level (`junior`, `mid`, `senior`) and coach style are also independent. `level: junior` does not auto-couple to `hints` or any other style. Level controls the angle of explanation in knowledge trailers; coach style controls the shape of the agent's work. Set them independently to match what you actually need.
+
+### Config settings
+
+The `coach` subtree in `learn/config.json` carries three fields:
+
+```json
+{
+  "coach": {
+    "style": "default",
+    "trailers": "auto",
+    "scope": "session"
+  }
+}
+```
+
+- **`coach.style`** — the active style. A missing or unparseable value resolves to `"default"`.
+- **`coach.trailers`** — `auto | always | never`. Under `auto`, `silent` style suppresses trailers; every other style emits them when the knowledge pillar is on. Set `never` to suppress trailers globally regardless of style.
+- **`coach.scope`** — `session | persistent`. Under `session` (the default), the style resets to `"default"` at the start of each new session. Under `persistent`, your chosen style survives across sessions.
+
+A v2.0.0 config with no `coach` key resolves to `coach.style = "default"`. Nothing changes for existing installs.
 
 ---
 
@@ -213,9 +336,11 @@ Learning Notes are brief, but the domain knowledge files take the space they nee
 
 ## Where to go next
 
-- [ADR-001](adr/001-developer-growth-mode.md) — the authoritative design decision, including alternatives considered and consequences (partially superseded by ADR-003 for paths and terminology).
+- [ADR-001](adr/001-developer-growth-mode.md) — the authoritative design decision for the knowledge pillar, including alternatives considered and consequences (partially superseded by ADR-003 for paths and terminology).
 - [ADR-003](adr/003-learning-mode-relocate-and-rename.md) — the v2.0.0 decision that renamed the feature, relocated the directory, and replaced "notes/notebook" with "knowledge."
-- [PRD](prd/developer-learning-mode.md) — functional requirements, non-functional requirements, and acceptance criteria.
-- [Domain taxonomy](learn/domain-taxonomy.md) — authoritative list of the 19 canonical domains and their owners.
-- `learn/preamble.md` — the enrichment contract every learning-aware agent follows at runtime.
-- `docs/en/learn/examples/<domain>.md` — read-only worked examples showing what populated knowledge files look like, grounded in the Meridian reference project *(shipping in v2.1.0)*.
+- [ADR-004](adr/004-coaching-pillar.md) — the v2.1.0 design decision for the coaching pillar: six styles (`default` plus five active modes), the hybrid Output Styles architecture, config schema, and composition rules.
+- [PRD](prd/developer-learning-mode.md) — functional requirements, non-functional requirements, and acceptance criteria for both pillars.
+- [Domain taxonomy](learn/domain-taxonomy.md) — authoritative list of the 19 canonical domains and their owners (knowledge pillar).
+- `learn/preamble.md` — the enrichment contract every learning-aware agent follows at runtime, including §§15–20 covering the coaching pillar.
+- `.claude/skills/learn/coach-styles/<style>.md` — the style files that define the deterministic behavior rules for each coaching style.
+- `docs/en/learn/examples/<domain>.md` — read-only worked examples showing what populated knowledge files look like, grounded in the Meridian reference project *(shipping in v2.2.0)*.

@@ -106,6 +106,55 @@ fi
 printf "\n"
 
 # ---------------------------------------------------------------------------
+# Check 4: Every learning-aware agent has the coach guard marker
+# ---------------------------------------------------------------------------
+printf "Check 4: Agent coach guard branch\n"
+coach_marker="coach.style"
+agents_without_coach_guard=()
+
+while IFS= read -r -d '' agent_file; do
+  if grep -Eq '^## Learning Domains$' "$agent_file"; then
+    if ! grep -Fq "$coach_marker" "$agent_file"; then
+      agents_without_coach_guard+=("$agent_file")
+    fi
+  fi
+done < <(find .claude/agents -maxdepth 1 -name '*.md' -print0 2>/dev/null)
+
+if [[ ${#agents_without_coach_guard[@]} -eq 0 ]]; then
+  pass "every agent with ## Learning Domains section references $coach_marker (coach guard)"
+else
+  for a in "${agents_without_coach_guard[@]}"; do
+    fail_check "$a has ## Learning Domains section but lacks coach guard marker '$coach_marker'"
+  done
+fi
+printf "\n"
+
+# ---------------------------------------------------------------------------
+# Check 5: Coach styles directory exists with all 6 canonical files, each
+#           containing a behavior-rule: frontmatter key
+# ---------------------------------------------------------------------------
+printf "Check 5: Coach styles directory and canonical style files\n"
+coach_styles_dir=".claude/skills/learn/coach-styles"
+canonical_styles=("default" "hints" "socratic" "pair" "review-only" "silent")
+
+if [[ ! -d "$coach_styles_dir" ]]; then
+  fail_check "$coach_styles_dir directory not found"
+else
+  pass "$coach_styles_dir directory exists"
+  for style in "${canonical_styles[@]}"; do
+    style_file="$coach_styles_dir/${style}.md"
+    if [[ ! -f "$style_file" ]]; then
+      fail_check "missing canonical style file: $style_file"
+    elif ! grep -Fq "behavior-rule:" "$style_file"; then
+      fail_check "$style_file exists but is missing 'behavior-rule:' frontmatter key"
+    else
+      pass "$style_file present with behavior-rule:"
+    fi
+  done
+fi
+printf "\n"
+
+# ---------------------------------------------------------------------------
 # Result
 # ---------------------------------------------------------------------------
 if [[ $fail -eq 0 ]]; then

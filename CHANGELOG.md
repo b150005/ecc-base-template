@@ -11,6 +11,95 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [2.1.0] — 2026-04-25
+
+### Added
+
+Coaching pillar for Developer Learning Mode. The mode now has two orthogonal
+pillars: the existing **knowledge** pillar (passive accumulation, v2.0.0) and a
+new **coaching** pillar (active in-session behavior change). See
+[ADR-004](docs/en/adr/004-coaching-pillar.md) for the design.
+
+- **Six coaching styles** at `.claude/skills/learn/coach-styles/<style>.md`:
+  - `default` — agent works normally (no coaching)
+  - `hints` — agent names the next step and pattern, stops before the function body
+  - `socratic` — agent replies with one focused question, no code in the same turn
+  - `pair` — agent writes scaffolding with `// TODO(human):` markers (≤30% of changed lines)
+  - `review-only` — agent refuses to write production code; reviews only
+  - `silent` — agent suppresses all `## Learning:` and `## Coach:` trailers
+- **Hybrid file format**: Output Styles–compatible Markdown frontmatter (`name`,
+  `description`, `behavior-rule`, `stop-markers`); state lives in `learn/config.json`
+  for mid-session switchability. New styles can be added by dropping a file into
+  `coach-styles/` — no code change.
+- **Skill command extensions** (`/learn coach`):
+  - `/learn coach <style>` — set style
+  - `/learn coach off` — equivalent to `default`
+  - `/learn coach list` — discover and list all styles
+  - `/learn coach show <style>` — print a style's behavior rule
+  - `/learn coach scope <session|persistent>` — set persistence scope
+- **Config schema extension**: `learn/config.json` gains an optional `coach`
+  subtree with `style`, `trailers`, `scope` fields. Backwards-compatible —
+  existing v2.0.0 configs without `coach` resolve to `coach.style = "default"`
+  with no behavior change.
+- **Preamble §§15–20**: new sections in `learn/preamble.md` covering the
+  coaching pillar overview, style resolution, per-style behavior contracts,
+  pillar composition, trailer format, and style file format.
+- **CI invariant Check 4 + Check 5**: extended
+  `scripts/check-learn-invariants.sh` to enforce (4) every learning-aware agent
+  references `coach.style` for the guard branch, (5) `coach-styles/` directory
+  contains all six canonical style files, each with `behavior-rule:` frontmatter.
+  Total: 5 deterministic invariant checks, all PASS.
+- **ADR-004** in English (`docs/en/adr/004-coaching-pillar.md`) and Japanese
+  (`docs/ja/adr/004-coaching-pillar.md`).
+
+### Changed
+
+- All 15 agent files: extended the `## Developer Learning Mode contract` section
+  with a 4-line coaching pillar guard branch (after reading `learn/config.json`,
+  also read `coach.style` and apply the matching style file's behavior rule).
+- `.claude/skills/learn/SKILL.md`: added `coach` subcommand group, extended
+  `/learn status` output, documented `coach` subtree in Config Schema.
+- `learn/preamble.md`: appended §§15–20 (~150 lines) on the coaching pillar.
+- `docs/en/learning-mode-explained.md`: added "The coaching pillar" section
+  (~120 lines) covering orthogonality, the six styles with examples, command
+  surface, `silent` vs. `/quiet` distinction, composition truth table.
+- `docs/en/prd/developer-learning-mode.md`: added FR-012 through FR-016
+  (~75 lines) and 12 new acceptance-criteria bullets covering coach behavior
+  verification.
+- `docs/en/learn/domain-taxonomy.md`: added 2-sentence note that taxonomy
+  describes the knowledge pillar only; coaching styles are domain-agnostic.
+- All Japanese mirrors under `docs/ja/` updated in parallel by the JA writer.
+- `.claude/CLAUDE.md`: extended the `## Developer Learning Mode` block to
+  mention the coaching pillar and `/learn coach` command.
+- `README.md`, `README.ja.md`: v2.0.0 banner extended to v2.1.0; Learning Mode
+  section now mentions coaching pillar with link to ADR-004.
+- `docs/en/index.md`, `docs/ja/index.md`: ADR-004 added to documentation table.
+
+### Notes
+
+- **Default-off byte-identity invariant preserved.** A v2.1.0 install with no
+  `coach` key in `learn/config.json` produces output byte-identical to v2.0.0.
+  The coach branch guard mirrors the knowledge branch guard.
+- **No model-initiated state changes.** `disable-model-invocation: true` on the
+  `/learn` Skill extends to every `coach` subcommand. Only the learner can
+  switch coach styles.
+- **`silent` vs. `/quiet`**: `/quiet` is single-turn trailer suppression
+  (introduced in ADR-001 / v1.1.0); `coach: silent` is a persistent style.
+  Both exist because they serve different authorship boundaries.
+- **Style file Japanese translation deferred**: behavior rules are
+  language-agnostic; the body prose of the six style files is English at ship.
+  A later release can translate them without changing ADR-004.
+- **Worked examples (Meridian)** remain deferred to v2.2.0 per ADR-003 §5 and
+  ADR-004 Implementation Notes Phase 6.
+
+### Migration
+
+No migration is required. v2.0.0 installs upgrade transparently — the absence
+of a `coach` key in `learn/config.json` resolves to `coach.style = "default"`
+with no behavior change.
+
+---
+
 ## [2.0.0] — 2026-04-24
 
 ### Breaking Changes

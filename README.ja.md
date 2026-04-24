@@ -1,5 +1,7 @@
 # ECC Base Template
 
+> **v2.1.0 — コーチングピラー:** Developer Learning Mode に第2のピラーが追加されました。`hints`・`socratic`・`pair`・`review-only`・`silent` の5つの決定論的なコーチングスタイルを用いて、実装中のエージェントの振る舞いを変更できます。`/learn coach <style>` で切り替え可能。デフォルト OFF のため、既存インストールへの影響はありません。設計は [ADR-004](docs/en/adr/004-coaching-pillar.md) を参照。
+>
 > **v2.0.0 — 破壊的変更:** Developer Growth Mode は **Developer Learning Mode** に改名され、機能ディレクトリが `.claude/growth/` から `learn/` に移動しました。この機能を有効化しておりかつナレッジファイルをコミット済みの場合は、アップグレード前に移行ガイド [`docs/en/migration/v1-to-v2.md`](docs/en/migration/v1-to-v2.md) をご確認ください。
 
 15 エージェントの開発チームと、**Developer Learning Mode** というオプトイン式の学習レイヤーを備えたフレームワーク非依存の GitHub テンプレートです。
@@ -42,18 +44,25 @@ cd <your-repo>
 ### 5.（任意）Learning Mode を有効化
 
 ```
-/learn on [junior|mid|senior]       指定レベルで有効化
-/learn off                          無効化
-/learn status                       現在の状態を表示
-/learn focus <domain>[,<domain>]    教示効果を特定ドメインに集中
-/learn unfocus                      focus を解除
-/learn level <junior|mid|senior>    有効/無効を切り替えずにレベルだけ変更
-/learn domain new <key>             カスタムドメインを作成（要確認）
+/learn on [junior|mid|senior]              指定レベルで有効化
+/learn off                                 無効化
+/learn status                              現在の状態を表示
+/learn focus <domain>[,<domain>]           教示効果を特定ドメインに集中
+/learn unfocus                             focus を解除
+/learn level <junior|mid|senior>           有効/無効を切り替えずにレベルだけ変更
+/learn domain new <key>                    カスタムドメインを作成（要確認）
+/learn coach <style>                       コーチングスタイルを設定（hints|socratic|pair|review-only|silent|default）
+/learn coach off                           コーチングをデフォルト（変更なし）にリセット
+/learn coach list                          利用可能なコーチングスタイルを一覧表示
+/learn coach show <style>                  指定スタイルの behavior-rule を表示
+/learn coach scope <session|persistent>    コーチングサブツリーの永続スコープを設定
 ```
 
 `/quiet` は、直後 1 回の応答の Learning Mode トレーラーだけを抑止するコンパニオン Skill です（ナレッジファイルは通常どおり更新されます）。
 
-**レベル・知識ベース・設計思想の詳細および side-by-side 例**は [docs/ja/learning-mode-explained.md](docs/ja/learning-mode-explained.md) にあります。**正典の設計判断**は [ADR-001](docs/ja/adr/001-developer-growth-mode.md) を、**改名・移動の経緯**は [ADR-003](docs/ja/adr/003-learning-mode-relocate-and-rename.md) を参照してください。
+**コーチングスタイル**は、実装中のエージェントの振る舞いを変えます。`hints` は次のステップを提示するだけで関数本体を書かず、`socratic` はコードの代わりに焦点を絞った質問を返し、`pair` は `TODO(human):` マーカー付きのスキャフォールディングを書き、`review-only` は本番コードの作成を拒否し、`silent` はすべてのトレーラーノイズを抑止します。すべてのスタイルはデフォルト OFF です。設計は [ADR-004](docs/ja/adr/004-coaching-pillar.md) を参照してください。
+
+**レベル・知識ベース・設計思想の詳細および side-by-side 例**は [docs/ja/learning-mode-explained.md](docs/ja/learning-mode-explained.md) にあります。**正典の設計判断**は [ADR-001](docs/ja/adr/001-developer-growth-mode.md) を、**改名・移動の経緯**は [ADR-003](docs/ja/adr/003-learning-mode-relocate-and-rename.md) を、**コーチングピラーの設計**は [ADR-004](docs/ja/adr/004-coaching-pillar.md) を参照してください。
 
 ---
 
@@ -156,6 +165,7 @@ orchestrator
 - [`001-developer-growth-mode.md`](docs/ja/adr/001-developer-growth-mode.md) — Learning Mode の設計判断（旧名 Growth Mode; ADR-003 により一部更新）
 - [`002-growth-domains-location.md`](docs/ja/adr/002-growth-domains-location.md) — Learning Domains をプロンプト本文に置く理由
 - [`003-learning-mode-relocate-and-rename.md`](docs/ja/adr/003-learning-mode-relocate-and-rename.md) — Learning Mode への改名と `learn/` への移動
+- [`004-coaching-pillar.md`](docs/ja/adr/004-coaching-pillar.md) — v2.1.0 コーチングピラー: 5つの決定論的コーチングスタイル（Output Styles 互換フォーマット、Learning Mode 状態管理と dispatch）
 
 プロダクト要件は [`docs/ja/prd/`](docs/ja/prd/) にあります。Developer Learning Mode の PRD は本機能に関する正典の機能仕様です。
 

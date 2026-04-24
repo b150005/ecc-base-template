@@ -1,5 +1,7 @@
 # ECC Base Template
 
+> **v2.1.0 — Coaching Pillar:** Developer Learning Mode gains a second pillar — five deterministic coaching styles (`hints`, `socratic`, `pair`, `review-only`, `silent`) that change how agents work during implementation. Toggle with `/learn coach <style>`. Default-off; no behavior change for existing installs. See [ADR-004](docs/en/adr/004-coaching-pillar.md).
+>
 > **v2.0.0 — Breaking Change:** Developer Growth Mode is renamed to **Developer Learning Mode** and the feature directory moves from `.claude/growth/` to `learn/`. If you have enabled this feature and committed knowledge files, follow the migration guide at [`docs/en/migration/v1-to-v2.md`](docs/en/migration/v1-to-v2.md) before upgrading.
 
 A framework-agnostic GitHub template that ships a 15-agent development team and an opt-in learning layer called **Developer Learning Mode**.
@@ -42,18 +44,25 @@ Give the orchestrator a real task. Specialists are invoked by the orchestrator o
 ### 5. (Optional) Enable Learning Mode
 
 ```
-/learn on [junior|mid|senior]       Enable at the chosen level
-/learn off                          Disable
-/learn status                       Show current state
-/learn focus <domain>[,<domain>]    Narrow teaching effort to specific domains
-/learn unfocus                      Clear focus
-/learn level <junior|mid|senior>    Change level without toggling
-/learn domain new <key>             Create a custom domain (confirmation required)
+/learn on [junior|mid|senior]              Enable at the chosen level
+/learn off                                 Disable
+/learn status                              Show current state
+/learn focus <domain>[,<domain>]           Narrow teaching effort to specific domains
+/learn unfocus                             Clear focus
+/learn level <junior|mid|senior>           Change level without toggling
+/learn domain new <key>                    Create a custom domain (confirmation required)
+/learn coach <style>                       Set coaching style (hints|socratic|pair|review-only|silent|default)
+/learn coach off                           Reset coaching to default (no modifications)
+/learn coach list                          List available coaching styles
+/learn coach show <style>                  Show a style's behavior rule
+/learn coach scope <session|persistent>    Set persistence scope for coach subtree
 ```
 
 `/quiet` is a companion Skill that suppresses Learning Mode trailers for a single agent response (knowledge files are still updated).
 
-**Full explanation** of levels, the knowledge base, philosophy, and a side-by-side example is in [docs/en/learning-mode-explained.md](docs/en/learning-mode-explained.md). **Authoritative design** is in [ADR-001](docs/en/adr/001-developer-growth-mode.md). **Rename and relocation rationale** is in [ADR-003](docs/en/adr/003-learning-mode-relocate-and-rename.md).
+**Coaching styles** change how agents work during implementation — `hints` names the next step without writing the function body, `socratic` returns a focused question instead of code, `pair` writes scaffolding with `TODO(human):` markers, `review-only` refuses to write production code, `silent` suppresses all trailer noise. All styles are default-off; selecting `default` or running `/learn coach off` restores normal behavior. See [ADR-004](docs/en/adr/004-coaching-pillar.md) for the design.
+
+**Full explanation** of levels, the knowledge base, philosophy, and a side-by-side example is in [docs/en/learning-mode-explained.md](docs/en/learning-mode-explained.md). **Authoritative design** is in [ADR-001](docs/en/adr/001-developer-growth-mode.md). **Rename and relocation rationale** is in [ADR-003](docs/en/adr/003-learning-mode-relocate-and-rename.md). **Coaching pillar design** is in [ADR-004](docs/en/adr/004-coaching-pillar.md).
 
 ---
 
@@ -156,6 +165,7 @@ Significant decisions are recorded as ADRs in `docs/en/adr/`. Current ADRs:
 - [`001-developer-growth-mode.md`](docs/en/adr/001-developer-growth-mode.md) — Learning Mode design decision (originally named Growth Mode; superseded in part by ADR-003)
 - [`002-growth-domains-location.md`](docs/en/adr/002-growth-domains-location.md) — why Learning Domains live in the prompt body
 - [`003-learning-mode-relocate-and-rename.md`](docs/en/adr/003-learning-mode-relocate-and-rename.md) — rename to Learning Mode and relocation to `learn/`
+- [`004-coaching-pillar.md`](docs/en/adr/004-coaching-pillar.md) — v2.1.0 coaching pillar: five deterministic coaching styles (Output Styles–compatible file format, Learning Mode state and dispatch)
 
 Product requirements are in [`docs/en/prd/`](docs/en/prd/). The PRD for Developer Learning Mode is the authoritative functional specification.
 

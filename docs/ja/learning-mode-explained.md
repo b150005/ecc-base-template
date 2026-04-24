@@ -8,7 +8,7 @@
 
 ---
 
-> **v2.0.0 移行ノート**: 本機能は v2.0.0 で "Developer Growth Mode" から "Developer Learning Mode" に改名され、ナレッジディレクトリが再配置されました（詳細は [ADR-003](adr/003-learning-mode-relocate-and-rename.md) を参照）。v1.x で本機能を有効化しており、`.claude/growth/notes/` 配下にコンテンツを蓄積していた場合は、移行ガイド [`docs/ja/migration/v1-to-v2.md`](migration/v1-to-v2.md) に従って、ナレッジファイルを新しい配置 `learn/knowledge/` へ移動してください。
+> **v2.0.0/v2.1.0 移行ノート**: 本機能は v2.0.0 で "Developer Growth Mode" から "Developer Learning Mode" に改名され、ナレッジディレクトリが再配置されました（詳細は [ADR-003](adr/003-learning-mode-relocate-and-rename.md) を参照）。v1.x で本機能を有効化しており、`.claude/growth/notes/` 配下にコンテンツを蓄積していた場合は、移行ガイド [`docs/ja/migration/v1-to-v2.md`](migration/v1-to-v2.md) に従って、ナレッジファイルを新しい配置 `learn/knowledge/` へ移動してください。v2.1.0 では、コーチングピラーが追加されました — 5 つの能動的なコーチスタイルと `default` — 知識ピラーと直交する 2 番目の軸として機能します。既存の v2.0.0 インストールは透過的にアップグレードされます。`coach` キーのない config ファイルは `coach.style = "default"` に解決され、挙動は v2.0.0 とバイト単位で同一です。
 
 ---
 
@@ -68,6 +68,129 @@ learn/knowledge/
 ## ナレッジはデフォルトで非公開
 
 `learn/knowledge/` はデフォルトで gitignore されており、`learn/config.json` も同様です。これには意図があります。ナレッジには、学習者の誤り、以前の誤った理解、そして心的モデルの変遷が含まれます。これは私的な学習素材であり、チームの共有リポジトリに公開することを想定したドキュメントではありません。蓄積されたドメイン知識をコミットしておき、すべての貢献者が参照できる共有ナレッジベースとして扱いたいチームは、gitignore のパターンを反転させることでオプトインできます。リポジトリの `.gitignore.example` ファイルに、追加すべきパターンが明示されています。
+
+---
+
+## コーチングピラー
+
+### 2 つのピラー、1 つの機能
+
+Learning Mode v2.0.0 は 1 つのピラー、**知識蓄積**とともに出荷されました。学びの機会が生じるたびに、エージェントはそれを `learn/knowledge/` 配下のドメインファイルに記録します。記録は後発的なものです — エージェントは作業を終えてから、教えた内容を書き残します。蓄積された知識は、エージェントのその場での動作を変えることなく、セッションをまたいで成長していきます。
+
+v2.1.0 では 2 番目のピラー、**コーチング**が加わります。コーチングはまったく別の軸です。知識ピラーが「何が記録されるか」を変えるのに対して、コーチングピラーは「エージェントがセッション中にどのように動くか」を変えます。この 2 つのピラーは直交しています — 知識ピラーだけオンにしてコーチなし、コーチだけオンにして知識蓄積なし、両方同時にオン、あるいはどちらもオフ、という組み合わせが自由に選べます。この組み合わせはすべて正式な使い方です。
+
+### 6 つのコーチスタイル
+
+コーチングピラーは 6 つの排他的なスタイルを定義しています。常に 1 つだけがアクティブです。切り替えは次のエージェントターンから有効になり、セッションの再起動は不要です。
+
+| スタイル | 一行説明 | 使いどころ |
+|---|---|---|
+| `default` | エージェントは通常どおり動作する。保留も追加の教示もなし。コーチ OFF と同等。 | このセッションでは能動的なコーチングは不要。 |
+| `hints` | エージェントは次の具体的なステップと関連するパターンに名前を付け、対象関数の本体を書く前に止まる。`## Coach: hint` ブロックを出力する。足場（インポート、シグネチャ、テストスタブ）は書いてよい。 | 実装コードを自分で書きたいとき。 |
+| `socratic` | how/why の問いに対して、答えると設計が決まるような問いを一つだけ返す。同じターンにコードは書かない。答えた後は通常の行動に戻る。 | 完成した設計を渡されるのではなく、設計を選ぶ助けを求めているとき。 |
+| `pair` | 判断ポイントに `// TODO(human): <一行の指示>` マーカーを付けた完全な足場を書く。テストは完全に書くので、達成目標が明確になる。マーカーは変更行の約 30% を上限とする。 | 構造を渡してもらいながらアルゴリズムを自分で担当したいとき。 |
+| `review-only` | 本番コードの実装を拒否する。提出したコードを読み、テストを実行し、構造的なレビューを行う。明示的に求めればテストは書いてよい。 | 自分が主導しており、エージェントに著者ではなくレビュアーとしての役割を求めるとき。 |
+| `silent` | 通常どおり動作し、このスタイルが有効な間すべての `## Learning:` および `## Coach:` 末尾節を抑制する。教示モードの逆。 | フロー状態にあり、応答に教育的なノイズを入れたくないとき。 |
+
+### 具体例: `default` vs `hints`
+
+お題: 「ログインエンドポイントを追加して」
+
+**`default` スタイル（またはコーチなし）:**
+
+implementer は完成したログインハンドラー全体を書きます — ルート登録、認証検証、トークン生成、エラーレスポンス、テスト。動作するエンドポイントを受け取り、知識ピラーが ON であればパターンを説明するラーニングトレーラーも付きます。何も保留されません。
+
+**`hints` スタイル:**
+
+implementer は次の具体的なステップを特定します — 「ユーザーストアに対して認証情報を検証し、not-found と wrong-password を型付きエラーで区別して返す」— 関連するパターン（「境界エラー分類法」）に名前を付け、足場を書きます。
+
+```typescript
+// auth/handler.ts
+export async function loginHandler(req: LoginRequest): Promise<LoginResult> {
+  // TODO(human): call userStore.verifyCredentials(req.email, req.password)
+  // and translate UserStore errors into LoginError variants
+}
+```
+
+```typescript
+// auth/handler.test.ts
+it('returns Unauthorized for wrong password', async () => {
+  const result = await loginHandler({ email: 'a@b.com', password: 'wrong' });
+  expect(result).toEqual({ ok: false, error: 'Unauthorized' });
+});
+```
+
+続いてヒントブロック:
+
+```
+## Coach: hint
+
+**Next step**: Implement the credential-validation call and map store errors to login errors.
+**Pattern**: Boundary error taxonomy — translate storage-layer errors to caller-facing error variants at the module boundary, so storage details do not leak into the API layer.
+**Rationale**: Callers of loginHandler should not have to understand UserStore's internal error shapes; they get a stable contract.
+```
+
+`loginHandler` の本体は意図的に空白です。あなたが書きます。テストは、達成すべき目標をすでに定義しています。
+
+### スタイルの切り替え方
+
+`/learn coach` サブコマンドグループを使います。
+
+| コマンド | 効果 |
+|---|---|
+| `/learn coach hints` | このセッションで `hints` スタイルに切り替える。 |
+| `/learn coach socratic` | `socratic` スタイルに切り替える。 |
+| `/learn coach pair` | `pair` スタイルに切り替える。 |
+| `/learn coach review-only` | `review-only` スタイルに切り替える。 |
+| `/learn coach silent` | 知識への書き込みを無効にせずにトレーラーを抑制する。 |
+| `/learn coach off` | `default` に戻す（`/learn coach default` と同等）。 |
+| `/learn coach list` | 発見したすべてのスタイルファイルを一行説明付きで一覧表示する。 |
+| `/learn coach show hints` | 特定のスタイルの行動ルール全文を表示する。 |
+
+スタイルを変更できるのはあなただけです。`/learn` Skill の `disable-model-invocation: true` フラグはすべての `coach` サブコマンドに適用されます — エージェントはあなたに代わって自分のコーチスタイルを切り替えることができません。
+
+### `silent` スタイルの詳細
+
+`silent` と `/quiet` は別物です。`/quiet` は単一のエージェント呼び出しに対してトレーラーを抑制し、次の呼び出しでは通常の動作に戻ります。`silent` は変更されるまで持続するスタイルです — スタイルが有効な間、すべての `## Learning:` および `## Coach:` 末尾節を抑制します。
+
+重要なのは、`silent` が知識ピラーの書き込みを止めないことです。知識ピラーが ON で学びの機会が生じた場合、エージェントは引き続き `learn/knowledge/<domain>.md` を拡充します — チャットに diff トレーラーが表示されないだけです。`/learn status` は常に直近の knowledge diff を報告するので、見に行けば silent による書き込みは見えます。
+
+フロー状態にあってトレーラーがノイズになっているときは `silent` を使ってください。一度だけ簡潔に返してほしいときは `/quiet` を使ってください。
+
+### コーチングと知識の合成
+
+2 つのピラーは完全に直交しています。
+
+| 知識ピラー | コーチングピラー | 挙動 |
+|---|---|---|
+| off | off（`default`）| デフォルト状態。Learning Mode がまったくない場合とバイト単位で同一。 |
+| on | off（`default`）| v2.0.0 の挙動: 後発的な知識蓄積のみ、セッション内コーチングなし。 |
+| off | on（任意のスタイル） | セッション中の能動的なコーチング、知識蓄積なし。 |
+| on | on（任意のスタイル） | 両方のレイヤーが重なる。コーチングが作業の形を決め、知識が学びの機会を記録する。 |
+
+注目すべき相互作用として: `socratic` スタイルでは、エージェントの問いかけ自体が重要な概念を明らかにすることがあります。そのときに知識ピラーが ON であれば、エージェントは問いを出すのと同じ応答の中で `learn/knowledge/` に書き込みます。
+
+レベル（`junior`、`mid`、`senior`）とコーチスタイルも独立しています。`level: junior` は `hints` やその他のスタイルに自動的に結びつきません。レベルは知識トレーラーの説明の角度を制御し、コーチスタイルはエージェントの作業の形を制御します。必要なものに合わせて個別に設定してください。
+
+### Config の設定
+
+`learn/config.json` の `coach` サブツリーには 3 つのフィールドがあります。
+
+```json
+{
+  "coach": {
+    "style": "default",
+    "trailers": "auto",
+    "scope": "session"
+  }
+}
+```
+
+- **`coach.style`** — アクティブなスタイル。値が欠如しているか解析不能な場合は `"default"` に解決される。
+- **`coach.trailers`** — `auto | always | never`。`auto` では、`silent` スタイルがトレーラーを抑制し、他のスタイルでは知識ピラーが ON のときにトレーラーを出力する。`never` にするとスタイルにかかわらずトレーラーをグローバルに抑制する。
+- **`coach.scope`** — `session | persistent`。`session`（デフォルト）では、各セッションの開始時にスタイルが `"default"` にリセットされる。`persistent` では、選択したスタイルがセッションをまたいで持続する。
+
+`coach` キーのない v2.0.0 の config は `coach.style = "default"` に解決されます。既存インストールで何も変わりません。
 
 ---
 
@@ -211,6 +334,7 @@ Learning Note 自体は簡潔にまとめますが、ドメインナレッジの
 - [ADR-001](adr/001-developer-growth-mode.md) — 正典の設計判断（検討した代替案と帰結を含む）。
 - [ADR-002](adr/002-growth-domains-location.md) — Learning Domains をフロントマターではなくエージェントプロンプト本文に置く理由。
 - [ADR-003](adr/003-learning-mode-relocate-and-rename.md) — Growth Mode から Learning Mode への改名とディレクトリ移動の理由。
+- [ADR-004](adr/004-coaching-pillar.md) — コーチングピラーの設計判断：6 つのコーチスタイル（`default` と 5 つの能動モード）、ハイブリッドアーキテクチャ、知識ピラーとの合成ルール。
 - [PRD](prd/developer-learning-mode.md) — 機能要件、非機能要件、受け入れ基準。
 - [ドメイン分類体系](learn/domain-taxonomy.md) — 19 の正典ドメインとその担当エージェントを定めた正典。
 - `learn/preamble.md` — 各 Learning 対応エージェントが実行時に従う拡充コントラクト。

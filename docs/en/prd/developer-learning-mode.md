@@ -1,6 +1,6 @@
 # Developer Learning Mode
 
-> **Version history.** Originally specified for v1.1.0 as "Developer Growth Mode." Directory layout, feature name, and terminology revised in [ADR-003](../adr/003-learning-mode-relocate-and-rename.md) / v2.0.0 (2026-04-24). All paths, commands, and terminology below reflect the v2.0.0 state.
+> **Version history.** Originally specified for v1.1.0 as "Developer Growth Mode." Directory layout, feature name, and terminology revised in [ADR-003](../adr/003-learning-mode-relocate-and-rename.md) / v2.0.0 (2026-04-24). Coaching pillar added in [ADR-004](../adr/004-coaching-pillar.md) / v2.1.0 (2026-04-25); see FR-012 through FR-016 and the updated Acceptance Criteria. All paths, commands, and terminology below reflect the v2.1.0 state.
 
 ## Metadata
 
@@ -10,7 +10,7 @@
 | Target release | v2.0.0 (breaking) |
 | Owner | Agent Team |
 | Created | 2026-04-22 |
-| Last updated | 2026-04-24 |
+| Last updated | 2026-04-25 |
 
 ---
 
@@ -237,7 +237,7 @@ The following invocation forms must be supported:
 | `/learn status` | Report current enabled state, level, focus_domains, and the last ten knowledge-diff report summaries; does not modify config |
 | `/learn focus <domain>` | Set `focus_domains` to a single domain; agents prioritize teaching moments in this domain |
 | `/learn focus <domain>,<domain>` | Set `focus_domains` to multiple comma-separated domains |
-| `/learn focus clear` | Clear `focus_domains`; agents treat all domains equally |
+| `/learn focus clear` (alias: `/learn unfocus`) | Clear `focus_domains`; agents treat all domains equally |
 | `/learn level junior\|mid\|senior` | Change level without toggling enabled state |
 | `/learn domain new <key>` | Prompt the learner to confirm a new custom domain key; on confirmation, create the seeded domain file and update config |
 | `/quiet` | One-shot suppression for the immediately following agent invocation; does not modify config |
@@ -421,6 +421,64 @@ The README documents both paths: default private, opt-in shared. The README does
 
 When `focus_domains` is non-empty in config, agents use it as a soft priority signal. An agent with a teaching moment in a focus domain writes a full enrichment entry. An agent with a teaching moment outside the focus domains evaluates whether the moment is genuinely load-bearing for understanding; if it is, it writes normally; if it is a secondary or marginal teaching moment, it defers rather than produce a shallow entry. This is a preference, not a hard filter — agents never suppress a genuinely important teaching moment because it falls outside the focus list.
 
+### FR-012: Coach Pillar Default-Off
+
+Installs that have no `coach` key in `learn/config.json` (all v2.0.0 configs) produce behavior byte-identical to v2.0.0. The coaching guard branch in every learning-aware agent reads `coach.style` from config; a missing, `null`, or `"default"` value means the coaching pillar is inactive for that turn. No migration step is required for existing v2.0.0 configs. When the Skill writes a new config for the first time, it includes `coach: { "style": "default", "trailers": "auto", "scope": "session" }`.
+
+### FR-013: Six Coaching Styles with Deterministic Behavior Contracts
+
+The following styles are available. Each is backed by a style file at `.claude/skills/learn/coach-styles/<style>.md` carrying a `behavior-rule:` frontmatter key that agents enforce at turn time.
+
+| Style | Deterministic behavior rule |
+|---|---|
+| `default` | Agent works normally. Equivalent to the coaching pillar being inactive. |
+| `hints` | Agent identifies the next concrete step, names the relevant pattern or API, writes scaffolding (imports, signatures, test stubs) only, and emits a `## Coach: hint` block. Never writes the body of the target function. |
+| `socratic` | Agent replies to a how/why request with exactly one focused question. Does not write code in the same turn as the question. Resumes normal behavior after the learner answers. |
+| `pair` | Agent writes scaffolding with `// TODO(human): <one-line instruction>` markers at decision points (capped at ~30% of changed lines). Tests are written in full. |
+| `review-only` | Agent refuses to write production code. Reads code, runs tests, and produces a structured review. May write tests if explicitly asked. |
+| `silent` | Agent works normally and suppresses every `## Learning:` and `## Coach:` trailing section for the lifetime of this style. Knowledge writes still occur when the knowledge pillar is on. |
+
+Styles are mutually exclusive — exactly one is active at any time. A style name not matching any file in `coach-styles/` resolves to `"default"` with a warning on next `/learn status`.
+
+### FR-014: Mid-Session Style Switchability
+
+`/learn coach <style>` changes the active coaching style with effect from the next agent turn. No session restart is required. The new style is written to `coach.style` in `learn/config.json` by the Skill. Agents read config at turn time; the change is immediately effective. The `disable-model-invocation: true` flag on the Skill extends to every `coach` subcommand: agents cannot switch their own coaching style.
+
+The following command forms are supported:
+
+| Command | Effect |
+|---|---|
+| `/learn coach <style>` | Set active style to `<style>`. |
+| `/learn coach off` | Equivalent to `/learn coach default`. |
+| `/learn coach list` | List discovered style files with name and description from frontmatter. |
+| `/learn coach show <style>` | Print a single style's behavior rule. |
+| `/learn coach scope <session\|persistent>` | Set persistence scope for the `coach` subtree. |
+
+### FR-015: Pillar Composition
+
+The knowledge pillar and the coaching pillar are orthogonal. The four combinations and their behaviors:
+
+| Knowledge | Coach | Behavior |
+|---|---|---|
+| off | off / `default` | Default state. Byte-identical to no Learning Mode. |
+| on | off / `default` | v2.0.0 behavior: post-hoc knowledge accumulation only. |
+| off | on (any non-default style) | Active coaching without knowledge accumulation. |
+| on | on (any non-default style) | Both layers active: coaching shapes work, knowledge records teaching moments. |
+
+Interaction rules:
+- In `socratic` style, if the agent's question surfaces a load-bearing concept and the knowledge pillar is on, the agent writes to `learn/knowledge/` in the same response where the question is asked.
+- In `silent` style, knowledge writes still happen when the knowledge pillar is on; only the chat-visible `## Learning:` and `## Coach:` trailer sections are suppressed.
+- `level` and `coach.style` are independent axes. `level: junior` does not auto-couple to `hints` or any other style.
+
+### FR-016: `/quiet` and `coach: silent` Distinction
+
+These two mechanisms serve different authorship boundaries and must remain separate:
+
+- **`/quiet`** — Single-turn suppression. Suppresses learning and coaching trailers for the immediately following agent invocation only. Does not modify `config.json`. After the suppressed call, the next invocation resumes normal behavior per the active style.
+- **`coach: silent`** — Persistent-until-changed style. Suppresses all `## Learning:` and `## Coach:` sections for the lifetime of the style without disabling the knowledge pillar. Changed by the learner via `/learn coach <style>`; cannot be changed by the agent.
+
+`/quiet` is the right tool for one-off suppression without altering the session's persistent style. `coach: silent` is the right tool for a flow-state session where the developer wants no pedagogy noise for an extended stretch.
+
 ---
 
 ## 6. Non-Functional Requirements
@@ -591,6 +649,21 @@ All criteria must be satisfied for this feature to be considered shippable. The 
 
 - [ ] `/quiet` suppresses the `## Learning:` sections and the knowledge diff for the immediately following invocation; the next invocation resumes normal behavior.
 - [ ] `/quiet` does not modify `config.json`.
+
+### Coaching Pillar
+
+- [ ] A `learn/config.json` with no `coach` key produces behavior byte-identical to v2.0.0; no coaching trailer appears and no coach-specific guard branch fires.
+- [ ] `/learn coach hints` sets `coach.style` to `"hints"` in config; the next agent turn on a code-writing prompt does not contain the body of the target function, only scaffolding plus a `## Coach: hint` block with step, pattern name, and one-line rationale.
+- [ ] `/learn coach socratic` sets `coach.style` to `"socratic"`; the next agent turn responding to a design question contains exactly one focused question and no implementation code in that same response.
+- [ ] `/learn coach pair` sets `coach.style` to `"pair"`; the next agent turn produces scaffolding with `// TODO(human):` markers at decision points, with tests written in full, and markers representing no more than roughly 30% of changed lines.
+- [ ] `/learn coach review-only` sets `coach.style` to `"review-only"`; the next agent turn refuses to write production code and produces a structured review of submitted or on-disk code instead.
+- [ ] `/learn coach silent` sets `coach.style` to `"silent"`; the next agent turn contains no `## Learning:` or `## Coach:` trailing section; knowledge files are still written when the knowledge pillar is on; `/learn status` reports the suppressed diff.
+- [ ] `/learn coach off` is equivalent to `/learn coach default`; subsequent agent turns revert to normal behavior with learning trailers if the knowledge pillar is on.
+- [ ] A style name not matching any file under `.claude/skills/learn/coach-styles/` resolves to `"default"` and the next `/learn status` reports a warning.
+- [ ] `/quiet` suppresses the coaching trailer for one turn regardless of the active coach style; the style remains unchanged in config.
+- [ ] With knowledge pillar on and `coach.style: "socratic"`, an agent turn that asks a clarifying question and surfaces a load-bearing concept also writes the concept to `learn/knowledge/<domain>.md` in the same response.
+- [ ] `scripts/check-learn-invariants.sh` asserts that `.claude/skills/learn/coach-styles/` contains at least the six canonical style files (`default.md`, `hints.md`, `socratic.md`, `pair.md`, `review-only.md`, `silent.md`), each with a `behavior-rule:` frontmatter key.
+- [ ] `scripts/check-learn-invariants.sh` asserts the coach guard branch marker string appears in every agent file under `.claude/agents/` that declares a `## Learning Domains` section.
 
 ### Default-Off Enforcement
 

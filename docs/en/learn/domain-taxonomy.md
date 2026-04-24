@@ -2,7 +2,7 @@
 
 > **Partially superseded.** [ADR-003](../adr/003-learning-mode-relocate-and-rename.md) (2026-04-24) renamed the feature from "Growth Mode" to "Learning Mode," moved domain files from `.claude/growth/notes/` to `learn/knowledge/`, and replaced the terms "notes/notebook" with "knowledge." The domain definitions, ownership matrix, and enrichment protocol in this document remain current. This file has been updated to reflect the new terminology and paths. The prior location of this file was `docs/en/growth/domain-taxonomy.md`.
 
-This document defines the canonical knowledge domains into which Learning Mode knowledge accumulates, the agents that contribute to each domain, and the structure that domain files follow as they grow over time.
+This document defines the canonical knowledge domains into which Learning Mode knowledge accumulates, the agents that contribute to each domain, and the structure that domain files follow as they grow over time. This taxonomy describes the **knowledge pillar** only. The coaching pillar — which controls how agents work during a session rather than what they record afterward — is domain-agnostic and governed separately by the style files at `.claude/skills/learn/coach-styles/` and [ADR-004](../adr/004-coaching-pillar.md).
 
 Developer Learning Mode is not a feature with a fixed curriculum. It is a mechanism for capturing teaching moments as they arise during real work. Knowledge is organized by domain, not by date. Over time, a domain file becomes a personal reference text built incrementally across many sessions — what this project calls a "textbook-in-progress."
 

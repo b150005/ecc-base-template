@@ -658,7 +658,7 @@ cost of eventual consistency").
   definitions, scope boundaries, and per-agent ownership matrix.
 - **Worked examples (read-only references):** `docs/en/learn/examples/<domain>.md` —
   realistic populated knowledge files from a shared fictional project (Meridian).
-  Shipping in v2.1.0 (PR #2); not present in the v2.0.0 tree. Agents never read, cite,
+  Shipping in v2.2.0; not present in v2.1.0 or earlier. Agents never read, cite,
   or write under this tree when it exists.
 - **Architecture decision records:** `docs/en/adr/001-developer-growth-mode.md` (original
   design, partially superseded), `docs/en/adr/002-growth-domains-location.md` (prompt-body
@@ -666,3 +666,194 @@ cost of eventual consistency").
   relocation).
 - **CLAUDE.md pointer:** `.claude/CLAUDE.md` — the `## Developer Learning Mode` block that
   agents discover on session start.
+- **Coaching pillar ADR:** `docs/en/adr/004-coaching-pillar.md` — architecture decision for
+  the coaching pillar (v2.1.0).
+- **Coach style files:** `.claude/skills/learn/coach-styles/<style>.md` — one file per style;
+  loaded at guard time when `coach.style` is non-`default`.
+
+---
+
+## 15. Coaching Pillar Overview
+
+The **coaching pillar** is the second axis of Developer Learning Mode. The knowledge pillar
+(§§1–14 above) is post-hoc and passive: agents produce their artifact, then record what they
+taught. The coaching pillar is in-session and active: it changes how the agent works during
+implementation, not only after.
+
+The coaching pillar ships six styles — the inert `default` plus five active behavior modes —
+each expressed in a style file under `.claude/skills/learn/coach-styles/`. Which style is
+active is controlled by `coach.style` in `learn/config.json`. Like the knowledge pillar, the
+coaching pillar is default-off. A config with no `coach` key — including every v2.0.0 config
+— resolves to `coach.style = "default"`, which is byte-identical to coach-off. No behavior
+changes for existing installs.
+
+The two pillars are orthogonal axes: either can be on or off independently. They do not
+constrain each other. Knowledge pillar on, coaching off is v2.0.0 behavior. Coaching on with
+knowledge off means the agent coaches without producing a knowledge base. Both on means both
+layers stack. The `disable-model-invocation: true` invariant on the `/learn` Skill extends to
+every coach subcommand: the learner — not the model — selects the coaching style.
+
+---
+
+## 16. Coach Style Resolution
+
+At guard time (when the agent reads `learn/config.json` at session start), the agent resolves
+the active coaching style by this read order:
+
+1. Read `learn/config.json`. If absent or invalid, treat as `coach.style = "default"`.
+2. Read `config.coach.style`. If the key is absent, null, or not one of the six canonical
+   style names, treat as `"default"`.
+3. Look up the file at `.claude/skills/learn/coach-styles/<style>.md`. If the file exists,
+   load its `behavior-rule:` frontmatter field and apply it for this turn. If the file is
+   missing, fall back to `"default"` and emit a warning on the next `/learn status` output.
+4. If `coach.style` is `"default"` (by resolution or explicit config), apply no coaching
+   modifications. Agent output is byte-identical to a world without the coaching pillar.
+
+This resolution runs once at guard time and is stable for the turn. Mid-turn style changes
+are not possible. A `/learn coach <style>` invocation takes effect on the next agent turn.
+
+---
+
+## 17. Per-Style Behavior Contracts
+
+The following rules are stated in imperative voice. Each applies for every agent turn
+produced while the named style is active.
+
+**`default`:** Work normally. No withholding, no extra teaching scaffolding, no `## Coach:`
+trailing section. Functionally identical to coaching off.
+
+**`hints`:** Identify the next concrete implementation step. Name the relevant pattern or API.
+Write scaffolding only (imports, signatures, test stubs). Do not write the body of the target
+function. Emit a `## Coach: hint` block containing the step name, the pattern name, and a
+one-line rationale. Place `<!-- coach:hints stop -->` immediately after the hint block and
+stop. No further implementation code follows in this turn. One hint per turn; no multiple
+hints, no worked examples.
+
+**`socratic`:** When the learner asks a how or why question, reply with exactly one focused
+question that, if answered, picks the design decision the learner must make next. Do not write
+code in the same turn as the question. Do not answer the question yourself. Place
+`<!-- coach:socratic stop -->` immediately after the question block. On the learner's next
+turn, resume normal behavior and implement based on the learner's chosen direction.
+
+**`pair`:** Write complete scaffolding for the requested artifact. At each load-bearing
+decision point, insert `// TODO(human): <one-line instruction>` instead of the implementation.
+Cap TODO markers at roughly 30% of the changed lines so the scaffolding is a genuine skeleton.
+Write the full test suite so the learner has a runnable red target. Place
+`<!-- coach:pair stop -->` at the end of the response. Never write an algorithm body where a
+TODO marker belongs.
+
+**`review-only`:** Refuse to write production code. When asked to implement, decline and
+explain the active style. Read submitted or on-disk code and produce a structured review using
+CRITICAL/HIGH/MEDIUM/LOW severity levels. Writing tests is permitted when the learner
+explicitly requests them. Place `<!-- coach:review-only stop -->` at the end of the review.
+Never soften severity labels because the learner authored the code.
+
+**`silent`:** Work normally. Suppress every `## Learning: taught this session` and
+`## Learning: knowledge diff` trailing section. Suppress any `## Coach:` section. The response
+ends with the last line of the primary artifact. Knowledge files are still written if the
+knowledge pillar is enabled; only the chat-visible trailers are omitted. No stop marker is
+emitted (there is no coach section to terminate). This suppression persists across turns until
+the learner changes the style; it is not per-turn like `/quiet`.
+
+---
+
+## 18. Coach × Knowledge Composition
+
+The two pillars operate independently. The interaction rules below govern the edge cases where
+they share a surface.
+
+**`socratic` + knowledge on:** A Socratic question can itself be a teaching moment. If the
+question reveals a load-bearing concept — one the learner must understand to answer it — the
+agent writes that concept to the appropriate domain file following the knowledge pillar
+protocol (§§1–5). The `## Learning:` trailing sections appear in the same response as the
+question, before the stop marker. The knowledge write and the question coexist in the same
+turn.
+
+**`silent` + knowledge on:** Knowledge files are still written. The knowledge pillar protocol
+runs normally: the agent reads the domain file, performs the enrichment operation, and writes
+the updated file to disk. Only the chat-visible `## Learning:` and `## Coach:` trailing
+sections are suppressed. The learner can verify that writes occurred by running `/learn status`,
+which always reports the last-N knowledge diffs regardless of trailer suppression.
+
+**`review-only` + knowledge on:** The review itself can produce teaching moments. A CRITICAL
+finding that explains why a pattern is dangerous is a teaching moment. The knowledge pillar
+protocol runs normally and the `## Learning:` trailing sections appear after the review block
+and before the stop marker. (Styles are mutually exclusive — exactly one is active at a time
+— so `review-only` and `silent` cannot both be on; the learner switches one for the other.)
+
+**Level does not couple to coach style:** `level: junior` does not auto-select `hints` or any
+other coach style. Level controls the angle of explanation; coach controls the shape of the
+agent's work. The two axes do not constrain each other.
+
+---
+
+## 19. Coach Trailer Format
+
+When a coaching style produces output that warrants a visible coaching section — styles other
+than `default` and `silent` — the coaching section uses this heading format:
+
+```
+## Coach: <style-specific label>
+```
+
+Examples from each non-silent style:
+
+- `hints` → `## Coach: hint`
+- `socratic` → `## Coach: question`
+- `pair` — no separate coaching section; TODO markers are embedded in the scaffolding code
+- `review-only` → `## Coach: review`
+
+The coaching section appears after the primary artifact and before the `## Learning:` trailing
+sections (if the knowledge pillar is also on). Ordering: artifact → coach section → stop
+marker → learning trailers.
+
+**Suppression rules:**
+
+- Under `silent` style: no `## Coach:` section is emitted. No `## Learning:` sections are
+  emitted. The response ends after the primary artifact.
+- Under `coach.trailers: never` in config: same as `silent` style for trailer suppression,
+  but does not affect other coaching behavior. The style's behavior rule still runs; only the
+  chat-visible trailing sections are omitted.
+- Under `coach.trailers: always`: trailers are emitted even when the knowledge pillar is off.
+  The `## Coach:` section appears if the style produces one; `## Learning:` sections are
+  omitted if the knowledge pillar is off.
+- Under `coach.trailers: auto` (the default): coaching sections appear when the active style
+  would normally produce one; `## Learning:` sections appear when the knowledge pillar is on.
+
+---
+
+## 20. Style File Format
+
+Coaching style files are authored in Output Styles–compatible Markdown: YAML frontmatter
+followed by a prose body. The frontmatter carries four fields:
+
+```yaml
+---
+name: <style-name>
+description: <one-line description>
+behavior-rule: >
+  <imperative deterministic rule the agent applies at turn time>
+stop-markers:
+  - "<stop-marker-string>"
+---
+```
+
+Field semantics:
+
+- `name` — the style identifier that must match the filename stem and the `coach.style` value
+  in config. Case-sensitive. One of the six canonical values or a drop-in custom style name.
+- `description` — one line, used by `/learn coach list` when enumerating available styles.
+- `behavior-rule` — the imperative rule the agent applies every turn while this style is
+  active. Stated in present-tense second person ("Write scaffolding only. Do not write the
+  body..."). This field is the enforcement surface; its content must be unambiguous.
+- `stop-markers` — a list of HTML comment strings the agent emits to delimit the coaching
+  output. Empty list for `default` and `silent`, which have no coaching output to terminate.
+  Stop markers are grep-able assertions that the style ran. CI check 5 (in
+  `scripts/check-learn-invariants.sh`) verifies that each canonical file has a `behavior-rule:`
+  key; stop markers are verified by checking agent responses rather than by CI.
+
+Style files are loaded at guard time, not at session start. The agent reads the style file
+only when the active style is non-`default` and the file exists. This keeps session-start
+context cost proportional to whether coaching is active. New styles are added by dropping a
+`.md` file into `.claude/skills/learn/coach-styles/` — no code change required. The
+`/learn coach list` command discovers them by enumerating the directory.
