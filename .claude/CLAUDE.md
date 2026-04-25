@@ -2,9 +2,25 @@
 
 ## About This Project
 
-> **Replace this section** with your project's specific context after creating a repository from this template.
+<!-- TODO(init): Replace this entire section before your first agent session.
+     The agents read this block on every turn. Vague context = vague output.
 
-This project was created from the [ECC Base Template](https://github.com/b150005/ecc-base-template).
+     Minimum viable description (1–3 sentences):
+       - What does this application do, and for whom?
+       - What is the primary tech stack? (language, framework, database)
+       - Any hard constraints? (mobile-first, offline-capable, GDPR, etc.)
+
+     Example:
+       TaskFlow is a team task management API built with Go + Gin and PostgreSQL.
+       It is consumed by a React SPA and an iOS client.
+       All data must remain within the EU (GDPR).
+-->
+
+[YOUR PROJECT NAME] — [one-line description].
+
+**Stack:** [language] / [framework] / [database]
+**Target users:** [who uses this]
+**Key constraints:** [performance, compliance, platform, etc.]
 
 ## Architecture Principles
 
@@ -37,33 +53,44 @@ This project uses an agent team for structured development. The **orchestrator**
 
 All agents detect the project ecosystem at runtime by reading this file and project manifest files (package.json, pubspec.yaml, go.mod, etc.).
 
+## Document Templates
+
+- ADR template: `.claude/templates/adr-template.md` (`.ja.md` for Japanese)
+- Spec/PRD template: `.claude/templates/spec-template.md` (`.ja.md` for Japanese)
+
+You decide where to place the resulting documents. Single-language projects can
+write directly under a top-level directory of your choice (e.g. `adr/001-foo.md`);
+bilingual projects can split by language (e.g. `adr/en/001-foo.md`,
+`adr/ja/001-foo.md`). The template does not impose a layout — only the templates.
+
 ## Developer Learning Mode
 
 Default-off learning layer with two orthogonal pillars: the **knowledge pillar**
 (agents contribute teaching moments to a domain-organized knowledge base) and the
 **coaching pillar** (agents change how they work during implementation based on a
-chosen coaching style). At session start, read `learn/config.json`; if absent or
-`"enabled": false`, skip all learning behavior entirely. If `"enabled": true`, read
-`learn/preamble.md` for the enrichment contract. Also read `coach.style` from
-`learn/config.json`; if non-`default` and the style file exists at
-`.claude/skills/learn/coach-styles/<style>.md`, load and apply the `behavior-rule`
-for this turn.
+chosen coaching style). At session start, read `.claude/learn/config.json`; if
+absent or `"enabled": false`, skip all learning behavior entirely. If
+`"enabled": true`, read `.claude/skills/learn/preamble.md` for the enrichment
+contract. Also read `coach.style` from `.claude/learn/config.json`; if non-`default`
+and the style file exists at `.claude/skills/learn/coach-styles/<style>.md`, load
+and apply the `behavior-rule` for this turn.
 
 Toggled only via the `/learn` Skill. Use `/learn coach <style>` to set the coaching
-style; `/learn coach list` to see available styles. See
-[ADR-001](docs/en/adr/001-developer-growth-mode.md),
-[ADR-003](docs/en/adr/003-learning-mode-relocate-and-rename.md), and
-[ADR-004](docs/en/adr/004-coaching-pillar.md) for the architecture and coaching
-pillar design. [PRD](docs/en/prd/developer-learning-mode.md) for the complete
-specification, and [docs/en/learn/domain-taxonomy.md](docs/en/learn/domain-taxonomy.md)
-for domain definitions.
+style; `/learn coach list` to see available styles. The complete design lives in
+`.claude/meta/` (template-internal):
+
+- `.claude/meta/adr/001-developer-growth-mode.md` — original Learning Mode design
+- `.claude/meta/adr/003-learning-mode-relocate-and-rename.md` — Learning Mode rename and relocation
+- `.claude/meta/adr/004-coaching-pillar.md` — coaching pillar design
+- `.claude/meta/prd/developer-learning-mode.md` — full functional specification
+- `.claude/meta/references/domain-taxonomy.md` — domain definitions
 
 ## Development Workflow
 
 1. **Issue Analysis**: Feed issues to the orchestrator via GitHub MCP or copy-paste
-2. **Product Planning**: The product-manager creates PRD, user stories, and acceptance criteria
+2. **Product Planning**: The product-manager creates a spec, user stories, and acceptance criteria using `.claude/templates/spec-template.md`
 3. **Research & Reuse**: Search GitHub, package registries, and docs before writing new code
-4. **Architecture**: The architect designs the solution; significant decisions are recorded as ADRs
+4. **Architecture**: The architect designs the solution; significant decisions are recorded as ADRs using `.claude/templates/adr-template.md`
 5. **Implementation**: The implementer writes code following TDD (RED → GREEN → IMPROVE)
 6. **Quality Gate**: The code-reviewer, linter, security-reviewer, and performance-engineer validate the implementation
 7. **Documentation**: The technical-writer updates docs and changelog
@@ -85,19 +112,17 @@ for domain definitions.
 - Handle errors explicitly at every level
 - Never hardcode secrets; use environment variables
 
-## Documentation Convention
-
-- Technology reference docs: `docs/en/` (English, source of truth)
-- Japanese translations: `docs/ja/` (maintained translations)
-- Claude reads `docs/en/` only to minimize context window usage
-- Japanese files include a header linking to the English source
-
 ## Extending This File
 
 Derived projects should:
 
-1. Replace the "About This Project" section with project-specific context
-2. Add framework-specific architecture details (e.g., state management, routing)
-3. Add framework-specific testing tools (e.g., Jest, pytest, go test)
-4. Add framework-specific code style rules (e.g., Biome, Ruff, gofmt)
-5. Keep the universal sections (workflow, testing requirements, code quality)
+1. Replace the "About This Project" section with project-specific context.
+   The fastest way is to run `.claude/meta/scripts/init.sh` once after forking;
+   it interactively replaces the placeholder. Manual editing is fine too.
+2. Add framework-specific architecture details (e.g., state management, routing).
+3. Add framework-specific testing tools (e.g., Jest, pytest, go test).
+4. Add framework-specific code style rules (e.g., Biome, Ruff, gofmt).
+5. Keep the universal sections (workflow, testing requirements, code quality).
+6. If you do not plan to use Developer Learning Mode, delete `.claude/meta/`,
+   `.github/workflows/learn-invariants.yml`, and the
+   `## Developer Learning Mode` section above.

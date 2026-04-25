@@ -1,10 +1,8 @@
-# ECC Base Template
+# ecc-base-template
 
-> **v2.1.0 — Coaching Pillar:** Developer Learning Mode gains a second pillar — five deterministic coaching styles (`hints`, `socratic`, `pair`, `review-only`, `silent`) that change how agents work during implementation. Toggle with `/learn coach <style>`. Default-off; no behavior change for existing installs. See [ADR-004](docs/en/adr/004-coaching-pillar.md).
->
-> **v2.0.0 — Breaking Change:** Developer Growth Mode is renamed to **Developer Learning Mode** and the feature directory moves from `.claude/growth/` to `learn/`. If you have enabled this feature and committed knowledge files, follow the migration guide at [`docs/en/migration/v1-to-v2.md`](docs/en/migration/v1-to-v2.md) before upgrading.
-
-A framework-agnostic GitHub template that ships a 15-agent development team and an opt-in learning layer called **Developer Learning Mode**.
+A framework-agnostic GitHub template that ships a 15-agent development team
+and an opt-in learning layer for high-quality, high-precision collaboration
+with Claude Code.
 
 [日本語版 README はこちら](README.ja.md)
 
@@ -12,9 +10,21 @@ A framework-agnostic GitHub template that ships a 15-agent development team and 
 
 ## What you get
 
-- **15 AI agents** covering the full product lifecycle — orchestrator, product-manager, architect, implementer, test-runner, code-reviewer, security-reviewer, performance-engineer, devops-engineer, technical-writer, and more. Ecosystem-agnostic: the agents detect your language and framework at runtime.
-- **Developer Learning Mode** (optional, default **off**) — when you turn it on, every agent appends two short trailer sections to its response explaining the decisions it made and updating a domain-organized knowledge base under `learn/knowledge/`. Over many sessions, the knowledge base becomes a personalized reference you built by shipping real features.
-- **Quality invariants in CI** — `scripts/check-learn-invariants.sh` enforces the default-off guarantee so Learning Mode never leaks into production artifacts.
+- **15 specialized agents** covering the full product lifecycle — orchestrator,
+  product-manager, architect, implementer, test-runner, code-reviewer,
+  security-reviewer, performance-engineer, devops-engineer, technical-writer,
+  and more. All ecosystem-agnostic: the agents detect your language and
+  framework at runtime.
+- **Clean root directory.** After forking you own the repo root — the template
+  does not reserve `docs/`, `scripts/`, `learn/`, or any ADR/spec numbers.
+- **Document templates** for ADRs and product specs at `.claude/templates/`,
+  with English-first `*.md` and Japanese `*.ja.md` counterparts. Copy them
+  wherever your project wants its decision records to live.
+- **Developer Learning Mode** (default **off**) — an opt-in enrichment layer
+  that turns everyday coding sessions into a personalized, domain-organized
+  knowledge base. Includes a coaching pillar with five named deterministic
+  styles (`hints`, `socratic`, `pair`, `review-only`, `silent`) plus
+  `default` (no coaching modification).
 
 ---
 
@@ -22,7 +32,8 @@ A framework-agnostic GitHub template that ships a 15-agent development team and 
 
 ### 1. Create your repository
 
-On GitHub, open [b150005/ecc-base-template](https://github.com/b150005/ecc-base-template) and click **Use this template**.
+On GitHub, open [b150005/ecc-base-template](https://github.com/b150005/ecc-base-template)
+and click **Use this template**.
 
 ### 2. Clone and open
 
@@ -31,145 +42,158 @@ git clone https://github.com/<your-username>/<your-repo>.git
 cd <your-repo>
 ```
 
-Open the repository in Claude Code (`claude` in the repo root).
+### 3. Run the initializer
 
-### 3. Customize `.claude/CLAUDE.md`
+```sh
+.claude/meta/scripts/init.sh
+```
 
-`.claude/CLAUDE.md` is the project instructions file the agents read on every session. Replace the `## About This Project` placeholder with your context. The rest (agent table, workflow, testing requirements, documentation convention) is designed to carry over as-is.
+This will prompt you for a project name, one-line description, and tech stack,
+then replace the `## About This Project` placeholder in `.claude/CLAUDE.md`
+and copy `.env.example` to `.env`. Re-running is safe.
+
+Non-interactive form:
+
+```sh
+.claude/meta/scripts/init.sh \
+  --project-name "TaskFlow" \
+  --description "Team task management API" \
+  --stack "Go / Gin / PostgreSQL"
+```
 
 ### 4. Start working
 
-Give the orchestrator a real task. Specialists are invoked by the orchestrator or directly. Learning Mode stays off unless you opt in.
+Open the repo in Claude Code (`claude` in the repo root) and give the
+orchestrator a real task. Try something concrete, for example:
 
-### 5. (Optional) Enable Learning Mode
+> Design and implement a REST endpoint `POST /tasks` that validates input,
+> persists to PostgreSQL, and returns the created resource. Use TDD.
+
+The orchestrator delegates to product-manager for acceptance criteria,
+architect for the module boundaries, implementer for code, and the quality
+agents for review — you steer the hand-offs.
+
+### 5. (Optional) Enable Developer Learning Mode
 
 ```
-/learn on [junior|mid|senior]              Enable at the chosen level
-/learn off                                 Disable
-/learn status                              Show current state
-/learn focus <domain>[,<domain>]           Narrow teaching effort to specific domains
-/learn unfocus                             Clear focus
-/learn level <junior|mid|senior>           Change level without toggling
-/learn domain new <key>                    Create a custom domain (confirmation required)
-/learn coach <style>                       Set coaching style (hints|socratic|pair|review-only|silent|default)
-/learn coach off                           Reset coaching to default (no modifications)
-/learn coach list                          List available coaching styles
-/learn coach show <style>                  Show a style's behavior rule
-/learn coach scope <session|persistent>    Set persistence scope for coach subtree
+/learn on [junior|mid|senior]     Enable at the chosen level
+/learn off                        Disable
+/learn status                     Show current state
+/learn focus <domain>[,<domain>]  Narrow teaching effort
+/learn coach <style>              Set coaching style (hints|socratic|pair|review-only|silent|default)
+/learn coach list                 List available styles
 ```
 
-`/quiet` is a companion Skill that suppresses Learning Mode trailers for a single agent response (knowledge files are still updated).
+`/quiet` is a companion Skill that suppresses the Learning trailer (the
+appended summary at the end of an agent response) for a single turn.
+Knowledge-base writes under `.claude/learn/knowledge/` continue normally.
 
-**Coaching styles** change how agents work during implementation — `hints` names the next step without writing the function body, `socratic` returns a focused question instead of code, `pair` writes scaffolding with `TODO(human):` markers, `review-only` refuses to write production code, `silent` suppresses all trailer noise. All styles are default-off; selecting `default` or running `/learn coach off` restores normal behavior. See [ADR-004](docs/en/adr/004-coaching-pillar.md) for the design.
-
-**Full explanation** of levels, the knowledge base, philosophy, and a side-by-side example is in [docs/en/learning-mode-explained.md](docs/en/learning-mode-explained.md). **Authoritative design** is in [ADR-001](docs/en/adr/001-developer-growth-mode.md). **Rename and relocation rationale** is in [ADR-003](docs/en/adr/003-learning-mode-relocate-and-rename.md). **Coaching pillar design** is in [ADR-004](docs/en/adr/004-coaching-pillar.md).
+Full Learning Mode explainer lives in
+[.claude/meta/references/learning-mode-explained.md](.claude/meta/references/learning-mode-explained.md).
+If you do not plan to use Learning Mode, delete `.claude/meta/` and
+`.github/workflows/learn-invariants.yml` after step 3 — the machinery is
+opt-in and adopters are free to drop it entirely.
 
 ---
 
 ## The 15-agent team
 
-All agents are ecosystem-agnostic. They detect the project's language and framework at runtime by reading `.claude/CLAUDE.md` and the project's manifest files (`package.json`, `pubspec.yaml`, `go.mod`, `Cargo.toml`, etc.). The orchestrator coordinates the team; the specialists are invoked by the orchestrator or directly by the developer.
+All agents are ecosystem-agnostic. They detect the project's language and
+framework at runtime by reading `.claude/CLAUDE.md` and your project's manifest
+files (`package.json`, `pubspec.yaml`, `go.mod`, `Cargo.toml`, etc.). The
+orchestrator coordinates the team; specialists are invoked by the orchestrator
+or directly.
 
-| Agent | Phase | Role | Primary learning domains |
-|-------|-------|------|----------------|
-| **orchestrator** | All | Analyzes issues, plans work, delegates to specialists, coordinates the session | release-and-deployment |
-| **product-manager** | Planning | PRD authoring, user stories, acceptance criteria, backlog prioritization | api-design |
-| **market-analyst** | Planning | Market research, competitor analysis, user segment identification | market-reasoning |
-| **monetization-strategist** | Planning | Business model design, pricing strategy, revenue analysis | business-modeling |
-| **ui-ux-designer** | Design | UI/UX design, usability review, accessibility compliance | ui-ux-craft |
-| **docs-researcher** | Research | API verification, framework behavior, version-specific changes against primary docs | ecosystem-fluency |
-| **architect** | Design | System architecture, technology decisions, ADR creation | architecture, api-design, data-modeling |
-| **implementer** | Build | Code implementation following architecture specs and TDD | ecosystem-fluency, error-handling, concurrency-and-async, implementation-patterns |
-| **code-reviewer** | Quality | Code quality, maintainability, standards adherence | review-taste, testing-discipline, implementation-patterns, security-mindset |
-| **test-runner** | Quality | Test execution, coverage reporting, TDD support | testing-discipline, performance-intuition |
-| **linter** | Quality | Static analysis and code style enforcement | implementation-patterns |
-| **security-reviewer** | Quality | Vulnerability detection, secret scanning, OWASP Top 10 | security-mindset |
-| **performance-engineer** | Quality | Profiling, bottleneck identification, optimization | performance-intuition, concurrency-and-async |
-| **devops-engineer** | Release | CI/CD, deployment strategy, release management | operational-awareness, release-and-deployment |
-| **technical-writer** | Release | Documentation, changelog, bilingual docs maintenance | documentation-craft |
-
-Each agent's domain ownership is declared in a `## Learning Domains` section at the top of its prompt body. See [ADR-002](docs/en/adr/002-growth-domains-location.md) for why the declaration lives in the body rather than in frontmatter. Secondary domains and the full taxonomy are in [docs/en/learn/domain-taxonomy.md](docs/en/learn/domain-taxonomy.md).
+| Agent | Phase | Role |
+|-------|-------|------|
+| **orchestrator** | All | Analyzes issues, plans work, delegates to specialists, coordinates the session |
+| **product-manager** | Planning | Spec authoring, user stories, acceptance criteria, backlog prioritization |
+| **market-analyst** | Planning | Market research, competitor analysis, user segment identification |
+| **monetization-strategist** | Planning | Business model design, pricing strategy, revenue analysis |
+| **ui-ux-designer** | Design | UI/UX design, usability review, accessibility compliance |
+| **docs-researcher** | Research | API verification, framework behavior, version-specific changes against primary docs |
+| **architect** | Design | System architecture, technology decisions, ADR creation |
+| **implementer** | Build | Code implementation following architecture specs and TDD |
+| **code-reviewer** | Quality | Code quality, maintainability, standards adherence |
+| **test-runner** | Quality | Test execution, coverage reporting, TDD support |
+| **linter** | Quality | Static analysis and code style enforcement |
+| **security-reviewer** | Quality | Vulnerability detection, secret scanning, OWASP Top 10 |
+| **performance-engineer** | Quality | Profiling, bottleneck identification, optimization |
+| **devops-engineer** | Release | CI/CD, deployment strategy, release management |
+| **technical-writer** | Release | Documentation, changelog, bilingual docs maintenance |
 
 ### Model tiers
 
-Each agent declares its model in frontmatter using a Claude Code alias (`opus` / `sonnet` / `haiku` / `inherit`), which always resolves to the latest version in that family — so the assignment below does not drift when Anthropic releases a new version. For the current version numbers, see the [Anthropic model overview](https://docs.claude.com/en/docs/about-claude/models/overview).
+Each agent declares its model in frontmatter using a Claude Code alias
+(`opus` / `sonnet` / `haiku` / `inherit`), which resolves to the latest version
+in that family. The template ships a mixed fleet — the right model for the job
+rather than a single floor. Current assignment: **Opus** for deep-reasoning
+decisions (architect, security-reviewer, performance-engineer,
+monetization-strategist), **Sonnet** for authoritative output (most of the
+team), **Haiku** for tool-wrapping agents with deterministic oracles (linter,
+test-runner), and **inherit** for the orchestrator.
 
-The template ships a mixed fleet — the right model for the job rather than a single floor — with the rule of thumb that agents whose output is consumed directly (authoritative prose, citations, translations) get Sonnet or Opus, while agents that wrap deterministic tools (linters, test runners) can safely use Haiku because the tool's own output is the ground truth.
-
-**Opus** — deepest reasoning for decisions with the highest downstream cost:
-architect, security-reviewer, performance-engineer, monetization-strategist
-
-**Sonnet** — best all-around coding and writing, the default for authoritative output:
-product-manager, market-analyst, ui-ux-designer, docs-researcher, implementer, code-reviewer, devops-engineer, technical-writer
-
-**Haiku** — lightweight, for tool-wrapping agents with a deterministic downstream oracle:
-linter, test-runner
-
-**Inherit** — follows the orchestrating session's model:
-orchestrator
+For the current version numbers, see the
+[Anthropic model overview](https://docs.claude.com/en/docs/about-claude/models/overview).
 
 ---
 
-## Project structure
+## Project structure (after forking)
 
 ```
-.
-├── .claude/
-│   ├── CLAUDE.md                          # project instructions the agents read
-│   ├── agents/                            # 15 agent definition files
-│   ├── skills/
-│   │   ├── learn/SKILL.md                 # /learn toggle Skill
-│   │   └── quiet/SKILL.md                 # /quiet trailer-suppression Skill
-│   ├── settings.json
-│   └── settings.local.json
-├── .devcontainer/
-│   └── devcontainer.json                  # commented template; customize per framework
-├── .github/
-│   ├── CODEOWNERS
-│   ├── ISSUE_TEMPLATE/
-│   ├── PULL_REQUEST_TEMPLATE.md
-│   ├── dependabot.yml
-│   └── workflows/                         # CI: lint/test/build + security scans
-├── docs/
-│   ├── en/                                # English source of truth
-│   │   ├── adr/                           # architecture decisions
-│   │   ├── prd/                           # product requirements
-│   │   ├── learn/                         # learning domain taxonomy and examples
-│   │   ├── migration/                     # upgrade guides (e.g., v1-to-v2.md)
-│   │   ├── learning-mode-explained.md     # long-form Learning Mode explainer
-│   │   └── (template-usage.md, etc.)
-│   └── ja/                                # Japanese translations (link to English source)
-├── learn/
-│   ├── preamble.md                        # shipped — shared enrichment contract
-│   ├── config.json                        # created on first /learn on (gitignored)
-│   └── knowledge/                         # lazy-materialized — created per domain on first teaching moment (gitignored)
-├── scripts/
-│   └── check-learn-invariants.sh          # CI check for default-off invariants
-├── .env.example
-├── .gitignore
-├── .gitignore.example                     # shows the opt-in inversion for sharing knowledge files
+your-repo/
+├── README.md                  ← your project's README (replace this one)
+├── README.ja.md               ← optional bilingual README
+├── CHANGELOG.md               ← starts at [Unreleased]; grows with your releases
 ├── LICENSE
-├── README.md                              # this file (English)
-└── README.ja.md                           # Japanese translation
+├── .env.example               ← template for environment variables
+├── .env                       ← created by the initializer; never committed
+├── .gitignore
+├── .gitignore.example
+├── .gitattributes
+├── .claude/                   ← Claude Code machinery
+│   ├── CLAUDE.md              ← project instructions (edit the About section first)
+│   ├── agents/                ← 15 agent definition files
+│   ├── skills/                ← /learn and /quiet skills
+│   ├── templates/             ← copy-and-fill ADR/spec templates
+│   ├── meta/                  ← template-internal ADRs, references, init script
+│   ├── settings.json
+│   └── settings.local.json    ← gitignored, user-specific
+├── .devcontainer/             ← VS Code Dev Containers scaffold
+└── .github/                   ← CI, dependabot, issue/PR templates
 ```
 
-Note: `learn/preamble.md` ships with the template. `learn/knowledge/` is lazy-materialized — no files exist on disk until a teaching moment earns content for a domain. `learn/config.json` is runtime-created on first `/learn on`. Both `config.json` and `learn/knowledge/` are gitignored by default so personal state and private learning material do not leak into commits; see [learning-mode-explained.md](docs/en/learning-mode-explained.md#knowledge-files-are-private-by-default) for the opt-in path.
+You own every visible root file. The template does not reserve `docs/`,
+`src/`, `scripts/`, or any other top-level directory name.
+
+### Placing your own ADRs and specs
+
+Copy `.claude/templates/adr-template.md` to wherever you want your ADRs to
+live. Common choices:
+
+- `adr/001-use-postgresql.md` at the repo root
+- `adr/en/001-use-postgresql.md` + `adr/ja/001-use-postgresql.md` for bilingual projects
+- `docs/adr/001-use-postgresql.md` if you already have a `docs/` tree
+
+The same applies to `spec-template.md`. There is no forced location.
 
 ---
 
-## Developing the template itself
+## Maintaining the template itself
 
-Significant decisions are recorded as ADRs in `docs/en/adr/`. Current ADRs:
+If you are working on **ecc-base-template** (this repository, not a fork),
+template-internal documentation lives under `.claude/meta/`:
 
-- [`000-template.md`](docs/en/adr/000-template.md) — ADR format template
-- [`001-developer-growth-mode.md`](docs/en/adr/001-developer-growth-mode.md) — Learning Mode design decision (originally named Growth Mode; superseded in part by ADR-003)
-- [`002-growth-domains-location.md`](docs/en/adr/002-growth-domains-location.md) — why Learning Domains live in the prompt body
-- [`003-learning-mode-relocate-and-rename.md`](docs/en/adr/003-learning-mode-relocate-and-rename.md) — rename to Learning Mode and relocation to `learn/`
-- [`004-coaching-pillar.md`](docs/en/adr/004-coaching-pillar.md) — v2.1.0 coaching pillar: five deterministic coaching styles (Output Styles–compatible file format, Learning Mode state and dispatch)
+- `.claude/meta/adr/` — architecture decisions for the template itself
+- `.claude/meta/prd/` — product requirements for template features
+- `.claude/meta/references/` — long-form explainers and worked examples
+- `.claude/meta/scripts/` — the initializer and invariant checker
+- `.claude/meta/CHANGELOG.md` — template's own release history
+- `.claude/meta/CHANGELOG.legacy.md` — full history through v2.2.0 (pre-v3 restructure)
 
-Product requirements are in [`docs/en/prd/`](docs/en/prd/). The PRD for Developer Learning Mode is the authoritative functional specification.
-
-When working on the template itself, the same agent workflow applies: the orchestrator coordinates, the architect records decisions as ADRs, and the implementer works against the PRD's acceptance criteria.
+CI enforces Learning Mode invariants via
+`.claude/meta/scripts/check-learn-invariants.sh`, wired up through
+`.github/workflows/learn-invariants.yml`.
 
 ---
 

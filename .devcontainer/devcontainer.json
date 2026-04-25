@@ -3,7 +3,7 @@
 //
 // This is a template. Uncomment and customize the sections
 // that match your project's framework and language.
-// See docs/en/devcontainer.md (or docs/ja/devcontainer.md) for guidance.
+// See .claude/meta/references/devcontainer.md (or .ja.md) for guidance.
 {
   "name": "Project Dev Container",
 

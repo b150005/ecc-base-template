@@ -3,20 +3,20 @@
 # Default (mirrored in .gitignore): knowledge files and config are gitignored.
 # Knowledge files contain a learner's mistakes, prior understanding, and revision history.
 # That is private learning material by default.
-learn/knowledge/
-learn/config.json
+.claude/learn/knowledge/
+.claude/learn/config.json
 
 # --- OPT-IN: Share the team knowledge base ---
 #
 # If your team wants a shared domain-organized knowledge base that accumulates across
-# everyone's sessions, remove the `learn/knowledge/` line above and add
+# everyone's sessions, remove the `.claude/learn/knowledge/` line above and add
 # the inversion pattern below to your real .gitignore.
 #
 # The config.json remains gitignored even in shared mode — level and focus are
 # per-developer preferences, not team state.
 #
-# !learn/knowledge/
-# !learn/knowledge/**
+# !.claude/learn/knowledge/
+# !.claude/learn/knowledge/**
 #
 # Considerations before opting in:
 #   - Knowledge files will contain revision history ("Superseded 2026-05-14: ...") visible to the team.

@@ -1,12 +1,13 @@
 name: Learning Mode Invariants
 
-# Verifies the three deterministic preconditions that guard the Developer
-# Learning Mode default-off invariant. See scripts/check-learn-invariants.sh
-# and docs/en/adr/001-developer-growth-mode.md for the rationale.
-# Renamed from growth-invariants.yml in v2.0.0 per ADR-003.
+# Verifies the deterministic preconditions that guard the Developer Learning Mode
+# default-off invariant. See .claude/meta/scripts/check-learn-invariants.sh and
+# .claude/meta/adr/001-developer-growth-mode.md for the rationale.
 #
-# This job runs on the template repository itself. Derived projects inherit
-# the script but are free to drop this workflow if they do not use Learning Mode.
+# This workflow runs on the template repository itself to protect Learning Mode's
+# guarantees. Derived projects that do not intend to maintain Learning Mode are
+# expected to delete this workflow file and .claude/meta/ — the template ships them
+# only so the contract is verifiable at the source.
 
 on:
   push:
@@ -14,19 +15,19 @@ on:
     paths:
       - ".claude/agents/**"
       - ".claude/skills/learn/**"
-      - "learn/**"
+      - ".claude/learn/**"
       - ".gitignore"
       - ".gitignore.example"
-      - "scripts/check-learn-invariants.sh"
+      - ".claude/meta/scripts/check-learn-invariants.sh"
       - ".github/workflows/learn-invariants.yml"
   pull_request:
     paths:
       - ".claude/agents/**"
       - ".claude/skills/learn/**"
-      - "learn/**"
+      - ".claude/learn/**"
       - ".gitignore"
       - ".gitignore.example"
-      - "scripts/check-learn-invariants.sh"
+      - ".claude/meta/scripts/check-learn-invariants.sh"
       - ".github/workflows/learn-invariants.yml"
 
 jobs:
@@ -37,4 +38,4 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Run Learning Mode invariant checks
-        run: bash scripts/check-learn-invariants.sh
+        run: bash .claude/meta/scripts/check-learn-invariants.sh

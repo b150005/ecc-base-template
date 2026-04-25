@@ -2,7 +2,7 @@
 name: learn
 description: >
   Toggle Developer Learning Mode, manage per-domain focus for the living knowledge base at
-  learn/knowledge/, and control the coaching pillar behavior. Learning Mode is a default-off
+  .claude/learn/knowledge/, and control the coaching pillar behavior. Learning Mode is a default-off
   learning layer with two orthogonal pillars: the knowledge pillar (agents contribute teaching
   moments to a domain-organized knowledge base) and the coaching pillar (agents change how
   they work during implementation based on a chosen coaching style).
@@ -24,7 +24,7 @@ description: >
                                            session only (separate Skill at .claude/skills/quiet/SKILL.md)
 
   This Skill is the only surface through which Learning Mode state changes. Agents read
-  learn/config.json; they never write it. disable-model-invocation: true is
+  .claude/learn/config.json; they never write it. disable-model-invocation: true is
   non-negotiable — the learner, not the model, decides when to enter teaching mode or
   change the coaching style.
 disable-model-invocation: true
@@ -48,7 +48,7 @@ arguments:
 ## Invariant
 
 This Skill is the single and exclusive mechanism for changing Learning Mode state.
-No agent reads any toggle signal other than `learn/config.json`. No agent
+No agent reads any toggle signal other than `.claude/learn/config.json`. No agent
 writes `config.json` directly — agents read it on session start and act on it, but
 only this Skill writes it back. This boundary is enforced at the platform layer by
 `disable-model-invocation: true`, which prevents the model from auto-invoking `/learn`
@@ -69,7 +69,7 @@ ADR-001) asserts that this flag is present and set to `true`; removing it fails 
 
 ## Config Schema
 
-Learning Mode state persists in `learn/config.json`. The schema is fixed; unknown
+Learning Mode state persists in `.claude/learn/config.json`. The schema is fixed; unknown
 keys are preserved on write for forward compatibility.
 
 ```json
@@ -119,7 +119,7 @@ Field semantics:
   this field.
 
 The file is created on first `/learn on` invocation. It does not exist in the repository
-before first use. Both `config.json` and `learn/knowledge/` are gitignored by default;
+before first use. Both `config.json` and `.claude/learn/knowledge/` are gitignored by default;
 see `.gitignore.example` for the opt-in inversion if you want to commit notes.
 
 ---
@@ -132,7 +132,7 @@ see `.gitignore.example` for the opt-in inversion if you want to commit notes.
 
 Step-by-step:
 
-1. Read `learn/config.json` if it exists.
+1. Read `.claude/learn/config.json` if it exists.
 2. Determine the level to enable at:
    - If `$level` is provided and valid (`junior`, `mid`, `senior`), use it.
    - If `$level` is absent and a valid `level` is already stored in config, use the stored level.
@@ -150,7 +150,7 @@ Step-by-step:
 Learning Mode enabled.
   Level: junior
   Focus: all domains (no focus set)
-  Knowledge base: learn/knowledge/
+  Knowledge base: .claude/learn/knowledge/
 
 Agents will contribute teaching moments to the domain-organized knowledge base as they work.
 Run /learn status to see current state. Run /learn off to disable.
@@ -167,7 +167,7 @@ the domain list, e.g. `Focus: architecture, testing-discipline`.
 
 Step-by-step:
 
-1. Read `learn/config.json` if it exists.
+1. Read `.claude/learn/config.json` if it exists.
 2. Write `config.json` with:
    - `"enabled": false`
    - All other fields preserved (`level`, `focus_domains`, `updatedAt` updated to now).
@@ -194,7 +194,7 @@ This action never writes config.
 
 Step-by-step:
 
-1. Read `learn/config.json`. If absent, report disabled state.
+1. Read `.claude/learn/config.json`. If absent, report disabled state.
 2. Read the last-ten knowledge-diff summaries from the learner's session history if available,
    or report "no recent diffs recorded" if the session has just started or the file does not
    exist. (Note: diff summaries are emitted as trailing sections in agent chat responses, not
@@ -208,8 +208,8 @@ Learning Mode Status
 Enabled:       true
 Level:         junior
 Focus domains: architecture, testing-discipline
-Config path:   learn/config.json
-Knowledge path:    learn/knowledge/
+Config path:   .claude/learn/config.json
+Knowledge path:    .claude/learn/knowledge/
 Last updated:  2026-04-22T14:30:00Z
 
 Coach style:   hints
@@ -226,8 +226,8 @@ Recent knowledge diffs (last 10, most recent first):
   [... up to 10 entries ...]
 
 Domain files present:
-  learn/knowledge/architecture.md
-  learn/knowledge/api-design.md
+  .claude/learn/knowledge/architecture.md
+  .claude/learn/knowledge/api-design.md
   [... one line per file that exists ...]
 
 Run /learn on [junior|mid|senior] to change level.
@@ -243,7 +243,7 @@ If config is absent or unparseable:
 Learning Mode Status
 ──────────────────
 Enabled:  false (no config file found)
-Knowledge path: learn/knowledge/ (does not yet exist)
+Knowledge path: .claude/learn/knowledge/ (does not yet exist)
 
 Run /learn on to enable. Default level: junior.
 ```
@@ -271,7 +271,7 @@ Focus cleared. Agents will contribute teaching moments across all 19 canonical d
 
 1. Read config.
 2. Parse the comma-separated domain key list from `$level`. Trim whitespace around each key.
-3. Validate each key: it must exist as a `.md` file under `learn/knowledge/` (canonical
+3. Validate each key: it must exist as a `.md` file under `.claude/learn/knowledge/` (canonical
    or learner-opened custom domain). An unknown key that does not correspond to a file is an
    error. Print the error, do not write config. (The 19 canonical keys are always valid if the
    notes directory is seeded. Custom domains are valid only after the learner has created them
@@ -335,7 +335,7 @@ Step-by-step:
    `new ` with leading and trailing whitespace trimmed.
 2. Validate the key:
    - Must contain only lowercase letters, digits, and hyphens.
-   - Must not already exist as a file under `learn/knowledge/`.
+   - Must not already exist as a file under `.claude/learn/knowledge/`.
    - Must not be one of the 19 canonical domain keys (those already exist).
    - Must be between 2 and 64 characters long.
    - If any validation fails, print a clear error describing the constraint, do not create
@@ -345,7 +345,7 @@ Step-by-step:
 ```
 Create custom domain: <key>
 
-This will create learn/knowledge/<key>.md with a seed placeholder. Agents will
+This will create .claude/learn/knowledge/<key>.md with a seed placeholder. Agents will
 be able to contribute teaching moments to this domain if their learning_domains include
 it, but they will not auto-populate it until you explicitly work in this area.
 
@@ -359,7 +359,7 @@ Confirm? [yes/no]
 4. Wait for learner confirmation. If the learner responds with anything other than `yes`
    (case-insensitive), print "Cancelled. No file created." and stop.
 5. On confirmation:
-   a. Create `learn/knowledge/<key>.md` with seed content following the canonical shape:
+   a. Create `.claude/learn/knowledge/<key>.md` with seed content following the canonical shape:
 
 ```markdown
 ---
@@ -371,16 +371,16 @@ contributing-agents: []
 # <Title-Cased Key>
 
 This is a custom domain opened by the learner. It covers concepts that do not fit
-cleanly into the 19 canonical domains defined in docs/en/learn/domain-taxonomy.md.
+cleanly into the 19 canonical domains defined in .claude/meta/references/domain-taxonomy.md.
 
 Agents contribute here only when their learning_domains declaration includes this key.
-The enrichment protocol is defined in learn/preamble.md.
+The enrichment protocol is defined in .claude/skills/learn/preamble.md.
 
 ## Placeholder
 
 This section is seeded empty. The first agent with a teaching moment in this domain
 will replace this placeholder with a real section following the enrichment protocol
-in learn/preamble.md.
+in .claude/skills/learn/preamble.md.
 ```
 
    b. Do not modify `focus_domains` in config unless the learner separately runs
@@ -388,7 +388,7 @@ in learn/preamble.md.
    c. Print:
 
 ```
-Created: learn/knowledge/<key>.md
+Created: .claude/learn/knowledge/<key>.md
 
 The domain file is seeded and ready. It will be enriched by agents whose
 learning_domains declaration includes "<key>". To narrow agent teaching effort to
@@ -401,7 +401,7 @@ this domain, run /learn focus <key>.
   placeholder. Knowledge content is agent territory; the Skill only creates the file
   structure. An agent writes the first real section when it encounters a teaching moment
   that belongs here.
-- The Skill never modifies any existing file under `learn/knowledge/`. Notes are
+- The Skill never modifies any existing file under `.claude/learn/knowledge/`. Notes are
   agent territory; the Skill creates new domain files only, and only on learner
   confirmation.
 
@@ -426,7 +426,7 @@ Usage: /learn on [junior|mid|senior]
 ### Domain keys for `focus`
 
 Domain keys passed to `/learn focus` must correspond to existing `.md` files under
-`learn/knowledge/`. The 19 canonical keys are:
+`.claude/learn/knowledge/`. The 19 canonical keys are:
 
 ```
 architecture          api-design           data-modeling
@@ -445,7 +445,7 @@ Invalid domain key error:
 
 ```
 Error: "<key>" is not a recognized domain. Valid keys are the 19 canonical domains
-plus any custom domains you have created under learn/knowledge/.
+plus any custom domains you have created under .claude/learn/knowledge/.
 
 Run /learn status to see which domain files are present.
 ```
@@ -471,10 +471,10 @@ Usage:
   /learn coach show <style>                  — Show a style's behavior rule
   /learn coach scope <session|persistent>    — Set scope for coach subtree
 
-Learning Mode state: learn/config.json
-Enrichment protocol: learn/preamble.md
-Domain taxonomy: docs/en/learn/domain-taxonomy.md
-Coaching ADR: docs/en/adr/004-coaching-pillar.md
+Learning Mode state: .claude/learn/config.json
+Enrichment protocol: .claude/skills/learn/preamble.md
+Domain taxonomy: .claude/meta/references/domain-taxonomy.md
+Coaching ADR: .claude/meta/adr/004-coaching-pillar.md
 ```
 
 Unknown subcommands do not halt the session. They print the usage message and return.
@@ -486,7 +486,7 @@ Unknown subcommands do not halt the session. They print the usage message and re
 **Argument shape:** `$action=coach`, `$level=<subcommand> [<arg>]`
 
 The `coach` subcommand group manages the coaching pillar. All subcommands write
-`learn/config.json` except `list` and `show`, which are read-only. The `disable-model-invocation:
+`.claude/learn/config.json` except `list` and `show`, which are read-only. The `disable-model-invocation:
 true` flag applies to every subcommand: the learner — not the model — changes the style.
 
 ### `coach <style>` — Set Active Style
@@ -495,7 +495,7 @@ true` flag applies to every subcommand: the learner — not the model — change
 
 Step-by-step:
 
-1. Read `learn/config.json` if it exists.
+1. Read `.claude/learn/config.json` if it exists.
 2. Validate `<style>`: must be one of `default`, `hints`, `socratic`, `pair`, `review-only`,
    `silent`. If not, check whether a matching file exists at
    `.claude/skills/learn/coach-styles/<style>.md`. If a file exists with that stem, it is a
@@ -706,16 +706,16 @@ knowledge base. Genuinely important teaching moments from any domain are never s
 ## Relationship to the Enrichment Protocol
 
 This Skill manages state. The enrichment protocol — what agents do with that state — is
-defined in `learn/preamble.md`. Every learning-aware agent reads `preamble.md` on
+defined in `.claude/skills/learn/preamble.md`. Every learning-aware agent reads `preamble.md` on
 session start when `enabled: true`. The Skill does not inline the protocol and does not
 override it.
 
 Cross-references:
 
-- Enrichment contract: `learn/preamble.md`
-- Domain taxonomy (authoritative list of 19 canonical domains): `docs/en/learn/domain-taxonomy.md`
-- Architecture decision record (design): `docs/en/adr/001-developer-growth-mode.md`
-- Architecture decision record (rename and relocation): `docs/en/adr/003-learning-mode-relocate-and-rename.md`
-- Architecture decision record (coaching pillar): `docs/en/adr/004-coaching-pillar.md`
+- Enrichment contract: `.claude/skills/learn/preamble.md`
+- Domain taxonomy (authoritative list of 19 canonical domains): `.claude/meta/references/domain-taxonomy.md`
+- Architecture decision record (design): `.claude/meta/adr/001-developer-growth-mode.md`
+- Architecture decision record (rename and relocation): `.claude/meta/adr/003-learning-mode-relocate-and-rename.md`
+- Architecture decision record (coaching pillar): `.claude/meta/adr/004-coaching-pillar.md`
 - Coach style files: `.claude/skills/learn/coach-styles/<style>.md`
 - Per-agent domain ownership: each agent's `## Learning Domains` section in `.claude/agents/`

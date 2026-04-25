@@ -37,7 +37,7 @@ When designing architecture:
    - API contracts (if applicable)
    - State management approach
    - Error handling strategy
-5. **Document**: Create an ADR for significant decisions using the template in `docs/en/adr/`
+5. **Document**: Create an ADR for significant decisions using the template in `.claude/meta/adr/`
 
 ### Review Mode
 
@@ -106,6 +106,6 @@ Detect the ecosystem from project files and adapt patterns:
 
 ## Developer Learning Mode contract
 
-When `learn/config.json` exists and has `"enabled": true`, this agent is a learning-aware contributor. At session start the agent reads `learn/preamble.md` and follows the 5-step enrichment contract for any teaching moment that falls within its declared Learning Domains (primary and secondary, as listed in the Learning Domains section above). When Learning Mode is off or the config is absent, this section has no effect and agent output is byte-identical to a world without the feature. See [ADR-001](../../docs/en/adr/001-developer-growth-mode.md) for the complete architecture and [ADR-003](../../docs/en/adr/003-learning-mode-relocate-and-rename.md) for the rename and relocation rationale.
+When `.claude/learn/config.json` exists and has `"enabled": true`, this agent is a learning-aware contributor. At session start the agent reads `.claude/skills/learn/preamble.md` and follows the 5-step enrichment contract for any teaching moment that falls within its declared Learning Domains (primary and secondary, as listed in the Learning Domains section above). When Learning Mode is off or the config is absent, this section has no effect and agent output is byte-identical to a world without the feature. See [ADR-001](../meta/adr/001-developer-growth-mode.md) for the complete architecture and [ADR-003](../meta/adr/003-learning-mode-relocate-and-rename.md) for the rename and relocation rationale.
 
-Coaching pillar extension (v2.1.0): after reading `learn/config.json` for the knowledge pillar guard above, also read `coach.style`. If `coach.style` is non-`default` and a matching style file exists at `.claude/skills/learn/coach-styles/<style>.md`, load the file and apply its `behavior-rule` for this turn. If the value is missing, invalid, or the file does not exist, fall back to `default` (no coaching modification). See [ADR-004](../../docs/en/adr/004-coaching-pillar.md) for the coaching pillar architecture.
+Coaching pillar extension (v2.1.0): after reading `.claude/learn/config.json` for the knowledge pillar guard above, also read `coach.style`. If `coach.style` is non-`default` and a matching style file exists at `.claude/skills/learn/coach-styles/<style>.md`, load the file and apply its `behavior-rule` for this turn. If the value is missing, invalid, or the file does not exist, fall back to `default` (no coaching modification). See [ADR-004](../meta/adr/004-coaching-pillar.md) for the coaching pillar architecture.

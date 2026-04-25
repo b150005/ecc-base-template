@@ -1,7 +1,7 @@
 name: CI Base
 
 # Reusable workflow — derived repositories call this with project-specific inputs.
-# See docs/en/ci-cd-pipeline.md for details.
+# See .claude/meta/references/ci-cd-pipeline.md for details.
 
 on:
   workflow_call:

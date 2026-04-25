@@ -1,15 +1,102 @@
-# Claude Code local settings (user-specific permissions)
+# ─────────────────────────────────────────────────────────────
+# Claude Code / template-internal
+# ─────────────────────────────────────────────────────────────
+# User-specific Claude Code permissions (never shared)
 .claude/settings.local.json
 
-# OS generated files
+# Developer Learning Mode runtime state (private by default).
+# See .gitignore.example if your team wants to share the knowledge base.
+.claude/learn/knowledge/
+.claude/learn/config.json
+
+# ─────────────────────────────────────────────────────────────
+# OS
+# ─────────────────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
 
-# Editor directories and files
+# ─────────────────────────────────────────────────────────────
+# Editors / IDEs
+# ─────────────────────────────────────────────────────────────
+.vscode/
+.idea/
 *.swp
 *.swo
 *~
+.history/
 
-# Developer Learning Mode — private learning material (see README.md "Knowledge files are private by default")
-learn/knowledge/
-learn/config.json
+# ─────────────────────────────────────────────────────────────
+# Environment & secrets (never commit)
+# ─────────────────────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+
+# Private keys & certificates
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+id_rsa
+id_dsa
+id_ecdsa
+id_ed25519
+
+# Tool credentials
+.npmrc
+.netrc
+.pypirc
+
+# Cloud provider credentials
+.aws/credentials
+service-account*.json
+gcp-credentials*.json
+
+# Generic credential files (rename if a real artifact happens to match)
+credentials.json
+secrets.yml
+secrets.yaml
+
+# ─────────────────────────────────────────────────────────────
+# Logs & temporary files
+# ─────────────────────────────────────────────────────────────
+*.log
+logs/
+tmp/
+.cache/
+
+# ─────────────────────────────────────────────────────────────
+# Language / framework ignores
+# ─────────────────────────────────────────────────────────────
+# Extend this section for your stack. Recommended references:
+#   https://github.com/github/gitignore
+#
+# Node.js / TypeScript:
+#   node_modules/
+#   dist/
+#   build/
+#   coverage/
+#
+# Python:
+#   __pycache__/
+#   *.pyc
+#   .venv/
+#   .pytest_cache/
+#   .mypy_cache/
+#
+# Go:
+#   vendor/
+#   *.test
+#   *.out
+#
+# Rust:
+#   target/
+#
+# Java / Kotlin:
+#   .gradle/
+#   build/
+#   *.class
