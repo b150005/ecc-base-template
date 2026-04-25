@@ -11,6 +11,91 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [2.2.0] — 2026-04-25
+
+### Added
+
+19 Meridian-grounded **worked examples** at `docs/en/learn/examples/<domain>.md`,
+with full Japanese mirrors at `docs/ja/learn/examples/<domain>.md`. These are
+read-only references that show what a populated knowledge file looks like after
+many sessions on a real project. The deliverable was originally planned for
+v2.1.0 but split out for review-load reasons (per ADR-003 §5 and ADR-004
+metadata; see also the v2.1.0 release notes).
+
+- **Universal template** at `docs/en/learn/examples/_template.md` (and JA mirror)
+  defining the canonical concept-entry shape, level markers (`[JUNIOR]` / `[MID]`
+  / `[SENIOR]`), Coach Illustration block, and frontmatter schema for every
+  example file.
+- **Reference set (5 files)** authored by technical-writer to lock the quality
+  bar: `testing-discipline.md`, `api-design.md`, `architecture.md`,
+  `error-handling.md`, `market-reasoning.md`.
+- **Per-domain set (14 files)** authored by the owning specialist agents per
+  the taxonomy ownership matrix:
+  - `data-modeling.md`, `persistence-strategy.md` (architect)
+  - `concurrency-and-async.md`, `ecosystem-fluency.md`, `dependency-management.md` (implementer)
+  - `implementation-patterns.md` (linter)
+  - `review-taste.md` (code-reviewer)
+  - `security-mindset.md` (security-reviewer)
+  - `performance-intuition.md` (performance-engineer)
+  - `operational-awareness.md`, `release-and-deployment.md` (devops-engineer)
+  - `business-modeling.md` (monetization-strategist)
+  - `documentation-craft.md` (technical-writer)
+  - `ui-ux-craft.md` (ui-ux-designer)
+- **Shared fictional reference project** Meridian — a B2B task-management SaaS
+  (Go + Gin + PostgreSQL + Redis backend, React + TanStack Query + TypeScript
+  frontend, Kubernetes + GitHub Actions deploy, per-seat subscription pricing).
+  All 19 examples reference Meridian so cross-domain links feel earned.
+- **Each file** is 350–~900 lines, 3–6 concept entries, with at least one Prior
+  Understanding / Corrected entry showing how understanding evolved, at least one
+  cross-domain reference with a specific path + anchor, and one Coach
+  Illustration section showing how a `default`-style turn differs from a
+  `hints` (or, for review-taste, `review-only`) turn for a Meridian scenario in
+  that domain.
+- **Full Japanese translations** of all 19 examples + the template at
+  `docs/ja/learn/examples/`. Code blocks, frontmatter, command strings, and
+  paths are byte-identical to the EN sources; prose is professional 丁寧語.
+
+### Changed
+
+- `docs/en/learning-mode-explained.md` and `docs/ja/learning-mode-explained.md`:
+  removed the "(shipping in v2.2.0)" parenthetical from the worked-examples
+  reference; the examples are now present.
+- `learn/preamble.md` §14 Cross-Reference: the Worked examples entry no longer
+  carries the "shipping in v2.2.0" forward-reference; it now describes the
+  examples as present.
+- The voice-consistency pass (Phase 3) corrected 57 cross-link anchor
+  mismatches across the reference and per-domain files. The Meridian fact set
+  (stack, architecture, Postgres SQLSTATE codes, pgxpool config, ARR figure)
+  is consistent across all 19 files.
+
+### Notes
+
+- **No spec changes ship in v2.2.0.** This release is documentation-only.
+  The runtime behavior of Learning Mode (knowledge pillar + coaching pillar)
+  is unchanged from v2.1.0.
+- **Default-off byte-identity invariant preserved.** A v2.1.0 install upgrades
+  to v2.2.0 transparently. The examples are read-only references; agents do
+  not read, cite, or write under `docs/en/learn/examples/` (preamble §8).
+  All 5 CI invariant checks continue to PASS.
+- **Two example files exceed the 350–500-line target.**
+  `implementation-patterns.md` is 897 lines and `operational-awareness.md` is
+  776 lines. The overage is content-justified (multiple concept entries,
+  layered level markers per entry); both files are flagged for the maintainer
+  in the Phase 3 report.
+- **Anchor strategy across batches** is mixed: the reference set and Batch C
+  use HTML anchors to preserve EN heading slugs in JA; Batch B translated
+  visible heading text and JA-side cross-references resolve to translated
+  slugs. Cross-references between examples are file-internal in most cases,
+  so the inconsistency is contained. A future patch may unify the strategy.
+
+### Migration
+
+No migration is required. v2.1.0 installs upgrade transparently — the new
+`docs/en/learn/examples/` and `docs/ja/learn/examples/` trees are additive
+read-only references.
+
+---
+
 ## [2.1.0] — 2026-04-25
 
 ### Added

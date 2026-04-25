@@ -657,9 +657,8 @@ cost of eventual consistency").
 - **Domain taxonomy (authoritative):** `docs/en/learn/domain-taxonomy.md` — canonical
   definitions, scope boundaries, and per-agent ownership matrix.
 - **Worked examples (read-only references):** `docs/en/learn/examples/<domain>.md` —
-  realistic populated knowledge files from a shared fictional project (Meridian).
-  Shipping in v2.2.0; not present in v2.1.0 or earlier. Agents never read, cite,
-  or write under this tree when it exists.
+  realistic populated knowledge files from a shared fictional project (Meridian),
+  one file per canonical domain. Agents never read, cite, or write under this tree.
 - **Architecture decision records:** `docs/en/adr/001-developer-growth-mode.md` (original
   design, partially superseded), `docs/en/adr/002-growth-domains-location.md` (prompt-body
   declaration), `docs/en/adr/003-learning-mode-relocate-and-rename.md` (v2.0.0 rename and
