@@ -175,6 +175,32 @@ your-repo/
 
 `spec-template.md` も同じです。場所は強制しません。
 
+### upstream Issue の追跡(default-off)
+
+不具合の原因が自リポではなくサードパーティのライブラリやフレームワーク
+にある場合、本テンプレートはそのライフサイクル(切り分け → 記録 → 追跡
+→ upstream パッチ適用後の Workaround 削除)を提供します。
+
+- `.claude/templates/workaround-template.md` — Workaround ごとに
+  `workarounds/NNN-*.md`(`registry_dir` の既定値。`docs/` ツリーがあれ
+  ば `docs/workarounds/NNN-*.md`)にコピー
+- `.github/workflows/workaround-check.yml` — CI 足場 (config でゲート、
+  外すべき `if: false` はなし)
+- `.github/workaround-tracker.yml` — オプトイン設定
+- `.claude/meta/adr/006-upstream-workaround-tracking.md` — 設計の全体像
+- `.claude/meta/references/upstream-workaround-tracking.md` — 使い方詳細
+
+「自リポ vs upstream」の 3 ステップ切り分けプロトコルは **orchestrator**
+と **docs-researcher** が実行し、**implementer** がソースコード内に
+`WORKAROUND-UPSTREAM(<owner>/<repo>#<issue>, fixed=>=<version>)` マー
+カーを配置します。CI 足場はマーカーとレジストリの整合を比較し、追跡対
+象パッケージを bump する Dependabot PR にコメントを付与します。
+
+**有効化はシングルスイッチ**: `.github/workaround-tracker.yml` で
+`enabled: true` にするだけです。ワークフロー側に外すべき第 2 のトグル
+はなく、各ジョブが config を読んで無効時は短絡終了します。Workaround
+ゼロのプロジェクトは CI ノイズもゼロです。
+
 ---
 
 ## テンプレート自身を保守する場合

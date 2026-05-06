@@ -87,15 +87,27 @@ style; `/learn coach list` to see available styles. The complete design lives in
 
 ## Development Workflow
 
-1. **Issue Analysis**: Feed issues to the orchestrator via GitHub MCP or copy-paste
+1. **Issue Analysis**: Feed issues to the orchestrator via GitHub MCP or copy-paste. For defect reports, the orchestrator runs the **ours vs. upstream triage** (3-step protocol via docs-researcher) before deciding the workflow path
 2. **Product Planning**: The product-manager creates a spec, user stories, and acceptance criteria using `.claude/templates/spec-template.md`
 3. **Research & Reuse**: Search GitHub, package registries, and docs before writing new code
 4. **Architecture**: The architect designs the solution; significant decisions are recorded as ADRs using `.claude/templates/adr-template.md`
-5. **Implementation**: The implementer writes code following TDD (RED → GREEN → IMPROVE)
+5. **Implementation**: The implementer writes code following TDD (RED → GREEN → IMPROVE). When the implementation is a workaround for an upstream defect, the implementer also places a `WORKAROUND-UPSTREAM(<owner>/<repo>#<issue>, fixed=>=<version>)` marker and copies `.claude/templates/workaround-template.md` to `workarounds/NNN-*.md` (the default `registry_dir`; or `docs/workarounds/NNN-*.md` if you keep a `docs/` tree — match `registry_dir` in `.github/workaround-tracker.yml`)
 6. **Quality Gate**: The code-reviewer, linter, security-reviewer, and performance-engineer validate the implementation
-7. **Documentation**: The technical-writer updates docs and changelog
+7. **Documentation**: The technical-writer updates docs and changelog. When a workaround is removed, the technical-writer maps `user_impact` to the appropriate CHANGELOG category (`internal` / `changed` / `fixed`)
 8. **Release**: The devops-engineer manages deployment and release
 9. **Commit**: Conventional commits format (feat, fix, refactor, docs, test, chore, perf, ci)
+
+### Upstream workaround lifecycle
+
+When a defect is traced to an upstream library or framework, follow the
+lifecycle defined in ADR-006: triage → search → record → track → remove.
+See `.claude/meta/references/upstream-workaround-tracking.md` for the
+day-to-day usage details and `.claude/meta/adr/006-upstream-workaround-tracking.md`
+for the rationale. The CI scaffold lives at
+`.github/workflows/workaround-check.yml` and ships **default-off**.
+Activation is a single switch — set `enabled: true` in
+`.github/workaround-tracker.yml`. There is no second toggle to remove
+from the workflow file.
 
 ## Testing Requirements
 

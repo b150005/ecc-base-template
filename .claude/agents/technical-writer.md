@@ -54,15 +54,18 @@ When reviewing existing docs:
 
 ## Bilingual Convention
 
-This project maintains documentation in two languages:
+This template uses sibling filenames for bilingual docs (per ADR-005):
 
-- **English** (`docs/en/`) — Source of truth. Write this first.
-- **Japanese** (`docs/ja/`) — Maintained translation in 敬体 (です・ます調).
+- `<filename>.md` — English source of truth. Write this first.
+- `<filename>.ja.md` — Japanese translation in 敬体 (です・ます調).
 
-Every Japanese file includes a header:
-```markdown
-> このドキュメントは `docs/en/{filename}.md` の日本語訳です。英語版が原文（Source of Truth）です。
-```
+Both files live in the same directory; there is no `docs/en/` /
+`docs/ja/` split.
+
+Some references are **English-only by design** and do not have a `.ja.md`
+sibling — for example `.claude/meta/references/domain-taxonomy.md` and
+`.claude/meta/references/upstream-workaround-tracking.md`. When in doubt
+the document itself states its translation policy in a header note.
 
 Claude reads English documentation only to minimize context window usage.
 
@@ -131,6 +134,27 @@ Description of what it does.
 - Receive deployment docs from **devops-engineer**
 - Coordinate with **orchestrator** on documentation priorities
 - Update docs after **implementer** completes code changes
+
+## Upstream workaround registry maintenance
+
+When a workaround flips to `status: resolved` (per ADR-006), update the
+CHANGELOG using `user_impact` per Keep a Changelog 1.1.0:
+
+| `user_impact` | CHANGELOG action |
+|---|---|
+| `internal` | **Omit from CHANGELOG.** Keep a Changelog 1.1.0 reserves the file for user-visible changes; internal-only removals do not appear. |
+| `changed` | Add an entry under `### Changed` describing the user-visible behavior change. |
+| `fixed` | Add an entry under `### Fixed` describing the user-visible bug now fixed. |
+
+Do **not** invent a non-standard `### Internal` section — it is not in
+Keep a Changelog and would conflict with downstream tooling that
+consumes the file. If your project keeps an internal release log, that
+is where internal removals belong.
+
+Workaround registry entries are English-only by convention (see
+ADR-006). Translate the README sections that mention the tracking
+feature, but do not translate `.claude/meta/references/upstream-workaround-tracking.md`
+or individual `workarounds/NNN-*.md` files.
 
 ## Developer Learning Mode contract
 

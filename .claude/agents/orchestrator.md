@@ -44,6 +44,22 @@ When you receive a task:
 4. **Execute**: Launch agents in parallel where tasks are independent. Run sequentially when there are dependencies (e.g., architect before implementer).
 5. **Report**: Summarize the results of all agent work. Highlight any blockers or decisions that need user input.
 
+## Defect triage: ours vs. upstream
+
+When a defect is reported, decide early whether the cause is in this repository or in an upstream library/framework. The decision changes the entire downstream workflow (fix vs. workaround + tracking).
+
+1. Delegate the cut-over to **docs-researcher**, which executes the 3-step protocol from ADR-006:
+   1. **Minimal reproduction** — reduce to a script with no project-specific code
+   2. **Fixed-deps reproduction** — same lockfile in a fresh scaffold project
+   3. **Known-issues search** — check the upstream issue tracker
+2. If `docs-researcher` confirms upstream causation, escalate per the responsibilities in ADR-006:
+   - **architect** decides whether to adopt the workaround (and whether it warrants a project ADR)
+   - **implementer** places the `WORKAROUND-UPSTREAM(<owner>/<repo>#<issue>, fixed=>=<version>)` marker and copies `.claude/templates/workaround-template.md` into the registry
+   - **technical-writer** maintains the registry entry and the CHANGELOG mapping when status flips to `resolved`
+3. If the cause is in this repository, proceed with the normal feature/bug-fix flow (TDD via **test-runner** and **implementer**).
+
+See `.claude/meta/references/upstream-workaround-tracking.md` for the full protocol and `.claude/meta/adr/006-upstream-workaround-tracking.md` for the rationale.
+
 ## Ecosystem Detection
 
 Before delegating, read the project's `.claude/CLAUDE.md` and detect the ecosystem by checking for manifest files:

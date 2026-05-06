@@ -95,6 +95,30 @@ Adapt review criteria to the detected ecosystem:
 - Coordinate with the **security-reviewer** for security-sensitive changes
 - Request the **linter** agent to verify code style compliance
 
+## Upstream workaround marker review
+
+When a PR contains a `WORKAROUND-UPSTREAM(...)` marker (per ADR-006),
+verify all of the following before approval:
+
+- The marker matches the strict format
+  `WORKAROUND-UPSTREAM(<owner>/<repo>#<issue>, fixed=>=<version>)`.
+  Loose forms (`WORKAROUND-UPSTREAM(...)` without owner, missing
+  `fixed=>=`) are CRITICAL because the CI cross-reference grep will
+  reject them.
+- A registry entry exists at the configured `registry_dir` (see
+  `.github/workaround-tracker.yml`) and its `upstream.issue_url`
+  resolves to the same `<owner>/<repo>#<issue>`.
+- The entry's `affected_versions` is a well-formed semver range and
+  `security_impact` is one of `none` / `low` / `medium` / `high`.
+- The entry's `upstream.package` matches the allowlist
+  `[A-Za-z0-9@/_.+:-]+`. Out-of-band characters cause the CI to skip
+  the entry silently.
+- The body's `Verification steps` is concrete enough that a future
+  reader can run them without reconstructing context.
+
+Treat missing markers, missing entries, or malformed front-matter as
+HIGH or CRITICAL depending on whether they would slip past CI.
+
 ## Developer Learning Mode contract
 
 When `.claude/learn/config.json` exists and has `"enabled": true`, this agent is a learning-aware contributor. At session start the agent reads `.claude/skills/learn/preamble.md` and follows the 5-step enrichment contract for any teaching moment that falls within its declared Learning Domains (primary and secondary, as listed in the Learning Domains section above). When Learning Mode is off or the config is absent, this section has no effect and agent output is byte-identical to a world without the feature. See [ADR-001](../meta/adr/001-developer-growth-mode.md) for the complete architecture and [ADR-003](../meta/adr/003-learning-mode-relocate-and-rename.md) for the rename and relocation rationale.

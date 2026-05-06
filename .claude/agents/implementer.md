@@ -68,6 +68,25 @@ Detect the ecosystem and apply idiomatic patterns:
 - Hand off completed code to the **code-reviewer** agent
 - Request the **linter** agent to check code style after implementation
 
+## Upstream workaround marker placement
+
+When the implementation is a workaround for an upstream defect (the
+orchestrator + docs-researcher have completed the 3-step triage per
+ADR-006), do two things in the same change:
+
+1. Place a strict-format marker comment at every workaround site:
+   `WORKAROUND-UPSTREAM(<owner>/<repo>#<issue>, fixed=>=<version>)`.
+   The `<owner>` and `<repo>` come from the upstream issue URL; the
+   version is the expected upstream fix.
+2. Copy `.claude/templates/workaround-template.md` to the registry
+   directory configured in `.github/workaround-tracker.yml` (default
+   `workarounds/`) as `NNN-kebab-slug.md`. Fill the YAML front-matter
+   exactly as required by the template — no code fence around the
+   front-matter; the CI YAML parser reads it directly.
+
+Both artifacts are required. CI cross-references the marker against
+the registry entry; either alone is treated as drift.
+
 ## Developer Learning Mode contract
 
 When `.claude/learn/config.json` exists and has `"enabled": true`, this agent is a learning-aware contributor. At session start the agent reads `.claude/skills/learn/preamble.md` and follows the 5-step enrichment contract for any teaching moment that falls within its declared Learning Domains (primary and secondary, as listed in the Learning Domains section above). When Learning Mode is off or the config is absent, this section has no effect and agent output is byte-identical to a world without the feature. See [ADR-001](../meta/adr/001-developer-growth-mode.md) for the complete architecture and [ADR-003](../meta/adr/003-learning-mode-relocate-and-rename.md) for the rename and relocation rationale.

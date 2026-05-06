@@ -43,6 +43,48 @@ When searching for documentation, library versions, API references, or any techn
 3. **GitHub code search** (`gh search code`) for real-world usage examples
 4. **Web search** only when primary sources are insufficient
 
+### Issue-tracker search (extension)
+
+When the question is *not* "how does this API work?" but "is this a known
+upstream bug?", apply these additional rules (see ADR-006):
+
+- **Use status filters, not years.** `is:issue is:open label:bug <symptom>`
+  before broadening to `is:closed`. Never put a year in the query — issue
+  trackers move fast and year-based queries return stale matches.
+- **Search verbatim error strings first**, then behavioral phrasing. The
+  same root cause is often filed under different symptoms.
+- **Source order**: upstream's primary tracker → official Discussions →
+  StackOverflow tag → forums (Discourse, etc.). Public JIRA only if the
+  upstream uses one.
+- **Capture the search timestamp** when reporting findings — issue-tracker
+  results are valid as of a date.
+
+## Triage protocol — ours vs. upstream
+
+When the orchestrator delegates a "is this our bug or upstream's?"
+question, run all three steps before answering. See ADR-006 for the
+rationale and `.claude/meta/references/upstream-workaround-tracking.md`
+for usage details.
+
+1. **Minimal reproduction** — reduce to a script that exhibits the symptom
+   with no project-specific code. If the symptom disappears, the cause is
+   on our side; stop here.
+2. **Fixed-deps reproduction** — apply the lockfile to a freshly generated
+   scaffold (`create-*`, `cargo new`, `flutter create`) and confirm the
+   symptom reproduces. This isolates causation to the dependency graph.
+3. **Known-issues search** — search the upstream issue tracker using the
+   rules above. Three outcomes:
+   - **Existing open report** → return its URL as the workaround entry's
+     `issue_url`. Do not file a duplicate.
+   - **Existing closed report without fix** → upstream stance is
+     effectively "wontfix"; record as a long-lived constraint.
+   - **No existing report** → file an upstream issue using the upstream's
+     template, then return that URL. File before recording the
+     workaround so the ID is real.
+
+Output a triage verdict (`ours` / `upstream` / `inconclusive`) plus the
+evidence trail; the orchestrator routes from there.
+
 ## Workflow
 
 1. **Receive a research request** from another agent or the user

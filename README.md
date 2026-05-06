@@ -177,6 +177,32 @@ live. Common choices:
 
 The same applies to `spec-template.md`. There is no forced location.
 
+### Tracking upstream issues (default-off)
+
+When a defect is caused by a third-party library or framework rather than
+your own code, the template provides a lifecycle for it: triage, record,
+track, and remove the workaround once the upstream patch lands.
+
+- `.claude/templates/workaround-template.md` — copy to
+  `workarounds/NNN-*.md` (the default `registry_dir`; or
+  `docs/workarounds/NNN-*.md` if you keep a `docs/` tree) per workaround
+- `.github/workflows/workaround-check.yml` — CI scaffold (config-gated;
+  no `if: false` to remove)
+- `.github/workaround-tracker.yml` — opt-in configuration
+- `.claude/meta/adr/006-upstream-workaround-tracking.md` — full design
+- `.claude/meta/references/upstream-workaround-tracking.md` — usage details
+
+The 3-step "ours vs. upstream" triage protocol is run by **orchestrator**
++ **docs-researcher**; **implementer** places a
+`WORKAROUND-UPSTREAM(<owner>/<repo>#<issue>, fixed=>=<version>)` marker
+in source. The CI scaffold compares markers against the registry and
+posts comments on Dependabot PRs that bump tracked packages.
+
+**Opt-in is a single switch**: set `enabled: true` in
+`.github/workaround-tracker.yml`. There is no second toggle to remove
+from the workflow file — every job reads the config and short-circuits
+when disabled. Projects with zero workarounds get zero CI noise.
+
 ---
 
 ## Maintaining the template itself

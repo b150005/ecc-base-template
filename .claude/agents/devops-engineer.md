@@ -106,6 +106,28 @@ Detect the ecosystem and adapt deployment strategies:
 - Notify **technical-writer** to update deployment docs and changelog
 - Report deployment status to **orchestrator**
 
+## Upstream workaround tracking — CI ownership
+
+You own the operational state of the upstream-workaround tracking
+layer (per ADR-006). When the project adopts tracking:
+
+- Activate it by setting `enabled: true` in
+  `.github/workaround-tracker.yml`. There is no second toggle to remove
+  from `.github/workflows/workaround-check.yml` — every job is
+  config-gated.
+- Decide whether to enable `annotate_dependabot_prs` (recommended for
+  projects where Dependabot manages the bumps that resolve workarounds).
+- Choose `fail_on_marker_drift: true` once the registry is stable so
+  marker/entry mismatches block PRs.
+- Honor the trigger discipline in ADR-006: `pull_request_target` is
+  reserved for the `dependabot-annotate` job with the documented gates;
+  do not extend it to other jobs and do not check out PR head code from
+  it.
+- For multi-ecosystem repos, add an ecosystem-specific job that compares
+  installed versions against `affected_versions` from registry entries.
+  The shipped scaffold deliberately does not do this; it is your call
+  what stack to support.
+
 ## Developer Learning Mode contract
 
 When `.claude/learn/config.json` exists and has `"enabled": true`, this agent is a learning-aware contributor. At session start the agent reads `.claude/skills/learn/preamble.md` and follows the 5-step enrichment contract for any teaching moment that falls within its declared Learning Domains (primary and secondary, as listed in the Learning Domains section above). When Learning Mode is off or the config is absent, this section has no effect and agent output is byte-identical to a world without the feature. See [ADR-001](../meta/adr/001-developer-growth-mode.md) for the complete architecture and [ADR-003](../meta/adr/003-learning-mode-relocate-and-rename.md) for the rename and relocation rationale.

@@ -1,0 +1,440 @@
+name: Upstream Workaround Check
+
+# Language-agnostic CI scaffold for the upstream-workaround tracking layer.
+# See .claude/meta/adr/006-upstream-workaround-tracking.md.
+#
+# This workflow is OPT-IN via a single switch: set `enabled: true` in
+# .github/workaround-tracker.yml. Each job's `if:` reads that flag and
+# short-circuits otherwise. There is no second `if: false` to remove.
+#
+# Security note: this workflow uses `pull_request_target` for the
+# Dependabot annotation job because `pull_request` PRs from forks (which
+# Dependabot is treated as) downgrade GITHUB_TOKEN to read-only and the
+# `gh pr comment` call would fail. To stay safe under
+# `pull_request_target`:
+#   1. dependabot-annotate is gated to `github.actor == 'dependabot[bot]'`
+#      AND `pull_request.head.repo.full_name == github.repository`.
+#   2. The job does NOT check out PR head code. It only reads workspace
+#      files and posts a comment. Do not add `actions/checkout` with
+#      `ref: ${{ github.event.pull_request.head.sha }}` or any other PR
+#      content here.
+
+on:
+  pull_request:
+    branches: [main]
+  pull_request_target:
+    branches: [main]
+  schedule:
+    # Weekly Monday 06:30 UTC. Adjust if your repo has other scheduled
+    # workflows that already run near this slot — staggering reduces
+    # runner-queue contention on free plans.
+    - cron: "30 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  # ----------------------------------------------------------------
+  # Job 1: Marker / registry consistency check
+  # ----------------------------------------------------------------
+  # Greps for WORKAROUND-UPSTREAM(...) markers in source and confirms each
+  # one resolves to a registry entry. Reverse direction: each registry
+  # entry with status=active should have at least one corresponding
+  # marker. When `fail_on_marker_drift: true`, drift fails the build.
+  marker-consistency:
+    name: Marker / registry consistency
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    # Skip on pull_request_target to avoid double-runs (handled by pull_request)
+    if: github.event_name != 'pull_request_target'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Read tracker config
+        id: cfg
+        shell: bash
+        run: |
+          set -euo pipefail
+          CFG=".github/workaround-tracker.yml"
+          if [ ! -f "$CFG" ]; then
+            echo "Tracker config missing; skipping."
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          enabled=$(yq -r '.enabled // false' "$CFG")
+          registry_dir=$(yq -r '.registry_dir // "workarounds"' "$CFG")
+          fail_on_drift=$(yq -r '.fail_on_marker_drift // false' "$CFG")
+          # Path-traversal guard: registry_dir must be a relative subpath
+          # under the repo. Reject "..", absolute paths, and globs.
+          if [[ "$registry_dir" =~ \.\. ]] || [[ "$registry_dir" =~ ^/ ]] || [[ "$registry_dir" =~ [*?] ]]; then
+            echo "Invalid registry_dir: $registry_dir" >&2
+            exit 1
+          fi
+          if ! [[ "$registry_dir" =~ ^[A-Za-z0-9_./-]+$ ]]; then
+            echo "Invalid characters in registry_dir: $registry_dir" >&2
+            exit 1
+          fi
+          {
+            echo "enabled=$enabled"
+            echo "registry_dir=$registry_dir"
+            echo "fail_on_drift=$fail_on_drift"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Locate markers and registry entries
+        if: steps.cfg.outputs.enabled == 'true'
+        id: scan
+        shell: bash
+        env:
+          REGISTRY_DIR: ${{ steps.cfg.outputs.registry_dir }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+
+          # Markers in source. Strict regex: WORKAROUND-UPSTREAM(<owner>/<repo>#<n>, fixed=>=<version>)
+          # The git grep filter excludes the registry itself and the template doc.
+          MARKER_RE='WORKAROUND-UPSTREAM\([A-Za-z0-9._-]+/[A-Za-z0-9._-]+#[0-9]+, *fixed=>=[A-Za-z0-9._+-]+\)'
+          : > markers.txt
+          git grep -nE "$MARKER_RE" \
+            -- ':!.claude/templates/workaround-template.md' \
+               ":!${REGISTRY_DIR}/*.md" \
+            > markers.txt 2>/dev/null || true
+
+          # Active registry entries — read status only from YAML front-matter.
+          : > active_entries.txt
+          if [ -d "${REGISTRY_DIR}" ]; then
+            files=("${REGISTRY_DIR}"/*.md)
+            for f in "${files[@]}"; do
+              [ -f "$f" ] || continue
+              status=$(yq -r '.status // ""' "$f" 2>/dev/null || echo "")
+              if [ "$status" = "active" ]; then
+                echo "$f" >> active_entries.txt
+              fi
+            done
+          fi
+
+          markers_count=$(grep -c . markers.txt 2>/dev/null || true)
+          active_count=$(grep -c . active_entries.txt 2>/dev/null || true)
+          markers_count=${markers_count:-0}
+          active_count=${active_count:-0}
+          echo "markers_count=$markers_count" >> "$GITHUB_OUTPUT"
+          echo "active_count=$active_count" >> "$GITHUB_OUTPUT"
+
+      - name: Cross-reference markers and entries
+        if: steps.cfg.outputs.enabled == 'true'
+        id: xref
+        shell: bash
+        env:
+          REGISTRY_DIR: ${{ steps.cfg.outputs.registry_dir }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+
+          # Build the set of "owner/repo#N" referenced by markers.
+          # `grep -oE` to handle multiple markers per line; `LC_ALL=C` so
+          # `sort` and `comm` agree on byte ordering.
+          : > marker_refs.txt
+          if [ -s markers.txt ]; then
+            grep -oE 'WORKAROUND-UPSTREAM\([A-Za-z0-9._-]+/[A-Za-z0-9._-]+#[0-9]+' markers.txt \
+              | sed -E 's/^WORKAROUND-UPSTREAM\(//' \
+              | LC_ALL=C sort -u > marker_refs.txt
+          fi
+
+          # Build the set of "owner/repo#N" referenced by active registry entries
+          # (derived from upstream.issue_url). Delimiter `,` chosen because:
+          #   - `#` is part of the replacement (cannot be the delimiter)
+          #   - `|` collides with the `(issues|pull)` alternation
+          #   - `/` is in the pattern itself
+          : > entry_refs.txt
+          if [ -s active_entries.txt ]; then
+            while IFS= read -r f; do
+              [ -f "$f" ] || continue
+              url=$(yq -r '.upstream.issue_url // ""' "$f" 2>/dev/null || echo "")
+              # github.com/<owner>/<repo>/issues/<n> → <owner>/<repo>#<n>
+              ref=$(printf '%s' "$url" | sed -nE 's,https?://github\.com/([A-Za-z0-9._-]+)/([A-Za-z0-9._-]+)/(issues|pull)/([0-9]+).*,\1/\2#\4,p')
+              [ -n "$ref" ] && echo "$ref" >> entry_refs.txt
+            done < active_entries.txt
+            LC_ALL=C sort -u -o entry_refs.txt entry_refs.txt
+          fi
+
+          # Markers without a matching active entry
+          LC_ALL=C comm -23 marker_refs.txt entry_refs.txt > orphan_markers.txt || true
+          # Active entries without any marker
+          LC_ALL=C comm -13 marker_refs.txt entry_refs.txt > orphan_entries.txt || true
+
+          orphan_markers_count=$(grep -c . orphan_markers.txt 2>/dev/null || true)
+          orphan_entries_count=$(grep -c . orphan_entries.txt 2>/dev/null || true)
+          orphan_markers_count=${orphan_markers_count:-0}
+          orphan_entries_count=${orphan_entries_count:-0}
+          echo "orphan_markers=$orphan_markers_count" >> "$GITHUB_OUTPUT"
+          echo "orphan_entries=$orphan_entries_count" >> "$GITHUB_OUTPUT"
+
+      - name: Report findings
+        if: steps.cfg.outputs.enabled == 'true'
+        env:
+          MARKERS_COUNT: ${{ steps.scan.outputs.markers_count }}
+          ACTIVE_COUNT: ${{ steps.scan.outputs.active_count }}
+          ORPHAN_MARKERS: ${{ steps.xref.outputs.orphan_markers }}
+          ORPHAN_ENTRIES: ${{ steps.xref.outputs.orphan_entries }}
+        shell: bash
+        run: |
+          {
+            echo "## Workaround marker / registry scan"
+            echo ""
+            echo "- Markers found: ${MARKERS_COUNT}"
+            echo "- Active registry entries: ${ACTIVE_COUNT}"
+            echo "- Markers without matching entry: ${ORPHAN_MARKERS}"
+            echo "- Active entries without any marker: ${ORPHAN_ENTRIES}"
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ -s orphan_markers.txt ]; then
+            {
+              echo ""
+              echo "### Orphan markers (no matching registry entry)"
+              echo '```'
+              cat orphan_markers.txt
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+          if [ -s orphan_entries.txt ]; then
+            {
+              echo ""
+              echo "### Active entries with no marker in source"
+              echo '```'
+              cat orphan_entries.txt
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Fail on drift (when configured)
+        if: steps.cfg.outputs.enabled == 'true' && steps.cfg.outputs.fail_on_drift == 'true'
+        env:
+          ORPHAN_MARKERS: ${{ steps.xref.outputs.orphan_markers }}
+          ORPHAN_ENTRIES: ${{ steps.xref.outputs.orphan_entries }}
+        shell: bash
+        run: |
+          if [ "${ORPHAN_MARKERS}" -gt 0 ] || [ "${ORPHAN_ENTRIES}" -gt 0 ]; then
+            echo "::error::Marker / registry drift detected (orphan_markers=${ORPHAN_MARKERS}, orphan_entries=${ORPHAN_ENTRIES})."
+            exit 1
+          fi
+
+  # ----------------------------------------------------------------
+  # Job 2: Expiry warning (scheduled / dispatch only)
+  # ----------------------------------------------------------------
+  # Reads each registry entry's `expires_on` and warns on imminent or
+  # overdue expiry. Reports via job summary; does not fail the build.
+  expiry-warning:
+    name: Expiry warning
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    if: |
+      (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Read tracker config
+        id: cfg
+        shell: bash
+        run: |
+          set -euo pipefail
+          CFG=".github/workaround-tracker.yml"
+          if [ ! -f "$CFG" ]; then
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          enabled=$(yq -r '.enabled // false' "$CFG")
+          registry_dir=$(yq -r '.registry_dir // "workarounds"' "$CFG")
+          warn_days=$(yq -r '.expiry_warning_days // 14' "$CFG")
+          if [[ "$registry_dir" =~ \.\. ]] || [[ "$registry_dir" =~ ^/ ]] || [[ "$registry_dir" =~ [*?] ]]; then
+            echo "Invalid registry_dir: $registry_dir" >&2; exit 1
+          fi
+          if ! [[ "$registry_dir" =~ ^[A-Za-z0-9_./-]+$ ]]; then
+            echo "Invalid characters in registry_dir: $registry_dir" >&2; exit 1
+          fi
+          if ! [[ "$warn_days" =~ ^[0-9]+$ ]]; then
+            echo "Invalid expiry_warning_days: $warn_days" >&2; exit 1
+          fi
+          {
+            echo "enabled=$enabled"
+            echo "registry_dir=$registry_dir"
+            echo "warn_days=$warn_days"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Scan expiry dates
+        if: steps.cfg.outputs.enabled == 'true' && steps.cfg.outputs.warn_days != '0'
+        env:
+          REGISTRY_DIR: ${{ steps.cfg.outputs.registry_dir }}
+          WARN_DAYS: ${{ steps.cfg.outputs.warn_days }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          [ -d "${REGISTRY_DIR}" ] || { echo "No registry dir; nothing to scan."; exit 0; }
+          files=("${REGISTRY_DIR}"/*.md)
+          [ "${#files[@]}" -eq 0 ] && { echo "Registry empty."; exit 0; }
+
+          # GNU date is required (ubuntu-latest). Fail loudly if absent.
+          date --version >/dev/null 2>&1 || { echo "GNU date not found"; exit 1; }
+          today=$(date -u +%s)
+          secs_per_day=86400
+          warn_window=$((WARN_DAYS * secs_per_day))
+
+          {
+            echo "## Workaround expiry scan"
+            echo ""
+            echo "| Entry | Expires | Status |"
+            echo "|---|---|---|"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          for f in "${files[@]}"; do
+            [ -f "$f" ] || continue
+            exp=$(yq -r '.expires_on // ""' "$f" 2>/dev/null || echo "")
+            if [ -z "$exp" ] || [ "$exp" = "null" ]; then
+              continue
+            fi
+            # Strict YYYY-MM-DD validation
+            if ! [[ "$exp" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+              echo "| $f | $exp | malformed (expected YYYY-MM-DD) |" >> "$GITHUB_STEP_SUMMARY"
+              continue
+            fi
+            exp_ts=$(date -u -d "$exp" +%s 2>/dev/null || true)
+            [ -z "$exp_ts" ] && continue
+            delta=$((exp_ts - today))
+            if [ "$delta" -lt 0 ]; then
+              echo "| $f | $exp | OVERDUE |" >> "$GITHUB_STEP_SUMMARY"
+            elif [ "$delta" -lt "$warn_window" ]; then
+              echo "| $f | $exp | warning (within ${WARN_DAYS}d) |" >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+
+  # ----------------------------------------------------------------
+  # Job 3: Dependabot PR annotation
+  # ----------------------------------------------------------------
+  # When a Dependabot PR bumps a package referenced by an active workaround
+  # entry, post (or update) a single comment listing the entries to
+  # revisit. Does NOT auto-flip status — the human/agent confirms.
+  #
+  # Trigger: pull_request_target (only path that grants pull-requests:write
+  # for Dependabot). Strict actor + same-repo gate compensates.
+  dependabot-annotate:
+    name: Annotate Dependabot PRs
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    if: |
+      github.event_name == 'pull_request_target' &&
+      github.actor == 'dependabot[bot]' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - name: Checkout (base ref only — never PR head)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          fetch-depth: 1
+
+      - name: Read tracker config
+        id: cfg
+        shell: bash
+        run: |
+          set -euo pipefail
+          CFG=".github/workaround-tracker.yml"
+          if [ ! -f "$CFG" ]; then
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          enabled=$(yq -r '.enabled // false' "$CFG")
+          annotate=$(yq -r '.annotate_dependabot_prs // false' "$CFG")
+          registry_dir=$(yq -r '.registry_dir // "workarounds"' "$CFG")
+          if [[ "$registry_dir" =~ \.\. ]] || [[ "$registry_dir" =~ ^/ ]] || [[ "$registry_dir" =~ [*?] ]]; then
+            echo "Invalid registry_dir: $registry_dir" >&2; exit 1
+          fi
+          if ! [[ "$registry_dir" =~ ^[A-Za-z0-9_./-]+$ ]]; then
+            echo "Invalid characters in registry_dir: $registry_dir" >&2; exit 1
+          fi
+          {
+            echo "enabled=$enabled"
+            echo "annotate=$annotate"
+            echo "registry_dir=$registry_dir"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Match bumped packages and post sticky comment
+        if: steps.cfg.outputs.enabled == 'true' && steps.cfg.outputs.annotate == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REGISTRY_DIR: ${{ steps.cfg.outputs.registry_dir }}
+          MARKER: "<!-- workaround-tracker-bot -->"
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          [ -z "${PR_NUMBER:-}" ] && { echo "Not a PR context; skipping."; exit 0; }
+          [ -d "${REGISTRY_DIR}" ] || { echo "No registry dir; skipping."; exit 0; }
+          files=("${REGISTRY_DIR}"/*.md)
+          [ "${#files[@]}" -eq 0 ] && { echo "Registry empty."; exit 0; }
+
+          # Allowlist for package names (defense against markdown/comment injection).
+          # Permits common package identifier characters across npm/pypi/go/crates/
+          # maven/pub/swift/nuget. `:` covers Maven groupId:artifactId coordinates.
+          ALLOWLIST_RE='^[A-Za-z0-9@/_.+:-]+$'
+
+          # Collect packages from active registry entries.
+          : > pkgs.txt
+          for f in "${files[@]}"; do
+            [ -f "$f" ] || continue
+            status=$(yq -r '.status // ""' "$f" 2>/dev/null || echo "")
+            [ "$status" = "active" ] || continue
+            pkg=$(yq -r '.upstream.package // ""' "$f" 2>/dev/null || echo "")
+            if [ -z "$pkg" ] || [ "$pkg" = "null" ]; then
+              continue
+            fi
+            if ! [[ "$pkg" =~ $ALLOWLIST_RE ]]; then
+              echo "::warning::Skipping entry with invalid package name: $f"
+              continue
+            fi
+            echo "$pkg" >> pkgs.txt
+          done
+          LC_ALL=C sort -u -o pkgs.txt pkgs.txt
+          [ ! -s pkgs.txt ] && { echo "No active packages."; exit 0; }
+
+          # Read PR title+body via gh (no shell expansion of PR content).
+          pr_text=$(gh pr view "$PR_NUMBER" --json title,body --jq '.title + "\n" + .body')
+
+          # Match each tracked package against the PR text using fixed-string grep.
+          matched_lines=""
+          while IFS= read -r pkg; do
+            [ -z "$pkg" ] && continue
+            if printf '%s' "$pr_text" | grep -qF -- "$pkg"; then
+              matched_lines+="- \`${pkg}\`"$'\n'
+            fi
+          done < pkgs.txt
+
+          if [ -z "$matched_lines" ]; then
+            echo "No tracked packages match this PR."
+            exit 0
+          fi
+
+          body=$(printf '%s\n\n**Upstream-workaround tracker**: this dependency bump touches package(s) referenced by active workaround entries:\n\n%s\nReview the corresponding registry entries under `%s/` and run their `verification_steps` before merging.' \
+            "$MARKER" "$matched_lines" "$REGISTRY_DIR")
+
+          # Idempotent: edit existing sticky comment if present, else create.
+          # `--arg` binds MARKER as data so the jq query has no shell-expanded code.
+          existing_id=$(gh api "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments" \
+            | jq -r --arg marker "$MARKER" '.[] | select(.body | startswith($marker)) | .id' \
+            | head -n1)
+          if [ -n "$existing_id" ]; then
+            gh api -X PATCH "repos/${GITHUB_REPOSITORY}/issues/comments/${existing_id}" \
+              -f body="$body" >/dev/null
+            echo "Updated existing tracker comment ($existing_id)."
+          else
+            gh pr comment "$PR_NUMBER" --body "$body" >/dev/null
+            echo "Posted new tracker comment."
+          fi

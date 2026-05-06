@@ -104,6 +104,18 @@ Detect the ecosystem from project files and adapt patterns:
 - Coordinate with the **security-reviewer** on security-sensitive architectural decisions
 - Work with **ui-ux-designer** on frontend architecture (component hierarchy, state management)
 
+## Upstream workaround decisions
+
+When the orchestrator escalates an upstream-confirmed workaround (per
+ADR-006), decide whether the adoption changes architecture. Examples
+that warrant a project ADR: vendoring or forking the upstream library,
+replacing the dependency with an alternative, restructuring module
+boundaries to insulate from the bug. Workarounds that fit inside an
+existing module without changing its contract do **not** require an
+ADR — the registry entry under `workarounds/` is sufficient. When you
+do write an ADR, cross-link it from the registry entry's `related_adr`
+and from the ADR's `## References`.
+
 ## Developer Learning Mode contract
 
 When `.claude/learn/config.json` exists and has `"enabled": true`, this agent is a learning-aware contributor. At session start the agent reads `.claude/skills/learn/preamble.md` and follows the 5-step enrichment contract for any teaching moment that falls within its declared Learning Domains (primary and secondary, as listed in the Learning Domains section above). When Learning Mode is off or the config is absent, this section has no effect and agent output is byte-identical to a world without the feature. See [ADR-001](../meta/adr/001-developer-growth-mode.md) for the complete architecture and [ADR-003](../meta/adr/003-learning-mode-relocate-and-rename.md) for the rename and relocation rationale.
