@@ -7,6 +7,55 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.3.0] - 2026-05-07
+
+### Added
+
+- `research-verification` Skill at
+  `.claude/skills/research-verification/` and a new `research-critic`
+  agent for adversarial review of external-research outputs. Generator
+  (`docs-researcher`) declares a Tier (T1/T2/T3) on every research
+  output; Critic (`research-critic`) reviews using a *different tool
+  family* and must cite at least one **primary source** the Generator
+  did not — secondary sources (blogs, Q&A sites, AI summaries,
+  translations of primary sources) are explicitly disallowed as the
+  Critic's independent citation. Bounded GAN iteration (default 2
+  rounds) with explicit escalation to the orchestrator when consensus
+  is not reached. Designed to catch confirmation echo,
+  secondary-source drift, and hallucinated APIs at the research step
+  rather than at build/test time. See ADR-008 for the rationale.
+- `.claude/skills/research-verification/SKILL.md` — protocol overview,
+  Tier table, Pre/Post checklist.
+- `.claude/skills/research-verification/checklist.md` — Critic
+  checklist (10 items) and primary-source allowlist.
+- `.claude/skills/research-verification/failure-modes.md` — five
+  typical research-error patterns the checklist is designed to catch.
+- `.claude/agents/research-critic.md` — new agent with
+  primary-source-only citation as a hard rule.
+- `.claude/templates/research-review-template.md` — output artifact
+  format shared by Generator and Critic.
+- `.claude/research-verification.yml.example` — opt-out config
+  template (`enabled`, `max_iterations`, `default_tier`,
+  `external_facts_only`). Adopters copy to
+  `.claude/research-verification.yml` to activate; absent file =
+  defaults apply.
+- ADR-008 (`.claude/meta/adr/008-research-verification-layer.md` and
+  `.ja.md`) documenting the design and the primary-source-only
+  Critic constraint.
+
+### Changed
+
+- `.claude/CLAUDE.md` — added `research-critic` to the Agent Team
+  table; expanded Workflow §3 (Research & Reuse) with a one-paragraph
+  reference to the research-verification Skill (CLAUDE.md remains
+  under the 200-line guard).
+- `.claude/agents/docs-researcher.md` — output format aligned with
+  the Critic input contract; Tier declaration documented; Generator
+  role in the research-verification protocol described inline.
+- `.claude/agents/orchestrator.md` — added `research-critic` to the
+  delegation table and a new "Routing external research" section
+  with the Tier-based routing rules and escalation flow.
+
 ## [3.2.0] - 2026-05-07
 
 ### Added

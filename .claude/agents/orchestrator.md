@@ -41,6 +41,7 @@ When you receive a task:
    - Performance optimization → **performance-engineer**
    - Deployment/release → **devops-engineer**
    - Documentation → **technical-writer**
+   - External-research review (T1/T2 in research-verification) → **research-critic**
 4. **Execute**: Launch agents in parallel where tasks are independent. Run sequentially when there are dependencies (e.g., architect before implementer).
 5. **Report**: Summarize the results of all agent work. Highlight any blockers or decisions that need user input.
 
@@ -53,6 +54,47 @@ checklist), and `docs-researcher` (volatile-rule verification, if any
 are cited). Each of these agents knows when to invoke the
 **claude-md-authoring** Skill (ADR-007). Routine small edits do not
 need the Skill — let the responsible agent decide.
+
+## Routing external research
+
+When external research will inform a decision (architecture, library
+selection, API usage, version pin, breaking-change assessment), route
+through the **research-verification** Skill
+(`.claude/skills/research-verification/SKILL.md`):
+
+1. Delegate to **docs-researcher** (Generator) with the research
+   question and the expected impact on downstream work. The Generator
+   declares a Tier (T1 / T2 / T3) on its output and uses
+   `.claude/templates/research-review-template.md`.
+2. For T1 and T2, route the Generator's output to **research-critic**
+   (Critic). The Critic uses a different tool family from the
+   Generator and must cite at least one primary source the Generator
+   did not cite. Secondary sources (blogs, Q&A sites, AI summaries,
+   translations of primary sources) are not acceptable as the
+   Critic's independent citation — see the allowlist in
+   `.claude/skills/research-verification/checklist.md`.
+3. For T3 (style, idiomatic usage), the Generator's self-check is
+   sufficient; the Critic is not invoked.
+4. Iterate up to `max_iterations` rounds (default 2 per
+   `.claude/research-verification.yml`). For T2, only iterate when
+   remaining findings include CRITICAL or HIGH — MEDIUM/LOW alone
+   terminate without further rounds. If findings remain after the
+   limit, follow `SKILL.md` §"Escalation contract": ask the user for
+   tie-break, mark the claim `UNVERIFIED:` and proceed, or block the
+   downstream agent.
+5. Tier override: you can escalate upward (T3 → T2, T2 → T1) but
+   never downward. **Tier-confirmation guardrail**: when the
+   Generator declares T2 or T3 but the research topic contains any
+   of `auth`, `authn`, `authz`, `crypto`, `breaking change`,
+   `migration`, `CVE`, `security`, `permission`, `token`, confirm the
+   declared Tier before accepting. If in doubt, escalate to T1. This
+   defends against silent under-classification on the highest-risk
+   path (ADR-008 §Consequences).
+6. Opt-out: if `.claude/research-verification.yml` has
+   `enabled: false`, skip this routing entirely; the Generator
+   returns directly. No error is raised.
+
+See ADR-008 for the rationale.
 
 ## Defect triage: ours vs. upstream
 

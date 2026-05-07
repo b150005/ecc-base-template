@@ -40,7 +40,8 @@ This project uses an agent team for structured development. The **orchestrator**
 | market-analyst | Market research, competitor analysis |
 | monetization-strategist | Business model, pricing, revenue strategy |
 | ui-ux-designer | UI/UX design, accessibility, usability review |
-| docs-researcher | Documentation research, API verification, freshness-safe search |
+| docs-researcher | Documentation research, API verification, freshness-safe search (research-verification Generator) |
+| research-critic | Adversarial review of external research with primary-source-only citation (research-verification Critic) |
 | architect | System architecture, technology decisions |
 | implementer | Code implementation following architecture and TDD |
 | code-reviewer | Code quality and standards review |
@@ -100,7 +101,7 @@ style; `/learn coach list` to see available styles. The complete design lives in
 
 1. **Issue Analysis**: Feed issues to the orchestrator via GitHub MCP or copy-paste. For defect reports, the orchestrator runs the **ours vs. upstream triage** (3-step protocol via docs-researcher) before deciding the workflow path
 2. **Product Planning**: The product-manager creates a spec, user stories, and acceptance criteria using `.claude/templates/spec-template.md`
-3. **Research & Reuse**: Search GitHub, package registries, and docs before writing new code
+3. **Research & Reuse**: Search GitHub, package registries, and docs before writing new code. When the result will inform a decision (architecture, library selection, API usage, version pin), invoke the **research-verification** Skill (`.claude/skills/research-verification/SKILL.md`). The `docs-researcher` (Generator) declares a Tier and the `research-critic` (Critic) reviews using a different tool family with primary-source-only citation. Default config in `.claude/research-verification.yml.example`; opt out via `enabled: false`. See ADR-008 for rationale.
 4. **Architecture**: The architect designs the solution; significant decisions are recorded as ADRs using `.claude/templates/adr-template.md`
 5. **Implementation**: The implementer writes code following TDD (RED → GREEN → IMPROVE). When the implementation is a workaround for an upstream defect, the implementer also places a `WORKAROUND-UPSTREAM(<owner>/<repo>#<issue>, fixed=>=<version>)` marker and copies `.claude/templates/workaround-template.md` to `workarounds/NNN-*.md` (the default `registry_dir`; or `docs/workarounds/NNN-*.md` if you keep a `docs/` tree — match `registry_dir` in `.github/workaround-tracker.yml`)
 6. **Quality Gate**: The code-reviewer, linter, security-reviewer, and performance-engineer validate the implementation

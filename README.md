@@ -1,6 +1,6 @@
 # ecc-base-template
 
-A framework-agnostic GitHub template that ships a 15-agent development team
+A framework-agnostic GitHub template that ships a 16-agent development team
 and an opt-in learning layer for high-quality, high-precision collaboration
 with Claude Code.
 
@@ -10,7 +10,7 @@ with Claude Code.
 
 ## What you get
 
-- **15 specialized agents** covering the full product lifecycle — orchestrator,
+- **16 specialized agents** covering the full product lifecycle — orchestrator,
   product-manager, architect, implementer, test-runner, code-reviewer,
   security-reviewer, performance-engineer, devops-engineer, technical-writer,
   and more. All ecosystem-agnostic: the agents detect your language and
@@ -96,7 +96,7 @@ opt-in and adopters are free to drop it entirely.
 
 ---
 
-## The 15-agent team
+## The 16-agent team
 
 All agents are ecosystem-agnostic. They detect the project's language and
 framework at runtime by reading `.claude/CLAUDE.md` and your project's manifest
@@ -111,7 +111,8 @@ or directly.
 | **market-analyst** | Planning | Market research, competitor analysis, user segment identification |
 | **monetization-strategist** | Planning | Business model design, pricing strategy, revenue analysis |
 | **ui-ux-designer** | Design | UI/UX design, usability review, accessibility compliance |
-| **docs-researcher** | Research | API verification, framework behavior, version-specific changes against primary docs |
+| **docs-researcher** | Research | API verification, framework behavior, version-specific changes against primary docs (research-verification Generator) |
+| **research-critic** | Research | Adversarial review of external-research outputs against primary sources, with primary-source-only citation (research-verification Critic) |
 | **architect** | Design | System architecture, technology decisions, ADR creation |
 | **implementer** | Build | Code implementation following architecture specs and TDD |
 | **code-reviewer** | Quality | Code quality, maintainability, standards adherence |
@@ -153,7 +154,7 @@ your-repo/
 ├── .gitattributes
 ├── .claude/                   ← Claude Code machinery
 │   ├── CLAUDE.md              ← project instructions (edit the About section first)
-│   ├── agents/                ← 15 agent definition files
+│   ├── agents/                ← 16 agent definition files
 │   ├── skills/                ← /learn and /quiet skills
 │   ├── templates/             ← copy-and-fill ADR/spec templates
 │   ├── meta/                  ← template-internal ADRs, references, init script
@@ -200,6 +201,47 @@ it for routine small edits. CI verifies the Skill's structural
 invariants (`.github/workflows/skill-invariants.yml`). An optional
 monthly Anthropic-docs freshness diff is also shipped, default-off
 (`.github/workflows/docs-freshness.yml`).
+
+### Research verification (adversarial review of external research)
+
+The template ships a `research-verification` Skill plus a new
+`research-critic` agent that adversarially reviews external research
+before its output is consumed by downstream agents. Designed to catch
+confirmation echo, secondary-source drift, and hallucinated APIs at
+the research step rather than at build/test time.
+
+- `.claude/skills/research-verification/SKILL.md` — protocol overview,
+  Tier table, Pre/Post checklist
+- `.claude/skills/research-verification/checklist.md` — 10-item Critic
+  checklist and the primary-source allowlist
+- `.claude/skills/research-verification/failure-modes.md` — five
+  typical research-error patterns
+- `.claude/agents/research-critic.md` — Critic agent definition
+- `.claude/templates/research-review-template.md` — shared output
+  format
+- `.claude/research-verification.yml.example` — opt-out config
+- `.claude/meta/adr/008-research-verification-layer.md` — design
+  rationale
+
+How it works: `docs-researcher` (Generator) declares a Tier (T1/T2/T3)
+on each external-research output. T1 (breaking changes, auth,
+security) and T2 (API arguments, return types, version features) are
+reviewed by `research-critic` (Critic) using a *different tool family*
+from the Generator. The Critic must cite at least one **primary
+source** the Generator did not — secondary sources (blogs, Q&A sites,
+AI summaries, translations of primary sources) are explicitly
+disallowed as the Critic's independent citation, because they lag
+primary docs and the Critic's purpose is to catch that lag. Up to 2
+GAN rounds; if consensus does not hold, the orchestrator escalates per
+the contract in `SKILL.md`. T3 (style, idiomatic usage) collapses to
+Generator self-check.
+
+To opt out, copy `.claude/research-verification.yml.example` to
+`.claude/research-verification.yml` and set `enabled: false`. With no
+file present, the defaults apply (`enabled: true`,
+`max_iterations: 2`, `default_tier: T2`). When `enabled: false`, the
+whole layer becomes inert and agents return to single-pass research
+with no error.
 
 ### Tracking upstream issues (default-off)
 

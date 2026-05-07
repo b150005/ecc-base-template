@@ -1,0 +1,49 @@
+# Research Verification configuration (ADR-008).
+#
+# Copy this file to `.claude/research-verification.yml` to opt in to the
+# research-verification layer. With no file present, the defaults below
+# apply (the layer is enabled by default).
+#
+# To disable the entire layer, set `enabled: false`. Agents continue
+# working without verification and no error is raised.
+
+# Master switch.
+# When false, docs-researcher and research-critic do not run the
+# verification protocol; external research returns directly from the
+# Generator without Critic review or Tier handling.
+enabled: true
+
+# Maximum GAN rounds before escalation. After this many rounds with
+# findings remaining, the orchestrator decides among:
+#   - ask user for tie-break
+#   - mark the claim UNVERIFIED: and proceed
+#   - block downstream until resolved
+#
+# 1 disables iteration entirely (Critic runs once, then the orchestrator
+# decides). 2 is the default and matches ADR-008. 3+ is unusual and
+# typically indicates the question is ill-posed.
+max_iterations: 2
+
+# Default Tier when the Generator does not declare one explicitly.
+# T1 — breaking changes, auth, security-sensitive APIs, crypto
+# T2 — public API arguments, return types, defaults, version features
+# T3 — idiomatic style, common usage, widely-known patterns
+#
+# T2 is the safe default. Generators should declare a Tier per
+# research output; this is the fallback only.
+default_tier: T2
+
+# Tier-specific overrides (optional). Most adopters do not need this.
+# tier_overrides:
+#   T1:
+#     max_iterations: 2  # full GAN
+#   T2:
+#     max_iterations: 1  # Critic once, no iteration unless CRITICAL/HIGH
+#   T3:
+#     max_iterations: 0  # Generator self-check only
+
+# Scope guard. When true, the layer activates only when external
+# research will inform a decision (architecture, library selection, API
+# usage, version constraints). Casual lookups during pair-programming
+# are skipped. Recommended.
+external_facts_only: true

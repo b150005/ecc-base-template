@@ -1,7 +1,7 @@
 # ecc-base-template
 
 Claude Code との高品質・高精度な協働を支える、フレームワーク非依存の GitHub
-テンプレート。15 のエージェントによる開発チームと、オプトインの学習レイヤーを
+テンプレート。16 のエージェントによる開発チームと、オプトインの学習レイヤーを
 標準装備しています。
 
 [English README](README.md)
@@ -10,7 +10,7 @@ Claude Code との高品質・高精度な協働を支える、フレームワ�
 
 ## 何が入っているか
 
-- **専門化された 15 エージェント** が製品ライフサイクル全体をカバー
+- **専門化された 16 エージェント** が製品ライフサイクル全体をカバー
   — orchestrator、product-manager、architect、implementer、test-runner、
   code-reviewer、security-reviewer、performance-engineer、devops-engineer、
   technical-writer など。エコシステム非依存で、利用言語とフレームワークを
@@ -95,7 +95,7 @@ orchestrator が product-manager に受け入れ基準を、architect にモジ�
 
 ---
 
-## 15 エージェントチーム
+## 16 エージェントチーム
 
 全エージェントはエコシステム非依存です。`.claude/CLAUDE.md` とプロジェクトの
 マニフェストファイル(`package.json`、`pubspec.yaml`、`go.mod`、`Cargo.toml`
@@ -109,7 +109,8 @@ orchestrator が product-manager に受け入れ基準を、architect にモジ�
 | **market-analyst** | 企画 | 市場調査、競合分析、ユーザーセグメント特定 |
 | **monetization-strategist** | 企画 | ビジネスモデル設計、価格戦略、収益分析 |
 | **ui-ux-designer** | 設計 | UI/UX デザイン、ユーザビリティレビュー、アクセシビリティ準拠 |
-| **docs-researcher** | 調査 | 一次資料に対する API 検証、フレームワーク挙動、バージョン差分確認 |
+| **docs-researcher** | 調査 | 一次資料に対する API 検証、フレームワーク挙動、バージョン差分確認(research-verification の Generator) |
+| **research-critic** | 調査 | 外部調査結果を primary source 限定で敵対的レビュー(research-verification の Critic) |
 | **architect** | 設計 | システムアーキテクチャ、技術選定、ADR 作成 |
 | **implementer** | 実装 | アーキテクチャと TDD に沿ったコード実装 |
 | **code-reviewer** | 品質 | コード品質、保守性、規約準拠のレビュー |
@@ -151,7 +152,7 @@ your-repo/
 ├── .gitattributes
 ├── .claude/                   ← Claude Code 機構
 │   ├── CLAUDE.md              ← プロジェクト指示(About セクションを最初に編集)
-│   ├── agents/                ← 15 エージェント定義
+│   ├── agents/                ← 16 エージェント定義
 │   ├── skills/                ← /learn と /quiet
 │   ├── templates/             ← コピー&記入用 ADR/spec テンプレート
 │   ├── meta/                  ← テンプレ自身の ADR、参考資料、init スクリプト
@@ -197,6 +198,47 @@ Skill は **手動 invoke 専用** (`disable-model-invocation: true`) で、
 不変条件を検証します (`.github/workflows/skill-invariants.yml`)。
 Anthropic Docs の月次 freshness diff もオプションで提供 (default-off、
 `.github/workflows/docs-freshness.yml`)。
+
+### Research verification(外部調査の敵対的レビュー)
+
+本テンプレートは `research-verification` Skill と新 agent
+`research-critic` を提供し、外部調査結果が下流 agent に消費される前
+に敵対的レビューを行います。確証エコー、二次情報ドリフト、API ハル
+シネーションを「ビルド/テスト時」ではなく「調査ステップ」で捕まえ
+る設計です。
+
+- `.claude/skills/research-verification/SKILL.md` — protocol、Tier
+  表、Pre/Post チェックリスト
+- `.claude/skills/research-verification/checklist.md` — Critic
+  チェックリスト 10 項目と primary source allowlist
+- `.claude/skills/research-verification/failure-modes.md` — 典型的
+  な調査誤りパターン 5 種
+- `.claude/agents/research-critic.md` — Critic agent 定義
+- `.claude/templates/research-review-template.md` — Generator と
+  Critic が共有する出力フォーマット
+- `.claude/research-verification.yml.example` — opt-out config
+- `.claude/meta/adr/008-research-verification-layer.ja.md` — 設計の
+  根拠
+
+仕組み: `docs-researcher` (Generator) は外部調査出力ごとに Tier
+(T1/T2/T3) を宣言します。T1 (破壊的変更、認証、セキュリティ)、T2
+(API 引数、戻り値、版数別機能) は `research-critic` (Critic) が
+レビュー — Generator とは異なるツールファミリを使い、Generator が
+引いていない **primary source** を最低 1 つ引用する必要があります。
+二次情報 (ブログ、Q&A サイト、AI 要約、primary source の翻訳) は
+Critic の独立引用としては明示的に不可です。primary docs から遅れる
+情報源を許せば、その遅れを捕まえる Critic の存在意義が消えるためで
+す。GAN 反復は最大 2 周。合意に至らなければ orchestrator が
+`SKILL.md` の escalation contract に従ってエスカレーションします。
+T3 (スタイル、慣用) は Generator self-check のみで Critic は呼ば
+れません。
+
+opt-out するには `.claude/research-verification.yml.example` を
+`.claude/research-verification.yml` にコピーし、`enabled: false` を
+設定します。ファイルがなければデフォルトが適用されます
+(`enabled: true`、`max_iterations: 2`、`default_tier: T2`)。
+`enabled: false` 時は層全体が不活化され、agent は単一パス調査に戻り
+ます。エラーは出ません。
 
 ### upstream Issue の追跡(default-off)
 

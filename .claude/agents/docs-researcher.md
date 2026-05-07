@@ -117,6 +117,16 @@ reviews.
 
 ## Output Format
 
+When the result will inform a downstream decision (architecture,
+library selection, API usage, version pin), use the
+research-verification template at
+`.claude/templates/research-review-template.md` and declare a Tier
+(T1 / T2 / T3 — see `.claude/skills/research-verification/SKILL.md`).
+The `research-critic` agent will append findings and a verdict.
+
+For casual lookups (T3 territory or smaller), the lighter format
+below is sufficient:
+
 ```
 ## Research: [Topic]
 
@@ -134,6 +144,28 @@ reviews.
 ### Sources
 1. [Full reference with URL or path]
 ```
+
+## Research-verification protocol (Generator role)
+
+When invoking the **research-verification** Skill
+(`.claude/skills/research-verification/SKILL.md`), this agent acts as
+**Generator**:
+
+1. Apply the freshness-safe rules above to construct queries.
+2. Declare a Tier on the output (T1 / T2 / T3).
+3. Record the tool log and citation list — the Critic uses these to
+   pick a *different* tool family.
+4. Cite at least one primary source per claim (vendor official docs,
+   GitHub at a tag, RFC/W3C/MDN, language stdlib). Secondary sources
+   may appear as supporting context but cannot be the only citation.
+5. Pin the version. If the version is unknown, mark the answer
+   provisional and surface that to the orchestrator.
+6. Receive Critic findings via the same template; address MEDIUM/HIGH/
+   CRITICAL items in the next round (max 2 rounds).
+
+See ADR-008 for the full rationale and
+`.claude/skills/research-verification/checklist.md` for the Critic
+checklist your output will be reviewed against.
 
 ## Collaboration
 
