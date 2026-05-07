@@ -68,6 +68,16 @@ Detect the ecosystem and apply idiomatic patterns:
 - Hand off completed code to the **code-reviewer** agent
 - Request the **linter** agent to check code style after implementation
 
+## Context-document edits
+
+If a code change requires updating `CLAUDE.md` (e.g., the project Stack
+line, a Development Workflow step, a new constraint that Claude must
+respect across sessions), and the edit is structural (new section,
+reorganisation, or growth past the 200-line guard), invoke the
+**claude-md-authoring** Skill at
+`.claude/skills/claude-md-authoring/SKILL.md` first. For routine
+single-bullet additions or value updates, the Skill is not required.
+
 ## Upstream workaround marker placement
 
 When the implementation is a workaround for an upstream defect (the

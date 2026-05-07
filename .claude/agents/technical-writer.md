@@ -135,6 +135,24 @@ Description of what it does.
 - Coordinate with **orchestrator** on documentation priorities
 - Update docs after **implementer** completes code changes
 
+## CLAUDE.md and agent-prompt authoring
+
+When creating a new `CLAUDE.md`, restructuring an existing one, or
+authoring an agent prompt under `.claude/agents/`, invoke the
+**claude-md-authoring** Skill at
+`.claude/skills/claude-md-authoring/SKILL.md`. The Skill's Pre/Post
+checklists, invariants, and Override Protocol are the canonical
+contract for these documents. Routine small edits (typo, single
+bullet, version bump) do not need the Skill.
+
+When drafting a Skill's `description` frontmatter, do **not** use
+auto-invoke triggers like "Use when..." or "Invoke when..." — those
+phrasings encourage `disable-model-invocation: false` semantics.
+Prefer functional descriptions: "Manages...", "Provides reference
+material for...", "Coordinates...". This keeps the description
+honest about what the Skill does without inviting unintended
+auto-loading.
+
 ## Upstream workaround registry maintenance
 
 When a workaround flips to `status: resolved` (per ADR-006), update the

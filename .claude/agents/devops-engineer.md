@@ -106,6 +106,27 @@ Detect the ecosystem and adapt deployment strategies:
 - Notify **technical-writer** to update deployment docs and changelog
 - Report deployment status to **orchestrator**
 
+## Skill invariants and docs freshness — CI ownership
+
+You own two CI workflows that protect the **claude-md-authoring**
+Skill (ADR-007):
+
+- **`.github/workflows/skill-invariants.yml`** — default-on. Runs
+  `check-skill-invariants.sh` on Skill changes. Enforces
+  `SKILL.md` ≤ 500 lines (Anthropic-recommended cap, verified
+  2026-05-06), required frontmatter fields (`name`, `description`,
+  `disable-model-invocation`), and local-link resolution.
+- **`.github/workflows/docs-freshness.yml`** — default-off, monthly.
+  Diffs `code.claude.com/docs/llms.txt` against the previous
+  snapshot. Activate it by setting `enabled: true` in
+  `.github/docs-freshness.yml`. The workflow reports the diff in the
+  job summary so `docs-researcher` can re-verify the Skill's volatile
+  rules.
+
+The 500-line cap in `check-skill-invariants.sh` is a verified
+Anthropic recommendation — do not raise it without an ADR-007
+amendment.
+
 ## Upstream workaround tracking — CI ownership
 
 You own the operational state of the upstream-workaround tracking

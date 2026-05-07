@@ -175,6 +175,29 @@ your-repo/
 
 `spec-template.md` も同じです。場所は強制しません。
 
+### CLAUDE.md authoring Skill
+
+`CLAUDE.md`、`README.md`、`.claude/agents/*.md` を短く、最新の Anthropic
+ガイダンスに沿った構造で保つための Skill を同梱しています。
+
+- `.claude/skills/claude-md-authoring/SKILL.md` — エントリポイント。
+  Pre/Post チェックリストと Override Protocol を含む
+- `.claude/skills/claude-md-authoring/invariants.md` — 4 つの不変則
+  (`code.claude.com/docs/en/{memory,best-practices,skills}` で検証済)
+- `.claude/skills/claude-md-authoring/docs-protocol.md` — 実行時検証
+  チェーン (Context7 → URL → `llms.txt`)
+- `.claude/skills/claude-md-authoring/examples.md` — 具体的な
+  Bad/Good 例
+- `.claude/meta/adr/007-claude-md-authoring-skill.ja.md` — 設計の根拠
+
+Skill は **手動 invoke 専用** (`disable-model-invocation: true`) で、
+明示的に呼ばない限り context コストはゼロです。コンテキストドキュメ
+ントを新規作成・大幅に再構成するときに invoke してください。typo や
+単一行追加など軽微な編集では呼び出し不要です。CI が Skill の構造的
+不変条件を検証します (`.github/workflows/skill-invariants.yml`)。
+Anthropic Docs の月次 freshness diff もオプションで提供 (default-off、
+`.github/workflows/docs-freshness.yml`)。
+
 ### upstream Issue の追跡(default-off)
 
 不具合の原因が自リポではなくサードパーティのライブラリやフレームワーク

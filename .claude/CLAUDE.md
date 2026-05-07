@@ -63,6 +63,17 @@ write directly under a top-level directory of your choice (e.g. `adr/001-foo.md`
 bilingual projects can split by language (e.g. `adr/en/001-foo.md`,
 `adr/ja/001-foo.md`). The template does not impose a layout — only the templates.
 
+## CLAUDE.md authoring guidance
+
+When creating or significantly restructuring this file (or `README.md` or
+`.claude/agents/*.md`), invoke the **claude-md-authoring** Skill at
+`.claude/skills/claude-md-authoring/SKILL.md`. The Skill provides a
+Pre/Post checklist, four invariant rules verified against Anthropic's
+official docs, and a runtime protocol for volatile values. Routine
+small edits (typo, single bullet, version bump) do not need the Skill.
+See `.claude/meta/adr/007-claude-md-authoring-skill.md` for the design
+rationale.
+
 ## Developer Learning Mode
 
 Default-off learning layer with two orthogonal pillars: the **knowledge pillar**

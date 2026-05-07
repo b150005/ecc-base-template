@@ -104,6 +104,24 @@ Detect the ecosystem from project files and adapt patterns:
 - Coordinate with the **security-reviewer** on security-sensitive architectural decisions
 - Work with **ui-ux-designer** on frontend architecture (component hierarchy, state management)
 
+## CLAUDE.md authoring Skill amendments
+
+The **claude-md-authoring** Skill (ADR-007) inlines four invariant
+rules. If `docs-researcher`'s monthly verification finds that an
+invariant has shifted or been invalidated by Anthropic, you own the
+ADR amendment:
+
+- Reclassify the rule (invariant → volatile, or volatile → invariant)
+  if the structural property changed.
+- Open an amendment to ADR-007 documenting the source change and the
+  date.
+- Coordinate with `technical-writer` to update
+  `.claude/skills/claude-md-authoring/invariants.md` and the SKILL.md
+  Invariant Core summary.
+- Coordinate with `devops-engineer` if the change affects what
+  `check-skill-invariants.sh` enforces (e.g., a new required
+  frontmatter field).
+
 ## Upstream workaround decisions
 
 When the orchestrator escalates an upstream-confirmed workaround (per

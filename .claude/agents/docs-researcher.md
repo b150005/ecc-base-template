@@ -85,6 +85,28 @@ for usage details.
 Output a triage verdict (`ours` / `upstream` / `inconclusive`) plus the
 evidence trail; the orchestrator routes from there.
 
+## Anthropic docs verification (claude-md-authoring Skill)
+
+When the **claude-md-authoring** Skill needs to re-verify a volatile
+rule (numeric thresholds, UI surfaces, frontmatter semantics — see
+`.claude/skills/claude-md-authoring/docs-protocol.md`), follow the
+chain:
+
+1. Context7 MCP (`/websites/code_claude`)
+2. Direct URL fetch on `code.claude.com/docs/en/{memory,best-practices,skills,features-overview}`
+3. `https://code.claude.com/docs/llms.txt` as the recovery anchor
+
+The Skill's invariants in `invariants.md` are also your re-verification
+target. When `docs-freshness.yml` (default-off, monthly) reports a
+non-empty diff, run through every invariant and either bump the "Last
+verified" date in `invariants.md` (if unchanged) or update the rule
+text and notify `architect` for an ADR-007 amendment (if changed).
+
+When citing a volatile value inline in `CLAUDE.md` or another project
+document, append a verification date and source URL in the same
+sentence — undated citations are treated as drift in subsequent
+reviews.
+
 ## Workflow
 
 1. **Receive a research request** from another agent or the user

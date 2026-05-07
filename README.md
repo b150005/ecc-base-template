@@ -177,6 +177,30 @@ live. Common choices:
 
 The same applies to `spec-template.md`. There is no forced location.
 
+### CLAUDE.md authoring Skill
+
+The template ships a `claude-md-authoring` Skill that helps you keep
+`CLAUDE.md`, `README.md`, and `.claude/agents/*.md` short and
+structurally aligned with current Anthropic guidance.
+
+- `.claude/skills/claude-md-authoring/SKILL.md` — entry point with
+  Pre/Post checklists and the Override Protocol
+- `.claude/skills/claude-md-authoring/invariants.md` — four invariant
+  rules (verified against `code.claude.com/docs/en/{memory,best-practices,skills}`)
+- `.claude/skills/claude-md-authoring/docs-protocol.md` — runtime
+  verification chain (Context7 → URL → `llms.txt`)
+- `.claude/skills/claude-md-authoring/examples.md` — concrete
+  good/bad excerpts
+- `.claude/meta/adr/007-claude-md-authoring-skill.md` — design rationale
+
+The Skill is **manual-invoke only** (`disable-model-invocation: true`),
+so it costs zero context unless you trigger it explicitly. Invoke it
+when creating or significantly restructuring a context document; skip
+it for routine small edits. CI verifies the Skill's structural
+invariants (`.github/workflows/skill-invariants.yml`). An optional
+monthly Anthropic-docs freshness diff is also shipped, default-off
+(`.github/workflows/docs-freshness.yml`).
+
 ### Tracking upstream issues (default-off)
 
 When a defect is caused by a third-party library or framework rather than

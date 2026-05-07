@@ -7,6 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.2.0] - 2026-05-07
+
+### Added
+
+- `claude-md-authoring` Skill at `.claude/skills/claude-md-authoring/`
+  for writing and reviewing `CLAUDE.md`, `README.md`, and
+  `.claude/agents/*.md`. Hybrid design (per ADR-007): four invariant
+  rules are inlined and dated; volatile values (numeric thresholds,
+  UI surfaces) are looked up at runtime via a Context7 → URL →
+  `llms.txt` chain with graceful degradation. Progressive Disclosure
+  (`SKILL.md` + `invariants.md` + `docs-protocol.md` + `examples.md`)
+  keeps the entry point under the Anthropic-recommended 500-line
+  cap. Manual-invoke only (`disable-model-invocation: true`) — zero
+  context cost unless explicitly invoked. All Anthropic-sourced facts
+  in the Skill were verified on 2026-05-06 via two independent paths
+  (Context7 MCP and direct URL fetch) against
+  `code.claude.com/docs/en/{memory,best-practices,skills,features-overview}`.
+- `.claude/meta/scripts/check-skill-invariants.sh` — CI script
+  enforcing structural invariants on Skills (line cap, required
+  frontmatter fields, local link resolution).
+- `.github/workflows/skill-invariants.yml` — default-on workflow
+  running the script on Skill changes.
+- `.github/workflows/docs-freshness.yml` — default-off, monthly
+  workflow that diffs `code.claude.com/docs/llms.txt` against the
+  previous snapshot for re-verification triggers.
+- `.github/docs-freshness.yml` — configuration for the freshness
+  workflow (`enabled: false` default).
+- ADR-007 (`.claude/meta/adr/007-claude-md-authoring-skill.md` and
+  `.ja.md`) documenting the hybrid design decision and the
+  invariant/volatile classification.
+- Responsibility additions to seven agent files
+  (`technical-writer`, `docs-researcher`, `architect`,
+  `devops-engineer`, `code-reviewer`, `implementer`,
+  `orchestrator`) anchoring the Skill into the existing workflow.
+- README and `.claude/CLAUDE.md` discoverability sections.
+
 ## [3.1.0] - 2026-05-06
 
 ### Added

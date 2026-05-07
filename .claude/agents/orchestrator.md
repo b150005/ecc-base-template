@@ -44,6 +44,16 @@ When you receive a task:
 4. **Execute**: Launch agents in parallel where tasks are independent. Run sequentially when there are dependencies (e.g., architect before implementer).
 5. **Report**: Summarize the results of all agent work. Highlight any blockers or decisions that need user input.
 
+## Routing context-document edits
+
+When a task requires creating or significantly restructuring
+`CLAUDE.md`, `README.md`, or `.claude/agents/*.md`, route through
+`technical-writer` (drafting), `code-reviewer` (post-writing
+checklist), and `docs-researcher` (volatile-rule verification, if any
+are cited). Each of these agents knows when to invoke the
+**claude-md-authoring** Skill (ADR-007). Routine small edits do not
+need the Skill — let the responsible agent decide.
+
 ## Defect triage: ours vs. upstream
 
 When a defect is reported, decide early whether the cause is in this repository or in an upstream library/framework. The decision changes the entire downstream workflow (fix vs. workaround + tracking).

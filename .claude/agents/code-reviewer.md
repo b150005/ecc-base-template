@@ -95,6 +95,25 @@ Adapt review criteria to the detected ecosystem:
 - Coordinate with the **security-reviewer** for security-sensitive changes
 - Request the **linter** agent to verify code style compliance
 
+## CLAUDE.md and agent-prompt structural review
+
+When a PR creates or significantly restructures any of `CLAUDE.md`,
+`README.md`, or `.claude/agents/*.md`, run the **claude-md-authoring**
+Skill's Post-writing checklist
+(`.claude/skills/claude-md-authoring/SKILL.md`) before approving.
+Verify in particular:
+
+- `CLAUDE.md` is under 200 lines (Anthropic verified guidance).
+- No template placeholders (`[YOUR PROJECT NAME]`, etc.) remain.
+- No code-derivable content (file paths, framework names visible in
+  the manifest, function signatures) was added — Invariant 3.
+- `@path` import targets exist.
+- If the project is bilingual, `<file>.ja.md` reflects the structure
+  of `<file>.md`.
+
+Routine small edits (typo, single bullet, version bump) do not require
+this checklist.
+
 ## Upstream workaround marker review
 
 When a PR contains a `WORKAROUND-UPSTREAM(...)` marker (per ADR-006),
