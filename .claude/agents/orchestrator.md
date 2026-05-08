@@ -41,7 +41,9 @@ When you receive a task:
    - Performance optimization → **performance-engineer**
    - Deployment/release → **devops-engineer**
    - Documentation → **technical-writer**
-   - External-research review (T1/T2 in research-verification) → **research-critic**
+   - External-research review (T1/T2 in verification-layer / research) → **research-critic**
+   - Implementation behavioural-delta verification (when `verification.implementation.enabled: true`) → **adversarial-implementer**
+   - ADR counter-proposal review (when `verification.design.enabled: true`) → **architecture-critic**
 4. **Execute**: Launch agents in parallel where tasks are independent. Run sequentially when there are dependencies (e.g., architect before implementer).
 5. **Report**: Summarize the results of all agent work. Highlight any blockers or decisions that need user input.
 
@@ -55,33 +57,40 @@ are cited). Each of these agents knows when to invoke the
 **claude-md-authoring** Skill (ADR-007). Routine small edits do not
 need the Skill — let the responsible agent decide.
 
-## Routing external research
+## Routing through the verification layer
+
+The verification layer (ADR-008 + ADR-010) covers three domains.
+Each domain has its own enable switch in `.claude/verification.yml`;
+absent file = research domain inert, implementation/design off.
+
+### Research domain (ADR-008)
 
 When external research will inform a decision (architecture, library
 selection, API usage, version pin, breaking-change assessment), route
-through the **research-verification** Skill
-(`.claude/skills/research-verification/SKILL.md`):
+through the **verification-layer / research** Skill
+(`.claude/skills/verification-layer/research/protocol.md`; shared
+invariants in `.claude/skills/verification-layer/SKILL.md`):
 
 1. Delegate to **docs-researcher** (Generator) with the research
    question and the expected impact on downstream work. The Generator
    declares a Tier (T1 / T2 / T3) on its output and uses
-   `.claude/templates/research-review-template.md`.
+   `.claude/templates/verification-review-template.md`.
 2. For T1 and T2, route the Generator's output to **research-critic**
    (Critic). The Critic uses a different tool family from the
    Generator and must cite at least one primary source the Generator
    did not cite. Secondary sources (blogs, Q&A sites, AI summaries,
    translations of primary sources) are not acceptable as the
    Critic's independent citation — see the allowlist in
-   `.claude/skills/research-verification/checklist.md`.
+   `.claude/skills/verification-layer/research/checklist.md`.
 3. For T3 (style, idiomatic usage), the Generator's self-check is
    sufficient; the Critic is not invoked.
 4. Iterate up to `max_iterations` rounds (default 2 per
-   `.claude/research-verification.yml`). For T2, only iterate when
-   remaining findings include CRITICAL or HIGH — MEDIUM/LOW alone
-   terminate without further rounds. If findings remain after the
-   limit, follow `SKILL.md` §"Escalation contract": ask the user for
-   tie-break, mark the claim `UNVERIFIED:` and proceed, or block the
-   downstream agent.
+   `.claude/verification.yml` → `research:` section). For T2, only
+   iterate when remaining findings include CRITICAL or HIGH —
+   MEDIUM/LOW alone terminate without further rounds. If findings
+   remain after the limit, follow the protocol's "Escalation
+   contract": ask the user for tie-break, mark the claim
+   `UNVERIFIED:` and proceed, or block the downstream agent.
 5. Tier override: you can escalate upward (T3 → T2, T2 → T1) but
    never downward. **Tier-confirmation guardrail**: when the
    Generator declares T2 or T3 but the research topic contains any
@@ -90,11 +99,40 @@ through the **research-verification** Skill
    declared Tier before accepting. If in doubt, escalate to T1. This
    defends against silent under-classification on the highest-risk
    path (ADR-008 §Consequences).
-6. Opt-out: if `.claude/research-verification.yml` has
-   `enabled: false`, skip this routing entirely; the Generator
-   returns directly. No error is raised.
+6. Opt-out: if `.claude/verification.yml` has
+   `research.enabled: false`, skip this routing entirely; the
+   Generator returns directly. No error is raised.
 
-See ADR-008 for the rationale.
+### Implementation domain (ADR-010 — default-off)
+
+When `.claude/verification.yml` has `implementation.enabled: true`
+**and** the implementer's change carries non-trivial judgement
+(custom algorithm, non-obvious data structure, performance-sensitive
+choice), route the change to **adversarial-implementer** (Critic).
+The Critic implements the same acceptance criteria with a
+deliberately different approach — picking the lowest level of the
+four-level ranking that yields a meaningful behavioural delta — and
+reports the delta. The Critic must respect the user-library
+precedence rule (an explicit pin disables levels 3-4) and the
+environment-safety contract (no system tooling installation, no
+Docker pulls, no manifest edits). See
+`.claude/skills/verification-layer/implementation/protocol.md`.
+
+### Design domain (ADR-010 — default-off)
+
+When `.claude/verification.yml` has `design.enabled: true` **and**
+the architect has produced an ADR in `Status: Proposed` that affects
+downstream work, route the ADR to **architecture-critic** (Critic).
+The Critic produces one concrete counter-proposal that takes a
+rejected alternative seriously — same Context, same constraints,
+different decision, fully written `## Consequences`, and citations
+from a different evidence base than the original ADR. The
+counter-proposal is appended to the ADR draft itself under a
+`## Counter-proposal` section while Status remains Proposed. See
+`.claude/skills/verification-layer/design/protocol.md`.
+
+See ADR-008 (research domain rationale) and ADR-010 (cross-domain
+generalization rationale) for the full design.
 
 ## Defect triage: ours vs. upstream
 

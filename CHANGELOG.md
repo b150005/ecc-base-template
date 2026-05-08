@@ -7,6 +7,87 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.5.0] - 2026-05-08
+
+### Added
+
+- ADR-010 implementation (`Verification Layer Generalization`).
+  Generalizes ADR-008's Generator-vs-Critic, primary-source-only
+  philosophy across three independently-toggled domains: research,
+  implementation, design.
+  - `.claude/skills/verification-layer/` — replaces
+    `.claude/skills/research-verification/`. Top-level `SKILL.md`
+    holds the shared invariants (Generator/Critic separation,
+    different tool family, primary-source-only citation, shared
+    severity vocabulary, bounded iteration, per-domain opt-in).
+    Per-domain subdirectories (`research/`, `implementation/`,
+    `design/`) each ship `protocol.md`, `checklist.md`, and
+    `failure-modes.md`.
+  - `.claude/agents/adversarial-implementer.md` — new Critic agent
+    for the implementation domain. Implements the same acceptance
+    criteria as the implementer with a deliberately different
+    approach, runs the test suite against both, and reports the
+    behavioural delta. Constrained by a four-level ranking
+    (control flow → idiom → library → blocked), permanent
+    user-library precedence (an explicit pin disables levels 3-4
+    for that task), and an environment-safety contract (no system
+    tooling installation, no Docker pulls, no manifest edits).
+  - `.claude/agents/architecture-critic.md` — new Critic agent
+    for the design domain. For every ADR in `Status: Proposed`
+    that affects downstream work, produces one concrete
+    counter-proposal that takes a rejected alternative seriously
+    — same Context, same constraints, different decision, full
+    Consequences, citations from a different evidence base.
+    Counter-proposal stays in the ADR file as permanent record
+    once the ADR moves to Accepted.
+  - `.claude/templates/verification-review-template.md` —
+    replaces `research-review-template.md`. Per-domain sections
+    (research / implementation / design) plus shared findings,
+    verdict, escalation, and audit-trail blocks.
+  - `.claude/verification.yml.example` — replaces
+    `research-verification.yml.example`. Per-domain `enabled`
+    switches; research default-on (when file present),
+    implementation and design default-off, citation-discipline
+    default-on.
+  - `.claude/meta/scripts/check-citation-discipline.sh` — CI
+    script that scans `.claude/learn/knowledge/`, `.claude/meta/adr/`,
+    and `.claude/meta/prd/` for blocked secondary-source links.
+    Honours an inline `<!-- cite-allow: <reason> -->` escape on
+    or above the same line. Blocklist hostnames live in the
+    script (CI's source of truth) and are referenced from the
+    Critic allowlist (single rule, two consumers).
+  - `.github/workflows/learn-invariants.yml` — extended with a
+    `citation-discipline` job that runs the script above. Path
+    triggers updated to cover `verification-layer/`,
+    `verification.yml`, and the new script.
+
+### Changed
+
+- `.claude/agents/docs-researcher.md`, `orchestrator.md`,
+  `research-critic.md` — paths and Skill name updated from
+  `research-verification` to `verification-layer / research`.
+  No behaviour change in the research domain.
+- `.claude/CLAUDE.md` — Agent Team table grows by two entries
+  (`adversarial-implementer`, `architecture-critic`). Workflow
+  step 3 references the verification-layer SKILL with the
+  three-domain framing.
+- `README.md` and `README.ja.md` — `Research verification`
+  section rewritten as `Verification layer (adversarial review
+  across three domains)`. Project structure tree references
+  `verification-layer/` and the two new Critic agents.
+- `.claude/output-styles/ecc-learn.md` — section renamed from
+  `Interaction with research-verification` to
+  `Interaction with the verification layer`.
+
+### Removed
+
+- `.claude/skills/research-verification/` (renamed via `git mv`
+  to `.claude/skills/verification-layer/`).
+- `.claude/templates/research-review-template.md` (renamed via
+  `git mv` to `.claude/templates/verification-review-template.md`).
+- `.claude/research-verification.yml.example` (renamed via
+  `git mv` to `.claude/verification.yml.example`).
+
 ## [3.4.0] - 2026-05-08
 
 ### Added

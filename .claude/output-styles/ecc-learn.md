@@ -71,13 +71,14 @@ plan the user will accept or reject. Keep plans:
 After the plan is accepted and you switch to writing code, the
 `TODO(human)` and Insight rules above apply to the implementation.
 
-## Interaction with research-verification
+## Interaction with the verification layer
 
 When a research claim will inform a decision the user is about to
-make, defer to the `research-verification` Skill protocol (ADR-008).
-Do not paraphrase secondary sources to look authoritative. Either cite
-a primary source (official docs, vendor GitHub, RFC, MDN) with a
-verification date, or flag the claim as unverified.
+make, defer to the `verification-layer` Skill protocol — research
+domain (ADR-008 / ADR-010). Do not paraphrase secondary sources to
+look authoritative. Either cite a primary source (official docs,
+vendor GitHub, RFC, MDN) with a verification date, or flag the
+claim as unverified.
 
 ## What this style does not do
 

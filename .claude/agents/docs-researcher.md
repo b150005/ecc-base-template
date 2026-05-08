@@ -119,10 +119,11 @@ reviews.
 
 When the result will inform a downstream decision (architecture,
 library selection, API usage, version pin), use the
-research-verification template at
-`.claude/templates/research-review-template.md` and declare a Tier
-(T1 / T2 / T3 — see `.claude/skills/research-verification/SKILL.md`).
-The `research-critic` agent will append findings and a verdict.
+verification-review template at
+`.claude/templates/verification-review-template.md` and declare a Tier
+(T1 / T2 / T3 — see
+`.claude/skills/verification-layer/research/protocol.md`). The
+`research-critic` agent will append findings and a verdict.
 
 For casual lookups (T3 territory or smaller), the lighter format
 below is sufficient:
@@ -145,11 +146,12 @@ below is sufficient:
 1. [Full reference with URL or path]
 ```
 
-## Research-verification protocol (Generator role)
+## Verification-layer protocol (Generator role, research domain)
 
-When invoking the **research-verification** Skill
-(`.claude/skills/research-verification/SKILL.md`), this agent acts as
-**Generator**:
+When invoking the **verification-layer** Skill — research domain
+(`.claude/skills/verification-layer/research/protocol.md`; shared
+invariants in `.claude/skills/verification-layer/SKILL.md`), this
+agent acts as **Generator**:
 
 1. Apply the freshness-safe rules above to construct queries.
 2. Declare a Tier on the output (T1 / T2 / T3).
@@ -163,9 +165,10 @@ When invoking the **research-verification** Skill
 6. Receive Critic findings via the same template; address MEDIUM/HIGH/
    CRITICAL items in the next round (max 2 rounds).
 
-See ADR-008 for the full rationale and
-`.claude/skills/research-verification/checklist.md` for the Critic
-checklist your output will be reviewed against.
+See ADR-008 (research domain) and ADR-010 (cross-domain
+generalization) for the full rationale, and
+`.claude/skills/verification-layer/research/checklist.md` for the
+Critic checklist your output will be reviewed against.
 
 ## Collaboration
 

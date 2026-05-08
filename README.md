@@ -1,6 +1,6 @@
 # ecc-base-template
 
-A framework-agnostic GitHub template that ships a 16-agent development team
+A framework-agnostic GitHub template that ships a 18-agent development team
 and an opt-in learning layer for high-quality, high-precision collaboration
 with Claude Code.
 
@@ -10,7 +10,7 @@ with Claude Code.
 
 ## What you get
 
-- **16 specialized agents** covering the full product lifecycle — orchestrator,
+- **18 specialized agents** covering the full product lifecycle — orchestrator,
   product-manager, architect, implementer, test-runner, code-reviewer,
   security-reviewer, performance-engineer, devops-engineer, technical-writer,
   and more. All ecosystem-agnostic: the agents detect your language and
@@ -107,7 +107,7 @@ opt-in and adopters are free to drop it entirely.
 
 ---
 
-## The 16-agent team
+## The 18-agent team
 
 All agents are ecosystem-agnostic. They detect the project's language and
 framework at runtime by reading `.claude/CLAUDE.md` and your project's manifest
@@ -122,8 +122,10 @@ or directly.
 | **market-analyst** | Planning | Market research, competitor analysis, user segment identification |
 | **monetization-strategist** | Planning | Business model design, pricing strategy, revenue analysis |
 | **ui-ux-designer** | Design | UI/UX design, usability review, accessibility compliance |
-| **docs-researcher** | Research | API verification, framework behavior, version-specific changes against primary docs (research-verification Generator) |
-| **research-critic** | Research | Adversarial review of external-research outputs against primary sources, with primary-source-only citation (research-verification Critic) |
+| **docs-researcher** | Research | API verification, framework behavior, version-specific changes against primary docs (verification-layer / research Generator) |
+| **research-critic** | Research | Adversarial review of external-research outputs against primary sources, with primary-source-only citation (verification-layer / research Critic) |
+| **adversarial-implementer** | Build | Parallel-implementation Critic for behavioural-delta verification (verification-layer / implementation Critic, default-off) |
+| **architecture-critic** | Design | Counter-proposal Critic that takes rejected ADR alternatives seriously (verification-layer / design Critic, default-off) |
 | **architect** | Design | System architecture, technology decisions, ADR creation |
 | **implementer** | Build | Code implementation following architecture specs and TDD |
 | **code-reviewer** | Quality | Code quality, maintainability, standards adherence |
@@ -165,8 +167,8 @@ your-repo/
 ├── .gitattributes
 ├── .claude/                   ← Claude Code machinery
 │   ├── CLAUDE.md              ← project instructions (edit the About section first)
-│   ├── agents/                ← 16 agent definition files
-│   ├── skills/                ← /learn, /quiet, claude-md-authoring, research-verification
+│   ├── agents/                ← 18 agent definition files
+│   ├── skills/                ← /learn, /quiet, claude-md-authoring, verification-layer
 │   ├── output-styles/         ← bundled `ecc-learn` output style (opt-in)
 │   ├── hooks/                 ← UserPromptSubmit hook for coaching auto-context
 │   ├── templates/             ← copy-and-fill ADR/spec templates
@@ -215,46 +217,60 @@ invariants (`.github/workflows/skill-invariants.yml`). An optional
 monthly Anthropic-docs freshness diff is also shipped, default-off
 (`.github/workflows/docs-freshness.yml`).
 
-### Research verification (adversarial review of external research)
+### Verification layer (adversarial review across three domains)
 
-The template ships a `research-verification` Skill plus a new
-`research-critic` agent that adversarially reviews external research
-before its output is consumed by downstream agents. Designed to catch
-confirmation echo, secondary-source drift, and hallucinated APIs at
-the research step rather than at build/test time.
+The template ships a `verification-layer` Skill that pairs every
+artifact-producing agent with a Critic that uses a different tool
+family and may cite only primary sources. Three independent domains:
 
-- `.claude/skills/research-verification/SKILL.md` — protocol overview,
-  Tier table, Pre/Post checklist
-- `.claude/skills/research-verification/checklist.md` — 10-item Critic
-  checklist and the primary-source allowlist
-- `.claude/skills/research-verification/failure-modes.md` — five
-  typical research-error patterns
-- `.claude/agents/research-critic.md` — Critic agent definition
-- `.claude/templates/research-review-template.md` — shared output
-  format
-- `.claude/research-verification.yml.example` — opt-out config
-- `.claude/meta/adr/008-research-verification-layer.md` — design
-  rationale
+- **`research`** (default-on; ADR-008). `docs-researcher` (Generator)
+  declares a Tier on every external-research output; `research-critic`
+  (Critic) reviews T1 and T2 outputs and must cite at least one
+  **primary source** the Generator did not. Secondary sources (blogs,
+  Q&A sites, AI summaries, translations of primary sources) are
+  explicitly disallowed as the Critic's independent citation. Up to
+  2 GAN rounds; T3 collapses to Generator self-check.
+- **`implementation`** (default-off; ADR-010). `implementer`
+  (Generator) writes the code; `adversarial-implementer` (Critic)
+  re-implements the same acceptance criteria with a deliberately
+  different approach, runs the test suite against both, and reports
+  the behavioural delta. Constrained by a four-level ranking, a
+  user-library precedence rule (an explicit pin disables levels 3-4),
+  and an environment-safety contract (no system tooling installation,
+  no Docker pulls, no manifest edits).
+- **`design`** (default-off; ADR-010). `architect` (Generator) writes
+  an ADR draft; `architecture-critic` (Critic) appends one concrete
+  counter-proposal that takes a rejected alternative seriously — same
+  Context, same constraints, different decision, full Consequences,
+  citations from a different evidence base than the original ADR.
 
-How it works: `docs-researcher` (Generator) declares a Tier (T1/T2/T3)
-on each external-research output. T1 (breaking changes, auth,
-security) and T2 (API arguments, return types, version features) are
-reviewed by `research-critic` (Critic) using a *different tool family*
-from the Generator. The Critic must cite at least one **primary
-source** the Generator did not — secondary sources (blogs, Q&A sites,
-AI summaries, translations of primary sources) are explicitly
-disallowed as the Critic's independent citation, because they lag
-primary docs and the Critic's purpose is to catch that lag. Up to 2
-GAN rounds; if consensus does not hold, the orchestrator escalates per
-the contract in `SKILL.md`. T3 (style, idiomatic usage) collapses to
-Generator self-check.
+A cross-cutting **citation-discipline** CI check (default-on) scans
+ADRs, PRDs, and Learning Mode knowledge entries for blocked
+secondary-source links. The same allowlist powers the Critic.
 
-To opt out, copy `.claude/research-verification.yml.example` to
-`.claude/research-verification.yml` and set `enabled: false`. With no
-file present, the defaults apply (`enabled: true`,
-`max_iterations: 2`, `default_tier: T2`). When `enabled: false`, the
-whole layer becomes inert and agents return to single-pass research
-with no error.
+Files:
+
+- `.claude/skills/verification-layer/SKILL.md` — overview, shared
+  invariants (Generator/Critic, primary-source-only, severity, tool
+  families)
+- `.claude/skills/verification-layer/research/{protocol,checklist,failure-modes}.md`
+- `.claude/skills/verification-layer/implementation/{protocol,checklist,failure-modes}.md`
+- `.claude/skills/verification-layer/design/{protocol,checklist,failure-modes}.md`
+- `.claude/agents/{research-critic,adversarial-implementer,architecture-critic}.md`
+- `.claude/templates/verification-review-template.md` — shared
+  output format with per-domain sections
+- `.claude/verification.yml.example` — opt-in config (per domain)
+- `.claude/meta/adr/008-research-verification-layer.md` — research-
+  domain rationale
+- `.claude/meta/adr/010-verification-layer-generalization.md` —
+  cross-domain generalization rationale
+
+To opt in for `implementation` and `design`, copy
+`.claude/verification.yml.example` to `.claude/verification.yml` and
+set the relevant `enabled: true`. The `research` domain is on
+when the file is present; with no file, all three domains are inert
+and the citation-discipline CI is the only active piece (default-on
+because the cost is essentially zero per CI run).
 
 ### Tracking upstream issues (default-off)
 

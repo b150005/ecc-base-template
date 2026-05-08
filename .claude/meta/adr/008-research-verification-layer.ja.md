@@ -241,3 +241,25 @@ Critic の独立引用は以下のいずれか:
   checklist と primary source allowlist。
 - `.claude/skills/research-verification/failure-modes.md` — Critic
   checklist を支える典型誤りパターン。
+
+## Amendment — 2026-05-08 (ADR-010 による)
+
+ADR-010 で research-verification 層は 3 ドメインを持つ統合
+`verification-layer` Skill に一般化されました。本 ADR の research
+ドメインは semantics として完全に保持され、ファイルの配置だけが
+移動しています。**本 ADR 本文中で言及されたパスを参照する読者向け
+の対応表:**
+
+| ADR-008 本文中のパス | 現在の位置 |
+|---|---|
+| `.claude/skills/research-verification/SKILL.md` | `.claude/skills/verification-layer/research/protocol.md` (research ドメイン protocol) と `.claude/skills/verification-layer/SKILL.md` (shared invariants) |
+| `.claude/skills/research-verification/checklist.md` | `.claude/skills/verification-layer/research/checklist.md` |
+| `.claude/skills/research-verification/failure-modes.md` | `.claude/skills/verification-layer/research/failure-modes.md` |
+| `.claude/research-verification.yml.example` | `.claude/verification.yml.example` (`research:` セクション付き) |
+| `.claude/research-verification.yml` | `.claude/verification.yml` |
+| `.claude/templates/research-review-template.md` | `.claude/templates/verification-review-template.md` (ドメイン別セクション化) |
+
+ADR-010 — `.claude/meta/adr/010-verification-layer-generalization.ja.md`
+を参照 — がドメイン横断抽象化の正典です。本 ADR-008 の本文は変更
+されません — research ドメインの決定とその根拠は、当該ドメインに
+ついての正典の記録のままです。

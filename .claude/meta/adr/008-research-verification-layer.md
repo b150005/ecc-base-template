@@ -264,3 +264,26 @@ that are not the vendor's own.
   checklist and primary-source allowlist.
 - `.claude/skills/research-verification/failure-modes.md` — typical
   research-error patterns informing the Critic checklist.
+
+## Amendment — 2026-05-08 (per ADR-010)
+
+ADR-010 generalised the research-verification layer into a unified
+`verification-layer` Skill with three domains. The research domain
+in this ADR is preserved verbatim in semantics; only the file
+locations moved. **Path translation table for any reader looking up
+a path mentioned above:**
+
+| Path in ADR-008 body | Current location |
+|---|---|
+| `.claude/skills/research-verification/SKILL.md` | `.claude/skills/verification-layer/research/protocol.md` (research-domain protocol) and `.claude/skills/verification-layer/SKILL.md` (shared invariants) |
+| `.claude/skills/research-verification/checklist.md` | `.claude/skills/verification-layer/research/checklist.md` |
+| `.claude/skills/research-verification/failure-modes.md` | `.claude/skills/verification-layer/research/failure-modes.md` |
+| `.claude/research-verification.yml.example` | `.claude/verification.yml.example` (with `research:` section) |
+| `.claude/research-verification.yml` | `.claude/verification.yml` |
+| `.claude/templates/research-review-template.md` | `.claude/templates/verification-review-template.md` (now per-domain sectioned) |
+
+ADR-010 — see
+`.claude/meta/adr/010-verification-layer-generalization.md` — is the
+authoritative reference for the cross-domain abstraction. ADR-008's
+body remains unchanged because the research-domain decision and its
+rationale are still the canonical record for that domain.
