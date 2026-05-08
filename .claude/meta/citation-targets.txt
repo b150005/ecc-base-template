@@ -1,0 +1,24 @@
+# Citation-discipline scan targets — single source of truth.
+#
+# Read by both the CI script (.claude/meta/scripts/check-citation-discipline.sh)
+# and documented as the default scope in .claude/verification.yml.example.
+# Add a new line here when a load-bearing document directory is introduced;
+# this file is the only place to change.
+#
+# Format:
+#   - One path per line, relative to the project root.
+#   - Lines starting with `#` are comments and are ignored.
+#   - Blank lines are ignored.
+#   - Paths are interpreted as directories; the script recurses with `find`.
+#   - Trailing slashes are optional.
+#
+# Why this file exists:
+#   The CI script's default and the example config carried duplicated
+#   path lists before; ADR-010's review surfaced that adding a fourth
+#   load-bearing directory required updating both places. This file
+#   collapses those into one. Derived projects override the default
+#   by setting `citation_discipline.paths` in their .claude/verification.yml.
+
+.claude/learn/knowledge
+.claude/meta/adr
+.claude/meta/prd

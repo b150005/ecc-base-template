@@ -31,6 +31,7 @@ on:
       - ".gitignore.example"
       - ".claude/meta/scripts/check-learn-invariants.sh"
       - ".claude/meta/scripts/check-citation-discipline.sh"
+      - ".claude/meta/citation-targets.txt"
       - ".github/workflows/learn-invariants.yml"
   pull_request:
     paths:
@@ -46,6 +47,7 @@ on:
       - ".gitignore.example"
       - ".claude/meta/scripts/check-learn-invariants.sh"
       - ".claude/meta/scripts/check-citation-discipline.sh"
+      - ".claude/meta/citation-targets.txt"
       - ".github/workflows/learn-invariants.yml"
 
 jobs:

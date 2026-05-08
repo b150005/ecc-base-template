@@ -31,12 +31,34 @@ set -u
 
 PROJECT_ROOT="${GITHUB_WORKSPACE:-$(pwd)}"
 CONFIG="${PROJECT_ROOT}/.claude/verification.yml"
+TARGETS_FILE="${PROJECT_ROOT}/.claude/meta/citation-targets.txt"
 
-DEFAULT_PATHS=(
-  ".claude/learn/knowledge"
-  ".claude/meta/adr"
-  ".claude/meta/prd"
-)
+# Load default paths from the SoT file when present; fall back to a
+# hard-coded minimal set only when the file is missing (which would
+# indicate a derived project that has stripped .claude/meta/ entirely).
+# Order of precedence (highest first):
+#   1. citation_discipline.paths in .claude/verification.yml (explicit)
+#   2. .claude/meta/citation-targets.txt (project default)
+#   3. hard-coded fallback (template self-hosting safety net)
+DEFAULT_PATHS=()
+if [ -f "${TARGETS_FILE}" ]; then
+  while IFS= read -r raw; do
+    # Trim leading/trailing whitespace and trailing slash, drop comments
+    # and blanks. POSIX-compatible: works on bare ubuntu-latest runners.
+    trimmed=$(echo "${raw}" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//; s|/*$||')
+    case "${trimmed}" in
+      ''|'#'* ) continue ;;
+    esac
+    DEFAULT_PATHS+=("${trimmed}")
+  done < "${TARGETS_FILE}"
+fi
+if [ ${#DEFAULT_PATHS[@]} -eq 0 ]; then
+  DEFAULT_PATHS=(
+    ".claude/learn/knowledge"
+    ".claude/meta/adr"
+    ".claude/meta/prd"
+  )
+fi
 
 ENABLED="true"
 PATHS=("${DEFAULT_PATHS[@]}")

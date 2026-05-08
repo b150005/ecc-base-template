@@ -103,12 +103,20 @@ design:
 citation_discipline:
   enabled: true
 
-  # Comma-separated paths to scan. Defaults match the project layout
-  # used by ADR-001 / ADR-005 / ADR-008.
-  paths:
-    - .claude/learn/knowledge/
-    - .claude/meta/adr/
-    - .claude/meta/prd/
+  # Paths to scan. The default list is the single source of truth at
+  # .claude/meta/citation-targets.txt — adding a new load-bearing
+  # document directory should be done there, not duplicated here. This
+  # `paths:` key only needs to be set when a derived project wants to
+  # OVERRIDE the default (e.g. add or remove specific directories for
+  # this project only). Leaving the key absent means "use the
+  # citation-targets.txt list."
+  #
+  # Example override (uncomment to use):
+  # paths:
+  #   - .claude/learn/knowledge
+  #   - .claude/meta/adr
+  #   - .claude/meta/prd
+  #   - workarounds            # if you keep a top-level workarounds/ tree
 
   # An inline escape hatch — a one-time allow comment placed adjacent
   # to a link the CI would otherwise flag. Use sparingly. The escape
