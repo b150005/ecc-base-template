@@ -165,6 +165,10 @@ load-bearing な不変条件を守るため。
   されたものとして文書化。コピー済みの既存フォークは再同期するまで動作継続。
 - 3 ドメインが 1 設定ファイルに収まるのは 3 個別ファイルより発見しやすい
   が、若干硬い。硬さを受け入れる。
+- `adversarial-implementer` の環境変更禁止 Hard rule は prompt level で
+  強制し、runtime の `permissions.deny` gate は導入しない。これは検討
+  済みで保留 (Alternatives considered の該当行参照)。再評価のトリガー
+  条件は同行に記録されている。
 
 ## 検討した代替案
 
@@ -175,6 +179,7 @@ load-bearing な不変条件を守るため。
 | `implementation` と `design` ドメインを default-on にする | 品質圧力が最大 | 非学習用途でフォークしたユーザを驚かせる、同意なしに実装コストを倍にする | default-off がテンプレートの役割を尊重、opt-in は設定 1 行 |
 | citation-discipline も default-off | 他ドメインと対称 | citation-discipline は CI 1 回あたりほぼ無コスト、かつ失敗モード (二次情報の静かな蓄積) が深刻 | コスト/リスクの非対称性が非対称デフォルトを正当化 |
 | Critic が必要に応じてツールをインストールしつつ任意の代替ライブラリを選べるようにする | 挙動差分の信号が最大 | 学習者マシンでの再現性が壊れる、ユーザの明示的なライブラリ指定を無視する、Docker や SDK やライセンスへのコミットを同意なく持ち込む | 上記 4 段階のランキングに制約、段階 4 は人間の承認必須 |
+| `adversarial-implementer` の環境安全契約を `permissions.deny` で強制 (`Bash(apt*)`、`Bash(docker pull*)`、`Edit(package.json)` 等をブロック) | Hard rule が prompt テキストではなく runtime gate になる — Critic に Docker イメージのインストールを指示する prompt-injection に対して堅牢 | `permissions.deny` はセッション全体に適用されるため、正規の `implementer` ワークフローも同じコマンドを失う。エージェント単位のスコープに戻すには deny を marker `verification:implementation` で toggle するカスタム Hook、または別セッションプロファイルが必要で、残存リスクの規模に対して仕掛けが過剰になる。脅威モデルは「攻撃者が Claude が読むテキスト (PR description、issue 本文) を仕込める」かつ「Plan Mode (ADR-009 で default-on) がその試みを表面化できない」の両方を仮定する — 学習用テンプレの典型的な利用面では両方とも起こりにくい | 2026-05-08 評価、**保留** (却下ではない)。再評価のトリガー: (a) implementation ドメインが default-on に変更される、(b) `adversarial-implementer` が外部 PR の webhook で無人実行されるようになる、(c) `settings.local.json` でパワーユーザ理由により Plan Mode が無効化される |
 
 ## 参考
 

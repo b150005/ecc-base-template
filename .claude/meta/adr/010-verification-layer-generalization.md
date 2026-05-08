@@ -182,6 +182,11 @@ guards a load-bearing invariant.
   re-sync.
 - Three domains in one config file is more discoverable than three
   separate files but slightly more rigid. We accept the rigidity.
+- The `adversarial-implementer` Hard rule against environment changes
+  is enforced at the prompt level, not via a runtime `permissions.deny`
+  gate. We considered the runtime gate (see Alternatives) and
+  deferred it. The trigger conditions for re-evaluating that decision
+  are documented in the same row.
 
 ## Alternatives considered
 
@@ -192,6 +197,7 @@ guards a load-bearing invariant.
 | Make `implementation` and `design` domains default-on | Maximum quality pressure | Surprises users who fork for non-learning reasons; doubles implementation cost without consent | Default-off respects the template's role; opt-in is one config line |
 | Make citation-discipline default-off too | Symmetry with the other domains | Citation discipline costs essentially nothing per CI run, and the failure mode (silent secondary-source accumulation) is severe | The cost/risk asymmetry justifies the asymmetric default |
 | Let the Critic pick any alternative library, installing tools as needed | Strongest behavioral-delta signal | Breaks reproducibility on a learner's machine; ignores explicit user library choices; can drag in Docker, SDKs, or license commitments without consent | Constrained to the four-level ranking above; level 4 requires human approval |
+| Enforce `adversarial-implementer`'s environment-safety contract via `permissions.deny` (block `Bash(apt*)`, `Bash(docker pull*)`, `Edit(package.json)`, etc.) | Hard rule becomes a runtime gate, not just prompt text — protects against prompt-injection that tells the Critic to install a Docker image | `permissions.deny` is session-wide, so the legitimate `implementer` workflow loses the same commands; restoring per-agent scope requires either a custom hook that toggles deny on the marker `verification:implementation` or a separate session profile, which is more machinery than the residual risk warrants. The threat model assumes an attacker can plant text Claude reads (PR description, issue body) AND that Plan Mode (default-on per ADR-009) fails to surface the attempt — both unlikely on a learning template's typical surface | Evaluated 2026-05-08 and **deferred**, not rejected. Re-evaluate if (a) the implementation domain becomes default-on, (b) `adversarial-implementer` runs unattended on external-PR webhooks, or (c) Plan Mode is turned off in `settings.local.json` for power-user reasons |
 
 ## References
 
