@@ -97,6 +97,31 @@ style; `/learn coach list` to see available styles. The complete design lives in
 - `.claude/meta/prd/developer-learning-mode.md` — full functional specification
 - `.claude/meta/references/domain-taxonomy.md` — domain definitions
 
+## Plan-First & Learning-Aware Defaults
+
+This template ships with `permissions.defaultMode: "plan"` in
+`.claude/settings.json` (per ADR-009). New sessions therefore boot in
+**Plan Mode**: Claude proposes a plan and waits for explicit approval
+before any write or shell side effect. Toggle off for the current
+session with Shift+Tab, or override per developer in
+`.claude/settings.local.json`.
+
+A learning-aware custom output style is shipped at
+`.claude/output-styles/ecc-learn.md`. It builds on the built-in
+`Learning` style — Claude inserts `TODO(human)` markers so you write
+small fragments yourself — and adds short `Insight:` notes that explain
+*why* a non-obvious choice was made. Selection is opt-in: choose it
+once via `/output-style ecc-learn`.
+
+When Developer Learning Mode is enabled and a non-default coaching
+style is set, a `UserPromptSubmit` hook at
+`.claude/hooks/coaching-context.sh` injects the active style's preamble
+into every prompt's context — guaranteeing the chosen style is live,
+not just documented. The hook fails open and is silent when Learning
+Mode is disabled or the style is `default`. See the
+`## Developer Learning Mode` section below for how to enable Learning
+Mode and pick a coaching style.
+
 ## Development Workflow
 
 1. **Issue Analysis**: Feed issues to the orchestrator via GitHub MCP or copy-paste. For defect reports, the orchestrator runs the **ours vs. upstream triage** (3-step protocol via docs-researcher) before deciding the workflow path

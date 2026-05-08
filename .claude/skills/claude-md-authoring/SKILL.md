@@ -128,6 +128,15 @@ and discuss the structure first.
   `<file>.ja.md` siblings (per ADR-005). Some references are intentionally
   English-only; if you are creating one, document the reason in the file's
   header.
+- [ ] **Agent `description` is trigger-shaped** (only when authoring or
+  editing a file under `.claude/agents/`). Per Anthropic's sub-agents
+  guidance, the `description` should answer *"when do I use this agent?"*
+  with at least one concrete trigger phrase — typically beginning with
+  "Use when …", "Use for …", or "Use immediately after …". Description
+  text that lists capabilities without naming a trigger condition makes
+  the orchestrator unable to delegate accurately. ADR-009 codifies this
+  for the template; see `.claude/agents/orchestrator.md` for the
+  reference shape.
 
 ## Post-writing review checklist
 
@@ -151,6 +160,11 @@ Run this after authoring, before commit.
   references match real files.
 - [ ] **Volatile-rule citations carry a verification date** if any are
   cited inline (e.g. "as of 2026-05, the limit is 200 lines").
+- [ ] **Agent `description` trigger-test passes** (only for files under
+  `.claude/agents/`). Read the `description` aloud as the answer to *"when
+  should I invoke this agent?"* — if the answer is a list of capabilities
+  rather than a triggering situation, rewrite it. See the pre-writing
+  checklist item above for the rule and ADR-009 for the rationale.
 
 ## Override Protocol
 

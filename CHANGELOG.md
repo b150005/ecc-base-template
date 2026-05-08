@@ -7,6 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.4.0] - 2026-05-08
+
+### Added
+
+- ADR-009 (`Plan-First & Learning-Aware Defaults`) — accepted 2026-05-07.
+  - `permissions.defaultMode: "plan"` is now set in
+    `.claude/settings.json`. New sessions boot in Plan Mode by default;
+    Claude proposes a plan and waits for explicit approval before any
+    write or shell side effect. Toggle for the current session with
+    Shift+Tab, or override per developer in `.claude/settings.local.json`.
+  - `.claude/output-styles/ecc-learn.md` — bundled custom output style
+    that builds on the built-in `Learning` style (`TODO(human)`
+    markers) and adds short `Insight:` notes explaining *why* a
+    non-obvious choice was made. Opt-in via `/output-style ecc-learn`.
+  - `.claude/hooks/coaching-context.sh` — `UserPromptSubmit` hook that
+    injects the active coaching style's preamble into every prompt's
+    `additionalContext` when Developer Learning Mode is enabled and a
+    non-`default` style is set. Fails open and is silent when Learning
+    Mode is disabled, the style is `default`, or `jq` is unavailable.
+  - `claude-md-authoring` Skill checklist gains an explicit
+    "agent `description` is trigger-shaped" item in both the Pre- and
+    Post-writing sections, codifying the convention forward. The 16
+    existing agents already conform; no rewrites were necessary.
+- ADR-010 (`Verification Layer Generalization`) — accepted 2026-05-07.
+  Architectural decision only at this release; implementation lands
+  in a follow-up.
+
+### Changed
+
+- `.claude/CLAUDE.md` — new `## Plan-First & Learning-Aware Defaults`
+  section describes the three opt-in/default surfaces above.
+- `README.md` and `README.ja.md` — Quick Start step 4 now explains
+  the default Plan Mode behaviour and the optional `ecc-learn`
+  output style. Project structure tree updated to include
+  `.claude/output-styles/` and `.claude/hooks/`.
+
 ## [3.3.0] - 2026-05-07
 
 ### Added

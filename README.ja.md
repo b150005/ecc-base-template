@@ -72,6 +72,17 @@ orchestrator が product-manager に受け入れ基準を、architect にモジ�
 境界を、implementer にコードを、品質エージェント群にレビューを、それぞれ
 委譲します。引き継ぎはあなたが舵を取ります。
 
+**デフォルトで起こること**(ADR-009 による):
+
+- **Plan Mode がデフォルト ON。** Claude は計画を提示し、書き込みやシェル
+  副作用の前にあなたの明示的な承認を待ちます。当該セッションのみ無効化
+  するには Shift+Tab、開発者ごとに上書きするには
+  `.claude/settings.local.json` を使用。
+- **学習意識の高いカスタム output style(任意)。** `/output-style ecc-learn`
+  を一度だけ実行すると、同梱スタイルが有効化されます。Claude は
+  `TODO(human)` マーカーを差し込み、あなたが小さな断片を自分で書く形にし、
+  非自明な選択には *なぜそうしたか* を説明する短い `Insight:` ノートを付けます。
+
 ### 5.(任意)Developer Learning Mode を有効化
 
 ```
@@ -153,10 +164,12 @@ your-repo/
 ├── .claude/                   ← Claude Code 機構
 │   ├── CLAUDE.md              ← プロジェクト指示(About セクションを最初に編集)
 │   ├── agents/                ← 16 エージェント定義
-│   ├── skills/                ← /learn と /quiet
+│   ├── skills/                ← /learn、/quiet、claude-md-authoring、research-verification
+│   ├── output-styles/         ← 同梱の `ecc-learn` output style(opt-in)
+│   ├── hooks/                 ← coaching auto-context 用 UserPromptSubmit hook
 │   ├── templates/             ← コピー&記入用 ADR/spec テンプレート
 │   ├── meta/                  ← テンプレ自身の ADR、参考資料、init スクリプト
-│   ├── settings.json
+│   ├── settings.json          ← Plan Mode デフォルト + hook 登録
 │   └── settings.local.json    ← gitignored、利用者固有
 ├── .devcontainer/             ← VS Code Dev Containers 雛形
 └── .github/                   ← CI、dependabot、Issue/PR テンプレート

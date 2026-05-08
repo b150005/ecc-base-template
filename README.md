@@ -73,6 +73,17 @@ The orchestrator delegates to product-manager for acceptance criteria,
 architect for the module boundaries, implementer for code, and the quality
 agents for review — you steer the hand-offs.
 
+**What you'll see by default** (per ADR-009):
+
+- **Plan Mode is on by default.** Claude proposes a plan and waits for your
+  approval before any write or shell side effect. Toggle for the current
+  session with Shift+Tab, or override per developer in
+  `.claude/settings.local.json`.
+- **Optional learning-aware output style.** Run `/output-style ecc-learn`
+  once to switch on the bundled style — Claude inserts `TODO(human)`
+  markers so you write small fragments yourself, and adds short `Insight:`
+  notes that explain *why* a non-obvious choice was made.
+
 ### 5. (Optional) Enable Developer Learning Mode
 
 ```
@@ -155,10 +166,12 @@ your-repo/
 ├── .claude/                   ← Claude Code machinery
 │   ├── CLAUDE.md              ← project instructions (edit the About section first)
 │   ├── agents/                ← 16 agent definition files
-│   ├── skills/                ← /learn and /quiet skills
+│   ├── skills/                ← /learn, /quiet, claude-md-authoring, research-verification
+│   ├── output-styles/         ← bundled `ecc-learn` output style (opt-in)
+│   ├── hooks/                 ← UserPromptSubmit hook for coaching auto-context
 │   ├── templates/             ← copy-and-fill ADR/spec templates
 │   ├── meta/                  ← template-internal ADRs, references, init script
-│   ├── settings.json
+│   ├── settings.json          ← Plan Mode default + hook registration
 │   └── settings.local.json    ← gitignored, user-specific
 ├── .devcontainer/             ← VS Code Dev Containers scaffold
 └── .github/                   ← CI, dependabot, issue/PR templates
