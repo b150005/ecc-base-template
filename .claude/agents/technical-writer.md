@@ -71,15 +71,59 @@ Claude reads English documentation only to minimize context window usage.
 
 ### Japanese typography rules
 
-Japanese documentation in this template uses **half-width parentheses
-`(` `)`** rather than full-width `（` `）` (U+FF08 / U+FF09). This rule
-applies to every `.ja.md` file in the repository, including ADRs,
-references, READMEs, and CHANGELOG. Rationale: half-width parens
-match the convention already used in code identifiers, file paths,
-URLs, and English source files, so a derived project that mixes
-Japanese prose with code references gets one consistent shape rather
-than two visually similar ones. Apply the same rule when authoring
-new Japanese docs and when translating from the English source.
+The rules below apply to every `.ja.md` file in the repository,
+including ADRs, references, READMEs, and CHANGELOG. They were
+codified after Issue #7's typography sweep; the rationale for each
+is "consistency with code, paths, and the English source."
+
+1. **Half-width parentheses.** Use ASCII `(` `)`, not full-width
+   `（` `）` (U+FF08 / U+FF09). Half-width parens match the shape
+   already used in code identifiers, file paths, URLs, and the
+   English source — derived projects that mix Japanese prose with
+   code references get one consistent shape rather than two
+   visually similar ones.
+
+2. **Quotation marks.** Use Japanese corner brackets `「 」` for
+   quoted Japanese phrases. Use ASCII `"` only inside fenced code
+   blocks, command-line examples, and inline code spans. Mixing
+   `"` and `「」` in the same prose paragraph is a smell — pick
+   one based on whether the wrapper is code or text.
+
+3. **Commas.** Use full-width `、` in Japanese prose. Use ASCII
+   `,` only inside code identifiers (e.g.
+   `WORKAROUND-UPSTREAM(<repo>#<issue>, fixed=>=<version>)`) and
+   inside English fragments embedded in JA prose. Lists of English
+   identifiers in a Japanese paragraph (e.g. `architect, implementer,
+   code-reviewer`) read more cleanly with `、` between them.
+
+4. **Spacing around ASCII tokens.** Insert a single ASCII space
+   between any Japanese character and an adjacent ASCII letter or
+   digit. `Claude Code` should always have a space before and after
+   it in JA prose. `GitHub` likewise. Punctuation does not count as
+   a space — `Claude Codeを使う` is wrong, `Claude Code を使う` is
+   right.
+
+5. **Heading parity with the English source.** Every `## heading`
+   and `### heading` in the EN file must have a 1:1 counterpart in
+   the same order in the `.ja.md` file. This makes diff-based
+   bilingual review tractable: a missing or reordered heading is
+   the first sign of drift. Headings may be translated, but their
+   *positions* in the document tree must match.
+
+Verification one-liners (run before committing a `.ja.md` edit):
+
+```sh
+# 1. No full-width parens
+grep -n '[（）]' path/to/file.ja.md          # expects no output
+
+# 5. Heading parity
+diff <(grep -c '^### ' path/to/file.md) \
+     <(grep -c '^### ' path/to/file.ja.md)   # expects no output
+```
+
+Rules 2-4 are checked during review by reading the file; they are
+not currently enforced by CI because the false-positive rate of a
+purely textual matcher is too high for prose this short.
 
 ## Output Formats
 
