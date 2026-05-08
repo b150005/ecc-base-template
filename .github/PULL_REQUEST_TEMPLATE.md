@@ -21,4 +21,4 @@
 - [ ] Code follows project conventions / コーディング規約に準拠
 - [ ] No hardcoded secrets / シークレットのハードコーディングなし
 - [ ] Tests added/updated / テスト追加・更新済み
-- [ ] Documentation updated (if applicable) / ドキュメント更新済み（該当する場合）
+- [ ] Documentation updated (if applicable) / ドキュメント更新済み(該当する場合)

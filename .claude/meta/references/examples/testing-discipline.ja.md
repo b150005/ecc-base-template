@@ -1,4 +1,4 @@
-> このドキュメントは `.claude/meta/references/examples/testing-discipline.md` の日本語訳です。英語版が原文（Source of Truth）です。
+> このドキュメントは `.claude/meta/references/examples/testing-discipline.md` の日本語訳です。英語版が原文(Source of Truth)です。
 
 ---
 domain: testing-discipline
@@ -46,7 +46,7 @@ Meridian のテスト各層はツールに次のように対応しています�
 
 統合テストはインプロセスの SQLite やモックではなく実データベースを使います。Meridian が SQLite を使わない理由は、制約違反とタイムスタンプ精度に関するエッジケースで SQLite の挙動が PostgreSQL と乖離することを発見したからです。実際の Postgres イメージを使うと速度は落ちますが、乖離は完全になくなります。
 
-E2E スイートは localhost ではなく CI 上のステージングデプロイメントに対して実行されます。レイテンシは増えますが、localhost では捕捉できない環境固有の障害（環境変数の欠落、CORS の設定ミス）を検出できます。
+E2E スイートは localhost ではなく CI 上のステージングデプロイメントに対して実行されます。レイテンシは増えますが、localhost では捕捉できない環境固有の障害(環境変数の欠落、CORS の設定ミス)を検出できます。
 
 ### Trade-offs and Constraints  [SENIOR]
 
@@ -79,7 +79,7 @@ func TestTaskRepository_Create_ReturnsCreatedTask(t *testing.T) {
 }
 ```
 
-`testhelper.MustOpenTestDB` ヘルパーはテストパッケージ単位（テスト関数単位ではなく）で新鮮な Postgres コンテナを起動し、すべてのマイグレーションを実行し、コンテナをティアダウンする `t.Cleanup` を登録します。データベース状態を必要とする各テスト関数は自身の行を個別に作成します。
+`testhelper.MustOpenTestDB` ヘルパーはテストパッケージ単位(テスト関数単位ではなく)で新鮮な Postgres コンテナを起動し、すべてのマイグレーションを実行し、コンテナをティアダウンする `t.Cleanup` を登録します。データベース状態を必要とする各テスト関数は自身の行を個別に作成します。
 
 ### Related Sections
 
@@ -92,7 +92,7 @@ func TestTaskRepository_Create_ReturnsCreatedTask(t *testing.T) {
 
 **シナリオ:** 学習者がエージェントに `TaskRepository.Archive` の統合テストを書くよう依頼します。
 
-**`default` スタイル** — エージェントは完全なテスト関数を作成します。Arrange（タスクを作成し、アクティブであることを確認）、Act（`repo.Archive` を呼び出す）、Assert（タスクステータスが `archived` で、`archived_at` タイムスタンプがセットされている）。統合テストとユニットテストの選択理由、およびこれが統合層に属する理由を説明する `## Learning:` トレーラーを付けます。
+**`default` スタイル** — エージェントは完全なテスト関数を作成します。Arrange(タスクを作成し、アクティブであることを確認)、Act(`repo.Archive` を呼び出す)、Assert(タスクステータスが `archived` で、`archived_at` タイムスタンプがセットされている)。統合テストとユニットテストの選択理由、およびこれが統合層に属する理由を説明する `## Learning:` トレーラーを付けます。
 
 **`hints` スタイル** — エージェントは Arrange/Act/Assert のセクションがコメントアウトされた空のテストスタブスケルトンを書き、次のヒントを出力します。
 
@@ -164,7 +164,7 @@ func (b *TaskBuilder) Build(t *testing.T, db *sql.DB) domain.Task {
 
 ### Example (Meridian)
 
-上記の `NewTaskBuilder()` のコードは Meridian の実際のテストヘルパーから取っています。検討された代替案は、グローバルな `TestDB` 変数とトランザクションロールバックのアプローチ（各テストはクリーンアップ時にロールバックされるトランザクション内で実行される）でした。ロールバックアプローチが却下されたのは、マルチトランザクション挙動をテストするテストを壊すからです — 具体的には、Meridian の楽観的ロックロジックのテストがこれに該当し、2 つの並行トランザクションを必要とするため単一のロールバックトランザクション内ではテストできません。
+上記の `NewTaskBuilder()` のコードは Meridian の実際のテストヘルパーから取っています。検討された代替案は、グローバルな `TestDB` 変数とトランザクションロールバックのアプローチ(各テストはクリーンアップ時にロールバックされるトランザクション内で実行される)でした。ロールバックアプローチが却下されたのは、マルチトランザクション挙動をテストするテストを壊すからです — 具体的には、Meridian の楽観的ロックロジックのテストがこれに該当し、2 つの並行トランザクションを必要とするため単一のロールバックトランザクション内ではテストできません。
 
 ### Related Sections
 
@@ -179,11 +179,11 @@ func (b *TaskBuilder) Build(t *testing.T, db *sql.DB) domain.Task {
 
 Meridian がタスク通知を Slack に送信するとき、Slack の API に HTTP 呼び出しを行います。その呼び出しを CI 上の実際の Slack ワークスペースでテストするのは非現実的です。実際のトークンが必要で、実際のメッセージが投稿され、レート制限があり、Slack の可用性に依存します。代替案としてテスト自体をスキップすることも考えられますが、それでは Slack インテグレーションのバグはユーザーが発見することになります。
 
-**コントラクトテスト**はこの 2 つの選択肢の中間に位置します。実際の Slack API を呼び出す代わりに、送信リクエストの形（「コントラクト」）をアサートする HTTP モックを使います。実際の Slack API がコントラクトを変更した場合、モックはそれを検出しません — Slack のサンドボックス環境に対して行う別のコントラクトテスト実行が検出します。ユニットテストスイートの中では、モックは Meridian のコードがドキュメント化された API に対して正しいリクエスト形を生成することを証明します。
+**コントラクトテスト**はこの 2 つの選択肢の中間に位置します。実際の Slack API を呼び出す代わりに、送信リクエストの形(「コントラクト」)をアサートする HTTP モックを使います。実際の Slack API がコントラクトを変更した場合、モックはそれを検出しません — Slack のサンドボックス環境に対して行う別のコントラクトテスト実行が検出します。ユニットテストスイートの中では、モックは Meridian のコードがドキュメント化された API に対して正しいリクエスト形を生成することを証明します。
 
 ### Idiomatic Variation  [MID]
 
-Meridian は `httpmock`（github.com/jarcoal/httpmock）を使って Slack クライアントからの送信 HTTP 呼び出しをインターセプトします。モックは特定の Slack webhook URL に対するレスポンダーを登録し、リクエストボディをアサートします。
+Meridian は `httpmock`(github.com/jarcoal/httpmock)を使って Slack クライアントからの送信 HTTP 呼び出しをインターセプトします。モックは特定の Slack webhook URL に対するレスポンダーを登録し、リクエストボディをアサートします。
 
 ```go
 // service/notification_test.go
@@ -211,7 +211,7 @@ func TestNotificationService_NotifyTaskAssigned_PostsToSlack(t *testing.T) {
 }
 ```
 
-`httpmock.GetTotalCallCount()` のアサーションは、Slack API がちょうど 1 回呼び出されたことを検証します — 0 回（サイレントな失敗）でも 2 回（重複通知）でもなく。
+`httpmock.GetTotalCallCount()` のアサーションは、Slack API がちょうど 1 回呼び出されたことを検証します — 0 回(サイレントな失敗)でも 2 回(重複通知)でもなく。
 
 ### Trade-offs and Constraints  [SENIOR]
 
@@ -221,7 +221,7 @@ func TestNotificationService_NotifyTaskAssigned_PostsToSlack(t *testing.T) {
 
 ### Example (Meridian)
 
-上記の `httpmock` スニペットを参照してください。Slack webhook 呼び出しの重複排除キー（リトライ時の二重送信を防ぐ）は、Redis 冪等性ストアを実行する統合テストで別途テストされています — [error-handling → Idempotent Retry on Slack Webhook](./error-handling.md#idempotent-retry-on-the-slack-webhook) を参照してください。
+上記の `httpmock` スニペットを参照してください。Slack webhook 呼び出しの重複排除キー(リトライ時の二重送信を防ぐ)は、Redis 冪等性ストアを実行する統合テストで別途テストされています — [error-handling → Idempotent Retry on Slack Webhook](./error-handling.md#idempotent-retry-on-the-slack-webhook) を参照してください。
 
 ### Related Sections
 
@@ -234,7 +234,7 @@ func TestNotificationService_NotifyTaskAssigned_PostsToSlack(t *testing.T) {
 
 ### Prior Understanding (revised 2026-02-14)
 
-最初のアプローチ（Meridian の初回 CI 設定、2025 年 9 月ごろ）は、Playwright E2E テストでユーザー向けアプリケーション全体をカバーすることでした。すべてのページ、すべてのインタラクション、すべてのエッジケースが対象でした。「UI にあるものには E2E テストがある」という方針です。
+最初のアプローチ(Meridian の初回 CI 設定、2025 年 9 月ごろ)は、Playwright E2E テストでユーザー向けアプリケーション全体をカバーすることでした。すべてのページ、すべてのインタラクション、すべてのエッジケースが対象でした。「UI にあるものには E2E テストがある」という方針です。
 
 以下の理由からこの方針は見直されました。
 
@@ -244,7 +244,7 @@ func TestNotificationService_NotifyTaskAssigned_PostsToSlack(t *testing.T) {
 
 **訂正後の理解:**
 
-E2E テストは**重要なユーザーパスのみ**をカバーします — 失敗がユーザーの主要な目標を直接妨げるフローです。ワークスペースの作成、タスクのアサイン、タスクボードの閲覧、Slack インテグレーション確認画面です。非重要なフロー（プロフィール設定、通知設定、請求ページ）はユニットテストと統合テストに依存します。
+E2E テストは**重要なユーザーパスのみ**をカバーします — 失敗がユーザーの主要な目標を直接妨げるフローです。ワークスペースの作成、タスクのアサイン、タスクボードの閲覧、Slack インテグレーション確認画面です。非重要なフロー(プロフィール設定、通知設定、請求ページ)はユニットテストと統合テストに依存します。
 
 スコープ縮小後、E2E スイートは 28 テストになり 6 分で実行できます。フレーキーさは 5% 以下に低下しました。アニメーション依存のアサーションを削除し、決定論的な `waitForSelector` 条件に置き換えたことによるものです。
 

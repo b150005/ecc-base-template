@@ -1,15 +1,15 @@
-> このドキュメントは `docs/en/devcontainer.md` の日本語訳です。英語版が原文（Source of Truth）です。
+> このドキュメントは `docs/en/devcontainer.md` の日本語訳です。英語版が原文(Source of Truth)です。
 
 # Dev Containers
 
 ## Dev Containers とは？
 
-Dev Containers（開発コンテナ）は、`devcontainer.json` 設定ファイルで定義された Docker ベースの開発環境です。チームの全開発者が同じツール、ランタイム、設定を使用することを保証し、「自分の環境では動く」問題を排除します。
+Dev Containers(開発コンテナ)は、`devcontainer.json` 設定ファイルで定義された Docker ベースの開発環境です。チームの全開発者が同じツール、ランタイム、設定を使用することを保証し、「自分の環境では動く」問題を排除します。
 
 ## 仕組み
 
-1. `devcontainer.json` ファイルが環境（ベースイメージ、ツール、拡張機能）を定義します
-2. IDE（VS Code、JetBrains、GitHub Codespaces）がこのファイルを読み取ります
+1. `devcontainer.json` ファイルが環境(ベースイメージ、ツール、拡張機能)を定義します
+2. IDE(VS Code、JetBrains、GitHub Codespaces)がこのファイルを読み取ります
 3. 指定された設定で Docker コンテナが作成されます
 4. プロジェクトのコードがコンテナにマウントされます
 5. すべてのツールがプリインストールされた状態でコンテナ内で開発します
@@ -18,7 +18,7 @@ Dev Containers（開発コンテナ）は、`devcontainer.json` 設定ファイ�
 
 ### ベースイメージ
 
-コンテナの出発点です。Microsoft は主要な言語用の公式 Dev Container イメージ（`mcr.microsoft.com/devcontainers/...`）を提供していますが、任意の Docker イメージを使用することもできます。
+コンテナの出発点です。Microsoft は主要な言語用の公式 Dev Container イメージ(`mcr.microsoft.com/devcontainers/...`)を提供していますが、任意の Docker イメージを使用することもできます。
 
 ### Features
 
@@ -30,7 +30,7 @@ Dev Container Features は、Dockerfile を書かずにコンテナにツール�
 
 コンテナのライフサイクルの異なる段階で実行されるコマンドです:
 
-- `postCreateCommand`: コンテナ作成後に1回実行（例: 依存関係のインストール）
+- `postCreateCommand`: コンテナ作成後に1回実行(例: 依存関係のインストール)
 - `postStartCommand`: コンテナ起動時に毎回実行
 - `postAttachCommand`: クライアントがコンテナに接続するたびに実行
 
@@ -47,9 +47,9 @@ Dev Containers は、コンテナからホストマシンにポートを転送�
 | IDE | サポート |
 |-----|---------|
 | VS Code | Dev Containers 拡張機能によるネイティブサポート |
-| GitHub Codespaces | ネイティブ（クラウドホスト型 Dev Containers） |
+| GitHub Codespaces | ネイティブ(クラウドホスト型 Dev Containers) |
 | JetBrains IDE | Gateway / リモート開発経由 |
-| Cursor | ネイティブ（VS Code 拡張機能エコシステムを共有） |
+| Cursor | ネイティブ(VS Code 拡張機能エコシステムを共有) |
 
 ## このテンプレートのアプローチ
 
@@ -59,7 +59,7 @@ Dev Containers は、コンテナからホストマシンにポートを転送�
 
 - **イメージを小さく保つ**: features ですべてインストールするのではなく、言語固有のイメージを使用してください
 - **依存関係をキャッシュ**: `postCreateCommand` で依存関係をインストールし、コンテナに永続化します
-- **ポートフォワーディング**: アプリが実行するサービス（Web サーバー、データベースなど）用に `forwardPorts` を宣言します
+- **ポートフォワーディング**: アプリが実行するサービス(Web サーバー、データベースなど)用に `forwardPorts` を宣言します
 - **環境変数**: 開発専用の変数には `remoteEnv` を使用してください。シークレットには使用しないでください
 
 ## 参考リンク

@@ -1,4 +1,4 @@
-> このドキュメントは `docs/en/template-usage.md` の日本語訳です。英語版が原文（Source of Truth）です。
+> このドキュメントは `docs/en/template-usage.md` の日本語訳です。英語版が原文(Source of Truth)です。
 
 # テンプレート利用ガイド
 
@@ -30,7 +30,7 @@ cd {repo-name}
 - [ ] **`.claude/CLAUDE.md`** — 「About This Project」セクションをプロジェクトのコンテキストに置き換えます
 - [ ] **`.gitignore`** — [github/gitignore](https://github.com/github/gitignore) から言語固有のパターンを追加します
 - [ ] **`README.md`** — プロジェクトの説明に置き換えます
-- [ ] **`LICENSE`** — 著作権者名を更新します（またはライセンスを変更します）
+- [ ] **`LICENSE`** — 著作権者名を更新します(またはライセンスを変更します)
 - [ ] **`.env.example`** — プロジェクトの環境変数を追加します
 
 ### 推奨
@@ -51,7 +51,7 @@ cd {repo-name}
 GitHub テンプレートリポジトリはアップストリーム接続を維持しません。後で更新を同期するには:
 
 ```bash
-# テンプレートをリモートとして追加（1回のみ）
+# テンプレートをリモートとして追加(1回のみ)
 git remote add template https://github.com/{owner}/ecc-base-template.git
 
 # 取得して特定のファイルをチェリーピック
@@ -65,5 +65,5 @@ git checkout template/main -- .github/workflows/ci-base.yml
 
 - [Creating a Repository from a Template](https://docs.github.com/ja/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template) — 「Use this template」の仕組み
 - [github/gitignore](https://github.com/github/gitignore) — 言語別の公式 .gitignore テンプレート
-- [Conventional Commits](https://www.conventionalcommits.org/) — コミットメッセージフォーマット（feat, fix 等）
+- [Conventional Commits](https://www.conventionalcommits.org/) — コミットメッセージフォーマット(feat, fix 等)
 - [Keep a Changelog](https://keepachangelog.com/) — CHANGELOG フォーマット標準

@@ -288,7 +288,7 @@ docs/
 Every Japanese file begins with a header identifying the source:
 
 ```markdown
-> このドキュメントは `docs/en/onboarding.md` の日本語訳です。英語版が原文（Source of Truth）です。
+> このドキュメントは `docs/en/onboarding.md` の日本語訳です。英語版が原文(Source of Truth)です。
 ```
 
 PR review enforces the pairing: any PR that modifies a file under `docs/en/` includes a
