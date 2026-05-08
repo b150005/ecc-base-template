@@ -128,6 +128,11 @@ and discuss the structure first.
   `<file>.ja.md` siblings (per ADR-005). Some references are intentionally
   English-only; if you are creating one, document the reason in the file's
   header.
+- [ ] **Japanese typography uses half-width parens** (only when authoring
+  a `.ja.md` file). Use ASCII `(` `)` instead of `（` `）` (U+FF08 /
+  U+FF09). The rule applies to every `.ja.md` file in this repo and is
+  enforced going forward; see `technical-writer` agent prompt for the
+  rationale.
 - [ ] **Agent `description` is trigger-shaped** (only when authoring or
   editing a file under `.claude/agents/`). Per Anthropic's sub-agents
   guidance, the `description` should answer *"when do I use this agent?"*
@@ -154,6 +159,10 @@ Run this after authoring, before commit.
 - [ ] **Bilingual sync, if applicable.** If `CLAUDE.md` was edited and a
   `CLAUDE.ja.md` exists, the Japanese version reflects the same structure
   (not necessarily a literal translation — see ADR-005 §Bilingual).
+- [ ] **Japanese half-width-parens scan**, if a `.ja.md` was edited.
+  Search the file for `（` and `）` (U+FF08 / U+FF09); replace with
+  ASCII `(` and `)`. A one-liner that catches strays:
+  `grep -n '[（）]' path/to/file.ja.md` should return nothing.
 - [ ] **No code-derivable content snuck in.** Re-skim. If a bullet describes
   what the code does rather than why or what constraint shaped it, cut it.
 - [ ] **Cross-references resolve.** All `[link](path.md)` and `ADR-NNN`

@@ -69,6 +69,18 @@ the document itself states its translation policy in a header note.
 
 Claude reads English documentation only to minimize context window usage.
 
+### Japanese typography rules
+
+Japanese documentation in this template uses **half-width parentheses
+`(` `)`** rather than full-width `（` `）` (U+FF08 / U+FF09). This rule
+applies to every `.ja.md` file in the repository, including ADRs,
+references, READMEs, and CHANGELOG. Rationale: half-width parens
+match the convention already used in code identifiers, file paths,
+URLs, and English source files, so a derived project that mixes
+Japanese prose with code references gets one consistent shape rather
+than two visually similar ones. Apply the same rule when authoring
+new Japanese docs and when translating from the English source.
+
 ## Output Formats
 
 ### README Structure
