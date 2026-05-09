@@ -5,8 +5,13 @@ Skill evaluates when `platform` is in `target_jurisdictions`. The
 target operating context is mobile applications distributed through
 Apple's App Store and Google's Play Store.
 
-These policies are treated as **primary sources** because they are
-the authoritative platform-side text — there is no higher source.
+These policies are treated as **Tier 1 primary sources** because they
+are the authoritative platform-side text — there is no higher source.
+**Tier 1.5** Apple Privacy Manifest specification and Google Play SDK
+Index documentation (per ADR-013) appear alongside Tier 1 citations on
+the same item, marked `[Tier 1.5]` and never standalone. Secondary
+sources (blog posts, news summaries, third-party policy explainers)
+are disqualifying.
 
 The agent reading this file must follow the citation links directly
 when generating an applicability finding — the URLs are the source
@@ -35,9 +40,12 @@ of truth, this file is the navigation index.
   - **§5.1 Privacy** — consent for personal data collection, data
     minimization, the app privacy questionnaire, and the
     SDK-disclosure obligations introduced for SDKs identified by
-    Apple in the "Required Reasons API" framework
-    (https://developer.apple.com/documentation/bundleresources/privacy_manifest_files
-    is the primary reference for the manifest format).
+    Apple in the "Required Reasons API" framework. The Privacy
+    Manifest specification at
+    https://developer.apple.com/documentation/bundleresources/privacy_manifest_files
+    is `[Tier 1.5]` per ADR-013 (Apple's first-party platform
+    interpretive document), cited paired with the §5.1 Tier 1
+    Review Guideline reference above.
   - **§5.4** — VPN apps, parental controls, and other regulated
     surfaces.
   - **Subscription disclosure** under §3.1.2 — exact pricing,
@@ -67,6 +75,11 @@ of truth, this file is the navigation index.
     (https://support.google.com/googleplay/android-developer/answer/10144311)
     — disclosure, consent, prominent disclosure for sensitive uses,
     data-safety form completion, and the SDK Index obligations.
+    The SDK Index documentation
+    (https://developers.google.com/android/sdk-index) is
+    `[Tier 1.5]` per ADR-013 (Google's first-party platform
+    interpretive document), cited paired with the User Data policy
+    Tier 1 reference above.
   - **Permissions and APIs that Access Sensitive Information**
     (https://support.google.com/googleplay/android-developer/answer/9888170)
     — special-permissions framework (SMS, Call Log, Background

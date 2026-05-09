@@ -1,10 +1,13 @@
 # Jurisdiction Reference: Japan (JP)
 
 This file enumerates the JP statutes the compliance-checklist Skill
-evaluates when `JP` is in `target_jurisdictions`. Each row cites the
-**primary source** (e-Gov 法令検索) for the active text of the
-statute. Secondary sources (commentary, blog summaries, AI overviews)
-are not used.
+evaluates when `JP` is in `target_jurisdictions`. Each row cites a
+**Tier 1 primary source** (e-Gov 法令検索) for the active text of the
+statute. **Tier 1.5** PPC official interpretive guidance (ガイドライン,
+Q&A, 通達 issued under 個人情報保護法 §147–§149 delegation, per
+ADR-013) appears alongside Tier 1 citations on the same item, marked
+`[Tier 1.5]` and never standalone. Secondary sources (commentary,
+blog summaries, AI overviews, PPC press releases) are disqualifying.
 
 The agent reading this file must follow the citation links directly
 when generating an applicability finding — the URLs are the source of
@@ -80,8 +83,10 @@ truth, this file is the navigation index.
     sends user data to servers outside Japan, including to common US
     SaaS vendors. The PPC (個人情報保護委員会) maintains a list of
     "適切な保護措置を講じている国" at
-    https://www.ppc.go.jp/personalinfo/legal/kaiseihogohou/ which is
-    a primary reference for the cross-border framework.
+    https://www.ppc.go.jp/personalinfo/legal/kaiseihogohou/ which
+    operationalizes the cross-border framework. `[Tier 1.5]` per
+    ADR-013 — PPC ガイドライン issued under 個人情報保護法 §147.
+    Cite paired with the §28 Tier 1 reference above.
   - The 漏えい等 (data breach) notification requirement under §26
     and the implementing PPC guidelines.
 - **Form of finding**: `applies` for any project that meets the

@@ -97,13 +97,44 @@ For full rationale and original-source citations, see [ADR-011].
      `target_jurisdictions`. This is a *scope* statement, not an
      applicability statement.
 
-2. **Primary-source-only citation.** Every applicability claim must
-   cite a primary source: e-Gov 法令検索 for Japan, EUR-Lex for EU,
-   California Legislative Information for CCPA, and the official
-   App Store Review Guidelines / Google Play Policy Center for
-   platform rules. Secondary sources (blog summaries, Q&A sites, AI
-   summaries, news articles, law-firm explainers) are disqualifying.
-   Same rule as the research domain of ADR-008/010.
+2. **Primary-source-only citation, with a Tier 1.5 allowance for
+   issuing-regulator official interpretive guidance.** Every
+   applicability claim must cite a Tier 1 primary source. Tier 1.5
+   guidance is admissible only paired with a Tier 1 citation on the
+   same item. Secondary sources are disqualifying. The full tier
+   structure is fixed by [ADR-013] and propagates to the rest of
+   the verification-layer.
+
+   - **Tier 1 — primary statute and first-party platform spec.**
+     e-Gov 法令検索 for Japanese statutes, EUR-Lex for EU
+     regulations and directives, California Legislative Information
+     for CCPA / CPRA, the official Apple App Store Review Guidelines
+     and Google Play Policy Center for platform rules.
+   - **Tier 1.5 — issuing-regulator official interpretive
+     guidance.** Closed allowlist, fixed at the ADR layer (extending
+     it requires a new ADR, not a Skill body edit):
+     - **EDPB** Guidelines, Recommendations, Opinions adopted under
+       GDPR Art. 70(1)(e).
+     - **個人情報保護委員会 (PPC)** ガイドライン, Q&A, 通達
+       under 個人情報保護法 §147–§149 delegation.
+     - **California Privacy Protection Agency (CPPA)** Regulations
+       under CCPA §1798.185.
+     - **Apple** Privacy Manifest specification and Required
+       Reasons API documentation under Apple's first-party platform
+       authority.
+     - **Google** Play User Data policy and SDK Index documentation
+       under Google's first-party platform authority.
+
+     Tier 1.5 admits only formal instruments under the regulator's
+     enabling-statute authority. Excluded as Tier 1.5: regulator
+     blog posts, press releases, staff op-eds, social-media posts,
+     FAQ landing pages. A Tier 1.5 citation must always appear
+     alongside a Tier 1 citation on the same checklist item.
+
+   - **Disqualifying.** Blog summaries, Q&A sites, AI summaries,
+     news articles, law-firm explainers, regulator informal output
+     (blog posts, press releases). Same rule as the research domain
+     of ADR-008/010.
 
 3. **PII path refusal.** The Skill must refuse to ingest paths likely
    to contain test data, seeds, environment files, or database dumps.
@@ -296,5 +327,9 @@ The Skill does **not**:
 - [ADR-011] — design rationale, the six invariants, and the
   rejected-alternatives table that produced this Skill rather than an
   agent.
+- [ADR-013] — Invariant 2 source tier model. Defines Tier 1 / Tier 1.5
+  / disqualifying, the closed Tier 1.5 regulator allowlist, the
+  pairing rule, and the verification-layer-wide scope.
 
 [ADR-011]: ../../meta/adr/011-compliance-checklist-skill.md
+[ADR-013]: ../../meta/adr/013-invariant-2-source-tier-model.md

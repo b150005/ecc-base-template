@@ -2,8 +2,12 @@
 
 This file enumerates the EU regulations the compliance-checklist
 Skill evaluates when `EU` is in `target_jurisdictions`. Each row
-cites the **primary source** (EUR-Lex consolidated text) for the
-active regulation. Secondary sources are not used.
+cites a **Tier 1 primary source** (EUR-Lex consolidated text) for the
+active regulation. **Tier 1.5** EDPB official interpretive guidance
+(per ADR-013) appears alongside Tier 1 citations on the same item,
+marked `[Tier 1.5]` and never standalone. Secondary sources (blog
+summaries, news, law-firm explainers, EDPB blog posts or press
+releases) are disqualifying.
 
 The agent reading this file must follow the citation links directly
 when generating an applicability finding — the URLs are the source
@@ -52,6 +56,8 @@ of truth, this file is the navigation index.
     high risk to rights and freedoms; the EDPB guidelines at
     https://edpb.europa.eu/our-work-tools/our-documents/guidelines_en
     are the authoritative reference for when one is required.
+    `[Tier 1.5]` per ADR-013 — EDPB Guidelines under GDPR Art. 70.
+    Cite paired with the GDPR Art. 35 Tier 1 reference above.
 - **Form of finding**: `applies` when the human confirms EU-user
   service for `pii`; `may apply, verify` when the answer is
   uncertain.
@@ -73,7 +79,8 @@ of truth, this file is the navigation index.
     requirements (granular, free choice, easily withdrawn). The
     EDPB Guidelines 03/2022 on dark patterns (
     https://edpb.europa.eu/our-work-tools/our-documents/guidelines/guidelines-032022-deceptive-design-patterns-social-media_en )
-    are a primary reference for what does *not* satisfy them.
+    define what does *not* satisfy them. `[Tier 1.5]` per ADR-013 —
+    cite paired with the ePrivacy Art. 5(3) Tier 1 reference above.
 - **Form of finding**: `applies` whenever a tracking SDK is present
   *and* EU-user service is confirmed.
 

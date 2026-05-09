@@ -54,6 +54,43 @@ below. Each row gives the rationale and a URL pattern.
 | MDN Web Docs | `developer.mozilla.org/docs/Web/...` | Authoritative for Web-platform APIs only — not for framework or library APIs |
 | Language stdlib | `docs.python.org/3/...`, `pkg.go.dev/std`, `doc.rust-lang.org/std/...` | Maintained by the language team |
 
+## Tier 1.5 — issuing-regulator official interpretive guidance
+
+Per ADR-013 (verification-layer-wide scope), a closed allowlist of
+issuing-regulator official interpretive guidance is admissible
+**only** when the question under review intersects a
+delegated-regulator domain (e.g., GDPR DPIA mechanics, PPC breach
+notification thresholds, Apple Privacy Manifest required reasons),
+and **only** paired with a Tier 1 citation on the same item. Tier 1.5
+alone is invalid output and the Critic must reject it.
+
+Closed Tier 1.5 allowlist (fixed at the ADR layer; extending it
+requires a new ADR, not a checklist edit):
+
+| Regulator | Document classes | Enabling delegation |
+|---|---|---|
+| EDPB | Guidelines, Recommendations, Opinions | GDPR Art. 70(1)(e) |
+| 個人情報保護委員会 (PPC) | ガイドライン, Q&A, 通達 | 個人情報保護法 §147–§149 |
+| California Privacy Protection Agency (CPPA) | Regulations | CCPA §1798.185 |
+| Apple | Privacy Manifest specification, Required Reasons API documentation | First-party platform authority |
+| Google | Play User Data policy, SDK Index documentation | First-party platform authority |
+
+Excluded from Tier 1.5 (these remain disqualifying as below):
+regulator blog posts, press releases, staff op-eds, social-media
+posts, FAQ landing pages, conference slides. Tier 1.5 admits only
+formal instruments issued under the regulator's enabling-statute
+authority.
+
+Topics outside delegated-regulator domains (general framework /
+library / language questions) continue to require Tier 1 only.
+Tier 1.5 does not apply to React, Next.js, Flutter, Go, Rust, etc.,
+because those domains have no enabling regulator.
+
+See [ADR-013] for the full sub-rules (closed allowlist, pairing
+rule, authority floor, stale-guidance handling, scope).
+
+[ADR-013]: ../../../meta/adr/013-invariant-2-source-tier-model.md
+
 ## Not acceptable as Critic's independent citation
 
 Listed explicitly because the Critic's whole purpose is to catch the lag

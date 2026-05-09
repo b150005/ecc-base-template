@@ -61,12 +61,20 @@ a verification-layer domain.
    from the Generator's wherever feasible. The enumerated families
    are below.
 
-3. **Primary-source-only citation.** The Critic may cite only primary
-   sources for any external claim. Secondary sources (blogs, Q&A
-   sites, AI summaries, translations of primary sources) are
-   disqualifying. The shared allowlist lives in
-   [research/checklist.md](./research/checklist.md) and is referenced
-   by every domain.
+3. **Primary-source-only citation, with a Tier 1.5 allowance for
+   issuing-regulator official interpretive guidance.** The Critic may
+   cite only Tier 1 primary sources for any external claim. Tier 1.5
+   guidance from the closed allowlist defined in [ADR-013] is
+   admissible only when the topic under review intersects a
+   delegated-regulator domain, and only paired with a Tier 1 citation
+   on the same item. Secondary sources (blogs, Q&A sites, AI
+   summaries, translations of primary sources, regulator informal
+   output) are disqualifying. The Tier 1 allowlist lives in
+   [research/checklist.md](./research/checklist.md); the Tier 1.5
+   allowlist lives in [ADR-013] and is the single source of truth for
+   it. Both are referenced by every domain.
+
+   [ADR-013]: ../../meta/adr/013-invariant-2-source-tier-model.md
 
 4. **Severity vocabulary.** All domains use the same four-level
    severity table:
