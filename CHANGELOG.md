@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.0] - 2026-05-09
+
 ### Documentation
 
 - ADR-013 (`Invariant 2 Source Tier Model — Regulator Guidance in
