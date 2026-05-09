@@ -46,7 +46,7 @@ This project uses an agent team for structured development. The **orchestrator**
 | architecture-critic | Counter-proposal Critic that takes rejected ADR alternatives seriously (verification-layer / design Critic, default-off) |
 | architect | System architecture, technology decisions |
 | implementer | Code implementation following architecture and TDD |
-| code-reviewer | Code quality and standards review |
+| code-reviewer | Meta-reviewer: delegates language depth to ECC `*-reviewer`, owns template cross-cutting checks |
 | test-runner | Test execution, coverage reporting |
 | linter | Static analysis, code style enforcement |
 | security-reviewer | Vulnerability detection, OWASP Top 10 |
@@ -131,7 +131,8 @@ Mode and pick a coaching style.
 3. **Research & Reuse**: Search GitHub, package registries, and docs before writing new code. When the result will inform a decision (architecture, library selection, API usage, version pin), invoke the **verification-layer** Skill — research domain (`.claude/skills/verification-layer/research/protocol.md`; shared invariants in `.claude/skills/verification-layer/SKILL.md`). The `docs-researcher` (Generator) declares a Tier and the `research-critic` (Critic) reviews using a different tool family with primary-source-only citation. Default config in `.claude/verification.yml.example`; opt out via `research.enabled: false`. The same Skill also covers the **implementation** and **design** domains (default-off; opt in per domain). See ADR-008 (research) and ADR-010 (generalization) for rationale.
 4. **Architecture**: The architect designs the solution; significant decisions are recorded as ADRs using `.claude/templates/adr-template.md`
 5. **Implementation**: The implementer writes code following TDD (RED → GREEN → IMPROVE). When the implementation is a workaround for an upstream defect, the implementer also places a `WORKAROUND-UPSTREAM(<owner>/<repo>#<issue>, fixed=>=<version>)` marker and copies `.claude/templates/workaround-template.md` to `workarounds/NNN-*.md` (the default `registry_dir`; or `docs/workarounds/NNN-*.md` if you keep a `docs/` tree — match `registry_dir` in `.github/workaround-tracker.yml`)
-6. **Quality Gate**: The code-reviewer, linter, security-reviewer, and performance-engineer validate the implementation
+6. **Quality Gate**: The code-reviewer (delegates language depth to the matching ECC `<lang>-reviewer`, owns template cross-cutting checks), linter, security-reviewer, and performance-engineer validate the implementation
+   - **6a. Compliance check (opt-in)**: When `.claude/compliance.yml` has `compliance.enabled: true` and a non-empty `target_jurisdictions`, the **compliance-checklist** Skill (`.claude/skills/compliance-checklist/SKILL.md`, per ADR-011, default-off) is invoked by `product-manager` / `security-reviewer` / `technical-writer` for capabilities that may have legal exposure (chat, payments, PII collection, data egress). The Skill produces a checklist with primary-source citations and a mandatory disclaimer; it never marks items as "complied with" — only the human reviewer can
 7. **Documentation**: The technical-writer updates docs and changelog. When a workaround is removed, the technical-writer maps `user_impact` to the appropriate CHANGELOG category (`internal` / `changed` / `fixed`)
 8. **Release**: The devops-engineer manages deployment and release
 9. **Commit**: Conventional commits format (feat, fix, refactor, docs, test, chore, perf, ci)

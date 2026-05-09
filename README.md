@@ -8,6 +8,26 @@ with Claude Code.
 
 ---
 
+## Prerequisites
+
+This template is designed for developers who already have **ECC
+(Everything Claude Code)** installed at the user level (`~/.claude/`).
+The agents in this template reference ECC-provided rules and Skills at
+runtime — language-specific reviewers, framework patterns, and shared
+verification workflows live in your ECC install, not in this repository.
+
+The template still runs without ECC, but agent quality is degraded:
+rule references resolve to nothing, Skill invocations are no-ops, and
+the language-specific code review path (see [`code-reviewer`](.claude/agents/code-reviewer.md))
+falls back to a generic review and says so in its verdict — the
+fallback is explicit, not silent, so a missing ECC layer is visible
+in every review report.
+
+> **New to ECC?** Install it at the user level first, then return here
+> to create your project repository from this template.
+
+---
+
 ## What you get
 
 - **18 specialized agents** covering the full product lifecycle — orchestrator,

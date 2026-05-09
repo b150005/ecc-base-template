@@ -7,6 +7,83 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- ADR-011 (`Compliance Checklist Skill`, status `Accepted`) and ADR-012
+  (`Code Reviewer as Dispatcher to ECC Language-Specific Reviewers`,
+  status `Accepted`). Both records were drafted, reviewed by the
+  Agent Team (`product-manager`, `architect`, `architecture-critic`,
+  `security-reviewer`, `technical-writer`, plus the new dispatcher
+  `code-reviewer` itself), and accepted in this release cycle.
+  ADR-012 permanently records the `architecture-critic`-generated
+  counter-proposal that argued for in-repo language-specific reviewers
+  instead of dispatcher delegation (Alternative B), with explicit
+  re-evaluation triggers, per ADR-010's design-domain protocol.
+  Bilingual `.md` and `.ja.md` for both ADRs.
+- `.claude/skills/compliance-checklist/` — the Skill body that
+  ADR-011 specifies. Ships default-off and refuses to run unless the
+  project sets `compliance.enabled: true` and a non-empty
+  `target_jurisdictions` in `.claude/compliance.yml`.
+  - `SKILL.md` — overview, six invariant rules (no
+    negative-applicability claims, primary-source-only citations,
+    PII path refusal, default-off, project-declared jurisdictions,
+    capability-based triggers), output contract, override protocol,
+    half-yearly re-verification cadence (quarterly for platform).
+  - `disclaimers.md` — mandatory disclaimer block in EN and JA,
+    locked from override; staleness banner rendered conditionally
+    after 365 days without re-verification.
+  - `triggers.md` — capability-based trigger detection rules
+    (`messaging`, `payments`, `pii`, `data-egress`) keyed off
+    manifest dependencies and source patterns, plus PII path
+    refusal globs and an output-mask regex layer.
+  - `jurisdictions/JP.md` — 電気通信事業法, 特定商取引法,
+    改正個人情報保護法, 資金決済法 with primary citations to
+    e-Gov 法令検索.
+  - `jurisdictions/EU.md` — GDPR (Reg. 2016/679 incl. Art. 3
+    extraterritorial scope), ePrivacy Directive 2002/58/EC, DSA
+    (Reg. 2022/2065) with primary citations to EUR-Lex and EDPB.
+  - `jurisdictions/US-CA.md` — CCPA / CPRA, CalOPPA, Shine the
+    Light with primary citations to California Legislative
+    Information.
+  - `jurisdictions/platform.md` — Apple App Store Review
+    Guidelines and Google Play Policy Center with primary
+    citations to the platform documentation surfaces themselves.
+  Vertical-specific regimes (healthcare PHI, financial KYC, etc.)
+  are explicitly deferred to existing ECC Skills (`hipaa-compliance`,
+  `healthcare-phi-compliance`) and to specialized counsel.
+- `.claude/compliance.yml.example` — sample per-project Skill
+  activation config. Sibling to `.claude/verification.yml.example`;
+  both are default-off opt-in surfaces.
+- README `## Prerequisites` section (EN + JA). Documents that the
+  template is designed for developers who already have ECC
+  (Everything Claude Code) installed at the user level (`~/.claude/`).
+  Soft prerequisite — the template still runs without ECC, but agent
+  quality is degraded; the `code-reviewer` dispatcher's verdict
+  always notes which delegation outcome occurred so a missing ECC
+  layer is visible per review, not silent.
+
+### Changed
+
+- `.claude/agents/code-reviewer.md` refactored from a generic reviewer
+  into a **meta-reviewer / dispatcher**. The agent now detects the
+  ecosystem from project manifests and delegates language-specific
+  depth to the matching ECC `*-reviewer` (`typescript-reviewer`,
+  `python-reviewer`, `go-reviewer`, `rust-reviewer`, `cpp-reviewer`,
+  `java-reviewer`, `kotlin-reviewer`, `flutter-reviewer`,
+  `csharp-reviewer`), then layers on cross-cutting checks that no
+  language-specific reviewer can perform: ADR conformance,
+  workaround-marker validation (ADR-006), CLAUDE.md / agent-prompt
+  structure (ADR-007), verification-layer hand-off (ADR-008/010), and
+  the compliance-checklist Skill trigger (ADR-011, when enabled). Falls
+  back to the original generic checklist if no ECC reviewer matches.
+  Resolves the audit finding that the project's generic reviewer was
+  strictly weaker than ECC's language-specific reviewers for any single
+  ecosystem.
+- `.claude/CLAUDE.md` — `code-reviewer` row in the Agent Team table
+  updated to reflect the meta-reviewer role; Quality Gate step in
+  Development Workflow updated to mention the compliance-checklist
+  Skill activation conditions (default-off, opt-in per project).
+
 ## [3.5.0] - 2026-05-08
 
 ### Added
