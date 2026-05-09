@@ -4,6 +4,59 @@
 
 Accepted — 2026-05-09
 
+## Known ambiguity (deferred to next re-verification cadence)
+
+Invariant 2 ("primary-source-only citation") names statute repositories
+(e-Gov, EUR-Lex, California Legislative Information) and platform
+policy pages as the allowed sources, and lists "blog summaries, Q&A
+sites, AI summaries, news articles, law-firm explainers" as
+disqualifying. **Regulator-issued official interpretive guidance**
+(EDPB Guidelines under GDPR Art. 70, 個人情報保護委員会 Q&A and
+通達, California Privacy Protection Agency Regulations, Apple's
+Privacy Manifest spec, Google Play SDK Index) sits in neither list:
+it is neither legislative text nor secondary commentary. The current
+Skill body (`jurisdictions/EU.md`, `JP.md`, `platform.md`) cites such
+guidance in supplementary positions. Strict reading of Invariant 2
+would force their removal, which would meaningfully degrade the
+Skill's practical value — DPIA-necessity judgments, cookie-consent
+dark-pattern criteria, and PPC enforcement posture cannot be derived
+from statute text alone.
+
+The Agent Team debated this on 2026-05-09 (architect /
+architecture-critic / security-reviewer). Two structural directions
+were on the table:
+
+- **Tier-allow-list amendment**: extend Invariant 2 to admit a
+  named "Tier 1.5" of issuing-regulator guidance, citable only when
+  paired with a Tier 1 statute reference, with the regulator
+  allow-list fixed at the ADR layer. (Argued for by architect and
+  security-reviewer.)
+- **Tightening to statute text only**: remove the regulator-guidance
+  citations entirely, keep `## See also` non-citation links for
+  human reviewers who want to read the guidance themselves.
+  (Argued for as a counter-proposal by architecture-critic on
+  bright-line / verifiability grounds.)
+
+Both proposals are coherent. Choosing between them is a deeper
+question about what kind of source discipline the verification-layer
+wants to standardize on, and the answer affects ADR-008 and ADR-010
+as much as it affects this Skill. Resolving it inside this Skill's
+release cycle would either be a snap judgment or would block v3.6.0.
+
+**Decision deferred to the next half-yearly re-verification cadence
+(target: 2026-11-09 ± a few weeks).** That pass already requires
+re-fetching every `jurisdictions/*.md` citation against primary
+sources via `docs-researcher`, which is the natural moment to also
+sweep the regulator-guidance references and pick a Tier model.
+Until then the Skill operates with the current citations; the
+practical risk is bounded because (a) Invariant 1 still forbids
+negative-applicability claims and (b) every report must include the
+mandatory disclaimer, so a downstream legal reviewer is on notice.
+
+The two structural directions will be filed as ADR-013 (*proposed*)
+during the cadence pass, with the architecture-critic counter
+preserved verbatim per ADR-010's design-domain protocol.
+
 ## Context
 
 AI agents have lowered the cost of shipping an application to the point

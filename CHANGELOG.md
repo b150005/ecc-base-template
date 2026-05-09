@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Documentation
+
+- ADR-011 gains a `## Known ambiguity` section recording the
+  Invariant 2 question that surfaced during the same release's
+  internal review: regulator-issued official interpretive guidance
+  (EDPB Guidelines, 個人情報保護委員会 Q&A and 通達, CPPA
+  Regulations, Apple Privacy Manifest spec, Google Play SDK Index)
+  fits neither Invariant 2's "primary source" list nor its
+  "disqualifying" list. Three Agent Team voices (`architect`,
+  `architecture-critic`, `security-reviewer`) debated two
+  structural directions — extend Invariant 2 with a "Tier 1.5"
+  allow-list, or tighten to statute-only and demote regulator
+  guidance to non-citation references. Decision deferred to the
+  half-yearly re-verification cadence (target 2026-11-09) when the
+  natural sweep of `jurisdictions/*.md` citations happens; the two
+  directions will be filed as ADR-013 at that time, with the
+  architecture-critic counter preserved verbatim per ADR-010's
+  design-domain protocol. Practical risk in the interim is bounded
+  because Invariant 1 still forbids negative-applicability claims
+  and every report carries the mandatory disclaimer. Bilingual
+  `.md` and `.ja.md`.
+
 ### Added
 
 - ADR-011 (`Compliance Checklist Skill`, status `Accepted`) and ADR-012
