@@ -212,3 +212,36 @@ guards a load-bearing invariant.
 - `.claude/skills/research-verification/checklist.md` — secondary-source
   blocklist, single source of truth shared by the CI check and the
   research domain.
+
+## Amendment — 2026-05-09 (per ADR-013)
+
+ADR-013 added **Tier 1.5 — issuing-regulator official interpretive
+guidance** as a verification-layer-wide extension to invariant 3
+(primary-source-only citation) defined in
+`.claude/skills/verification-layer/SKILL.md`. The Tier 1.5 allowlist
+is closed and fixed at the ADR-013 layer; it admits EDPB Guidelines,
+PPC ガイドライン/Q&A/通達, CPPA Regulations, Apple Privacy Manifest
+specification, and Google Play SDK Index documentation, only paired
+with a Tier 1 citation on the same item, and only when the topic
+under review intersects a delegated-regulator domain.
+
+The change applies uniformly across all three verification-layer
+domains (`research`, `implementation`, `design`):
+
+- `research` Critic (`research-critic`) — see ADR-008 amendment.
+- `implementation` Critic (`adversarial-implementer`) — same rule
+  applies to citations supporting an alternative implementation
+  choice when the implementation under review intersects a
+  delegated-regulator domain (e.g., a payment flow under Apple §3.1
+  entitlements; a PII pipeline under GDPR Art. 35 DPIA).
+- `design` Critic (`architecture-critic`) — same rule applies to
+  citations supporting a counter-proposal when the ADR under review
+  intersects a delegated-regulator domain.
+
+ADR-010's original Decision text and four-level ranking are
+unchanged. Tier 1.5 is a narrow, closed extension to the citation
+allowlist; the per-domain protocols, severity vocabulary, and
+opt-in configuration model are not modified.
+
+See ADR-013 for the closed allowlist, pairing rule, authority floor,
+stale-guidance handling, and re-evaluation triggers.

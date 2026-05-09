@@ -4,57 +4,35 @@
 
 Accepted — 2026-05-09
 
-## 既知の曖昧性 (次回再検証ケイデンスへ持ち越し)
+## 既知の曖昧性 — ADR-013 により解決 (2026-05-09)
 
-Invariant 2 (「一次情報のみの引用」) は、許容される情報源として
-法令リポジトリ (e-Gov、EUR-Lex、California Legislative Information)
-とプラットフォームポリシーページを列挙し、「ブログ要約、Q&A サイト、
-AI 要約、ニュース記事、法律事務所の解説」を disqualifying として
-列挙している。**規制当局が公式に発する解釈ガイダンス**
-(GDPR 第 70 条に基づく EDPB Guidelines、個人情報保護委員会 Q&A
-および通達、California Privacy Protection Agency Regulations、
-Apple の Privacy Manifest spec、Google Play SDK Index) は、いずれの
-リストにも属さない ── 立法テキストでもなければ二次的解説でも
-ない。現行の Skill 本体 (`jurisdictions/EU.md`, `JP.md`,
-`platform.md`) は、これらのガイダンスを補助的な位置で引用している。
-Invariant 2 を厳格に解すると引用削除を要するが、それは Skill の
-実用価値を大きく損なう ── DPIA 必要性判定、cookie 同意の dark
-pattern 基準、PPC の運用姿勢は、条文テキストだけからは導けない。
+ここに記録された Invariant 2 の曖昧性は、半年ケイデンスを待たずに
+前倒しで解決された。ADR-013 (Invariant 2 情報源 Tier モデル) は
+2026-05-09 に起票・議論・採択され、**Option A — Tier 1.5 allow-list
+拡張** が **verification-layer 全体スコープ** で確定した。元の
+曖昧性:
 
-Agent Team はこの問題を 2026-05-09 に議論した
-(architect / architecture-critic / security-reviewer)。2 つの構造的
-方向性が俎上に上った:
+> Invariant 2 (「一次情報のみの引用」) は、許容される情報源として
+> 法令リポジトリ (e-Gov、EUR-Lex、California Legislative
+> Information) とプラットフォームポリシーページを列挙し、「ブログ
+> 要約、Q&A サイト、AI 要約、ニュース記事、法律事務所の解説」を
+> disqualifying として列挙している。**規制当局が公式に発する
+> 解釈ガイダンス** (GDPR 第 70 条に基づく EDPB Guidelines、個人
+> 情報保護委員会 Q&A および通達、California Privacy Protection
+> Agency Regulations、Apple の Privacy Manifest spec、Google Play
+> SDK Index) は、いずれのリストにも属さない。
 
-- **Tier 許容リストの拡張**: Invariant 2 を拡張し、発令する規制
-  当局のガイダンスを「Tier 1.5」として明示的に許容する。Tier 1 の
-  条文参照と必ず併記することを条件とし、許容される規制当局の
-  allow-list は ADR 層で固定する。(architect と security-reviewer
-  が支持)
-- **条文テキストのみへの厳格化**: 規制当局ガイダンスの引用を
-  完全に削除し、`## See also` セクションに非引用扱いの参考リンクと
-  して残す。当局ガイダンスを読みたい人間レビュアーは、引用ではなく
-  参照として辿る。(architecture-critic が bright-line / 検証可能性の
-  観点から反対提案として擁護)
+architecture-critic の反対提案 (Option D — 条文のみへの厳格化、
+`## See also` 非引用扱いリンク) は、ADR-010 の design-domain
+プロトコルに従って ADR-013 の `## Counter-proposal` セクションに
+逐語保存され、再評価トリガーを伴う。
 
-両提案ともに筋が通っている。どちらを選ぶかは、verification-layer 全体が
-どのような情報源規律を標準化したいかというより深い問いに関わり、
-回答は本 Skill だけでなく ADR-008 と ADR-010 にも波及する。これを
-本 Skill のリリースサイクル内で解決しようとすると、即断になるか、
-v3.6.0 をブロックするかのいずれかになる。
-
-**判断は次回の半年ケイデンスへ持ち越す (目標: 2026-11-09 前後)。**
-そのパスでは `docs-researcher` を介して `jurisdictions/*.md` の
-全引用を一次情報源に対して再取得することが既に要請されており、
-規制当局ガイダンス参照を sweep して Tier モデルを選定する自然な
-タイミングとなる。それまでの間、Skill は現行の引用で運用する。
-実務リスクは限定的である ── (a) Invariant 1 は依然として
-negative-applicability claims を禁じており、(b) すべての報告に
-必須の免責ブロックが含まれるため、下流の法務レビュアーは警告を
-受け取る。
-
-2 つの構造的方向性は、ケイデンスパス時に ADR-013 (*proposed*)
-として立てる。architecture-critic の反対提案は ADR-010 の
-design-domain プロトコルに従い逐語で保存する。
+解決の詳細は
+[`.claude/meta/adr/013-invariant-2-source-tier-model.ja.md`](./013-invariant-2-source-tier-model.ja.md)
+を参照。ADR-008 と ADR-010 への amendment が verification-layer 全体
+への伝播を記録する。本 Skill の `SKILL.md` における Invariant 2 の
+テキストは、同一リリースサイクル内で 3 段構造 (Tier 1 / Tier 1.5 /
+disqualifying) を反映するように更新された。
 
 ## 背景
 

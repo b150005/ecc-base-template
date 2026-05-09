@@ -263,3 +263,29 @@ ADR-010 — `.claude/meta/adr/010-verification-layer-generalization.ja.md`
 を参照 — がドメイン横断抽象化の正典です。本 ADR-008 の本文は変更
 されません — research ドメインの決定とその根拠は、当該ドメインに
 ついての正典の記録のままです。
+
+## Amendment — 2026-05-09 (ADR-013 による)
+
+ADR-013 は本 ADR が確立した primary-source-only citation 規律に
+verification-layer 全体スコープで拡張を加え、**Tier 1.5 — 発令する
+規制当局の公式解釈ガイダンス** を導入した。Tier 1.5 allowlist
+(EDPB Guidelines、PPC ガイドライン/Q&A/通達、CPPA Regulations、
+Apple Privacy Manifest 仕様、Google Play SDK Index) は、検討中の
+問いが委任規制当局ドメインと交わる場合に限り、かつ同一項目で
+Tier 1 引用と併記する場合に限り、research ドメインで許容される。
+
+research ドメインのプロトコルファイルは Tier 1.5 allowlist を参照
+するように更新された:
+
+- `.claude/skills/verification-layer/research/checklist.md` — primary
+  source allowlist の後に `## Tier 1.5` セクションを追加。
+- `.claude/skills/verification-layer/SKILL.md` — shared invariant 3 が
+  Tier 1.5 の single source of truth として ADR-013 を参照。
+
+ADR-008 の元の Decision テキストは変更されない。Tier 1.5 は委任
+規制当局トピックのために Critic の primary-source allowlist を狭く
+閉じた形で拡張する。一般的なフレームワーク / ライブラリ / 言語の
+研究ではルールを緩和しない。それらは引き続き Tier 1 のみ。
+
+closed allowlist、ペアリングルール、権威下限、古いガイダンスの
+取り扱い、再評価トリガーは ADR-013 を参照。

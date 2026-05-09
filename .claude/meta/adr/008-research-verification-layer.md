@@ -287,3 +287,31 @@ ADR-010 — see
 authoritative reference for the cross-domain abstraction. ADR-008's
 body remains unchanged because the research-domain decision and its
 rationale are still the canonical record for that domain.
+
+## Amendment — 2026-05-09 (per ADR-013)
+
+ADR-013 introduced **Tier 1.5 — issuing-regulator official
+interpretive guidance** as a verification-layer-wide extension to the
+primary-source-only citation rule established by this ADR. The
+Tier 1.5 allowlist (EDPB Guidelines, PPC ガイドライン/Q&A/通達, CPPA
+Regulations, Apple Privacy Manifest spec, Google Play SDK Index) is
+admissible across the research domain only when the question under
+review intersects a delegated-regulator domain, and only paired with
+a Tier 1 citation on the same item.
+
+The research-domain protocol files have been updated to reference the
+Tier 1.5 allowlist:
+
+- `.claude/skills/verification-layer/research/checklist.md` — adds a
+  `## Tier 1.5` section after the primary-source allowlist.
+- `.claude/skills/verification-layer/SKILL.md` — shared invariant 3
+  now references ADR-013 as the Tier 1.5 single source of truth.
+
+ADR-008's original Decision text is unchanged. Tier 1.5 admits a
+narrow, closed extension to the Critic's primary-source allowlist for
+delegated-regulator topics; it does not relax the rule for general
+framework / library / language research, which continues under
+Tier 1 only.
+
+See ADR-013 for the closed allowlist, pairing rule, authority floor,
+stale-guidance handling, and re-evaluation triggers.

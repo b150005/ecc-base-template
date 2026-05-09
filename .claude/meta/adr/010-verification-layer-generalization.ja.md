@@ -192,3 +192,34 @@ load-bearing な不変条件を守るため。
   換えが、新 Critic エージェントを orchestrator から発見可能にする。
 - `.claude/skills/research-verification/checklist.md` — 二次情報ブロック
   リストの single source of truth、CI チェックと research ドメインで共有。
+
+## Amendment — 2026-05-09 (ADR-013 による)
+
+ADR-013 は `.claude/skills/verification-layer/SKILL.md` の invariant 3
+(primary-source-only citation) に対する verification-layer 全体の
+拡張として、**Tier 1.5 — 発令する規制当局の公式解釈ガイダンス** を
+追加した。Tier 1.5 allowlist は ADR-013 層で閉じて固定されており、
+EDPB Guidelines、PPC ガイドライン/Q&A/通達、CPPA Regulations、
+Apple Privacy Manifest 仕様、Google Play SDK Index ドキュメントを
+許容する。同一項目で Tier 1 引用と併記する場合に限り、かつ検討中の
+トピックが委任規制当局ドメインと交わる場合に限る。
+
+本変更は verification-layer の 3 ドメイン (`research`、
+`implementation`、`design`) に一様に適用される:
+
+- `research` Critic (`research-critic`) — ADR-008 amendment を参照。
+- `implementation` Critic (`adversarial-implementer`) — レビュー対象
+  実装が委任規制当局ドメインと交わる場合 (例: Apple §3.1
+  entitlements 下の payment flow、GDPR 第 35 条 DPIA 下の PII
+  パイプライン)、代替実装選択を支持する引用に同じルールが適用
+  される。
+- `design` Critic (`architecture-critic`) — レビュー対象 ADR が
+  委任規制当局ドメインと交わる場合、反対提案を支持する引用に
+  同じルールが適用される。
+
+ADR-010 の元の Decision テキストと 4 段階ランキングは変更されない。
+Tier 1.5 は引用 allowlist への狭く閉じた拡張である。各ドメインの
+protocol、severity vocabulary、opt-in 設定モデルは変更しない。
+
+closed allowlist、ペアリングルール、権威下限、古いガイダンスの
+取り扱い、再評価トリガーは ADR-013 を参照。
