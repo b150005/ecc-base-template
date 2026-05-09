@@ -9,25 +9,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Documentation
 
-- ADR-011 gains a `## Known ambiguity` section recording the
-  Invariant 2 question that surfaced during the same release's
-  internal review: regulator-issued official interpretive guidance
-  (EDPB Guidelines, 個人情報保護委員会 Q&A and 通達, CPPA
-  Regulations, Apple Privacy Manifest spec, Google Play SDK Index)
-  fits neither Invariant 2's "primary source" list nor its
-  "disqualifying" list. Three Agent Team voices (`architect`,
-  `architecture-critic`, `security-reviewer`) debated two
-  structural directions — extend Invariant 2 with a "Tier 1.5"
-  allow-list, or tighten to statute-only and demote regulator
-  guidance to non-citation references. Decision deferred to the
-  half-yearly re-verification cadence (target 2026-11-09) when the
-  natural sweep of `jurisdictions/*.md` citations happens; the two
-  directions will be filed as ADR-013 at that time, with the
-  architecture-critic counter preserved verbatim per ADR-010's
-  design-domain protocol. Practical risk in the interim is bounded
-  because Invariant 1 still forbids negative-applicability claims
-  and every report carries the mandatory disclaimer. Bilingual
-  `.md` and `.ja.md`.
+- ADR-013 (`Invariant 2 Source Tier Model — Regulator Guidance in
+  Compliance Citations`, status `Accepted`) resolves the Invariant 2
+  ambiguity that ADR-011 had recorded as `## Known ambiguity` and
+  deferred to the half-yearly cadence. The user advanced the decision
+  in the same release cycle. ADR-013 was drafted Proposed with two
+  coherent decisions (Option A — Tier 1.5 allow-list extension;
+  Option D — statute-only tightening with `## See also` demotion)
+  and the architecture-critic counter-proposal preserved verbatim
+  per ADR-010 design-domain protocol. The user selected
+  **Option A with verification-layer-wide scope** on 2026-05-09;
+  Option D stays in `## Counter-proposal` with its re-evaluation
+  trigger (two failures within one cadence cycle attributable to
+  Tier 1.5 misuse). Closed Tier 1.5 allowlist (fixed at the ADR
+  layer): EDPB Guidelines under GDPR Art. 70, PPC ガイドライン /
+  Q&A / 通達 under 個人情報保護法 §147–§149, CPPA Regulations
+  under CCPA §1798.185, Apple Privacy Manifest specification,
+  Google Play SDK Index. Bilingual `.md` and `.ja.md`.
+- ADR-011's `## Known ambiguity` section is rewritten to
+  `## Known ambiguity — Resolved by ADR-013 (2026-05-09)`,
+  preserving the original ambiguity quote and pointing forward to
+  the resolution. Bilingual.
+- ADR-008 and ADR-010 each gain a 2026-05-09 amendment section
+  recording the verification-layer-wide Tier 1.5 propagation,
+  parallel to ADR-008's existing 2026-05-08 amendment for ADR-010.
+  The original Decision text in those ADRs is unchanged. Bilingual.
 
 ### Added
 
@@ -105,6 +111,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   updated to reflect the meta-reviewer role; Quality Gate step in
   Development Workflow updated to mention the compliance-checklist
   Skill activation conditions (default-off, opt-in per project).
+- `.claude/skills/compliance-checklist/SKILL.md` Invariant 2 rewritten
+  from a single-rule statement into a three-tier structure (Tier 1
+  primary statute / first-party platform spec, Tier 1.5 issuing-regulator
+  official interpretive guidance with closed allowlist and pairing
+  rule, disqualifying secondary sources) per ADR-013. Override
+  Protocol updated to reflect that Invariant 2 now carries the
+  Tier 1.5 sub-rules.
+- `.claude/skills/compliance-checklist/jurisdictions/EU.md`,
+  `JP.md`, `platform.md` — each currently-cited regulator-guidance
+  reference (EDPB Guidelines on DPIA, EDPB Guidelines 03/2022 on
+  dark patterns, PPC adequate-protection list, Apple Privacy
+  Manifest specification, Google Play SDK Index) annotated with a
+  `[Tier 1.5]` marker, paired with the Tier 1 statute or
+  platform-spec citation on the same item. Each file's preamble
+  updated to describe the three-tier structure.
+- `.claude/skills/verification-layer/SKILL.md` — shared invariant 3
+  (primary-source-only citation) updated to reference ADR-013 as
+  the Tier 1.5 single source of truth. Tier 1 allowlist remains in
+  `research/checklist.md`.
+- `.claude/skills/verification-layer/research/checklist.md` — adds
+  a `## Tier 1.5` section after the primary-source allowlist,
+  defining the closed regulator allowlist, pairing rule, exclusions,
+  and topic-scope rule (Tier 1.5 applies only when the question
+  intersects a delegated-regulator domain).
 
 ## [3.5.0] - 2026-05-08
 
