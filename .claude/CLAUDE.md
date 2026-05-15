@@ -124,6 +124,26 @@ Mode is disabled or the style is `default`. See the
 `## Developer Learning Mode` section below for how to enable Learning
 Mode and pick a coaching style.
 
+## Roadmap
+
+Single entry point mapping each milestone to its authoritative design source. Each row is one milestone; the linked Spec/ADR is the source of truth for content — this table is an index only, never duplicating acceptance criteria or rationale. See `.claude/meta/adr/014-roadmap-index-single-entry-point.md` for the rationale.
+
+| # | Milestone | Status | Design source |
+|---|-----------|--------|---------------|
+| 01 | [replace with one-line milestone description] | ☐ todo | spec: `specs/01-example.md` |
+| 02 | [replace with one-line milestone description] | ☑ done | spec: `specs/02-example.md` + adr: `adr/002-example.md` |
+
+> **These rows are placeholders.** Replace them with real milestones as you plan. Row numbers are stable and never reused.
+
+**Rules:**
+- One row per milestone; row number stable, never reused (follows ADR-number convention). A split = new row + note on old row.
+- `Design source` names the type explicitly: `spec:` and/or `adr:` links.
+- Milestone ↔ Spec is 1:1 mandatory; Milestone → ADR is 0:1 or 1:N (only when a structural decision occurred; the ADR's `## References` back-links the row number).
+- Status = implementation state: ☐ todo / ◐ in-progress / ☑ done / ✗ dropped. Dropped rows stay (history not rewritten).
+- Index only — never duplicate acceptance criteria or rationale; the linked Spec/ADR is the source of truth.
+- Write-ownership: `product-manager` creates/updates the row + `spec:` link; `architect` adds the `adr:` link; `orchestrator` only reads.
+- At 100+ milestones, split into `### Phase N` sub-tables under `## Roadmap`.
+
 ## Development Workflow
 
 1. **Issue Analysis**: Feed issues to the orchestrator via GitHub MCP or copy-paste. For defect reports, the orchestrator runs the **ours vs. upstream triage** (3-step protocol via docs-researcher) before deciding the workflow path
@@ -175,6 +195,7 @@ Derived projects should:
 3. Add framework-specific testing tools (e.g., Jest, pytest, go test).
 4. Add framework-specific code style rules (e.g., Biome, Ruff, gofmt).
 5. Keep the universal sections (workflow, testing requirements, code quality).
-6. If you do not plan to use Developer Learning Mode, delete `.claude/meta/`,
+6. Fill the Roadmap section as you plan milestones; let `product-manager` own row creation.
+7. If you do not plan to use Developer Learning Mode, delete `.claude/meta/`,
    `.github/workflows/learn-invariants.yml`, and the
    `## Developer Learning Mode` section above.

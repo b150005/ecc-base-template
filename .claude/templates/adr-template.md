@@ -53,3 +53,4 @@ What is the decision? State it clearly, in one or two sentences, so a reader who
 ## References
 
 - Links to prior art, benchmarks, vendor docs, or related ADRs.
+- Roadmap row: #NN (back-link to the milestone this ADR records a decision for)

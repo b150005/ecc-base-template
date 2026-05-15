@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Documentation
+
+- ADR-014 (`Roadmap Index as the Single Entry Point for
+  Design Artifacts`, status `Accepted`) adds a `## Roadmap`
+  index table to `.claude/CLAUDE.md`, placed immediately
+  before `## Development Workflow`. Each row maps one
+  milestone 1:1 to its authoritative Spec (`spec:` link,
+  mandatory) and 0:1 or 1:N to ADRs (`adr:` link, only
+  when a structural decision occurred). The table is an
+  index only — acceptance criteria and rationale are never
+  duplicated; the linked Spec/ADR remains the source of
+  truth. Write-ownership is role-separated: `product-manager`
+  creates/updates the row and `spec:` link; `architect` adds
+  the `adr:` link; `orchestrator` only reads. Four agent
+  prompts (`orchestrator`, `architect`, `implementer`,
+  `product-manager`) and the spec/adr templates were amended.
+  A new `.claude/templates/roadmap-section.md`
+  (+ `.ja.md`) paste-in fragment ships with this release.
+  The counter-proposal to collapse to one document type
+  (Alternative A) was raised and rejected during user
+  dialogue because it breaks the `implementer`/`architect`
+  reference contracts; it is permanently recorded in the
+  ADR per ADR-012 precedent. Bilingual `.md` and `.ja.md`.
+
 ## [3.6.1] - 2026-05-10
 
 ### Changed

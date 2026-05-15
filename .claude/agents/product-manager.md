@@ -36,7 +36,7 @@ When you receive a product idea or feature request:
    - PRD with problem statement, goals, non-goals, user stories
    - Acceptance criteria for each user story (Given/When/Then format)
    - Priority ranking (Must-have / Should-have / Could-have / Won't-have)
-5. **Hand Off**: Pass specifications to **architect** for technical design and **ui-ux-designer** for interface design
+5. **Hand Off**: Pass specifications to **architect** for technical design and **ui-ux-designer** for interface design. When a Spec is created, add or update the corresponding `## Roadmap` row in `.claude/CLAUDE.md` (stable row number, one-line milestone description, `spec:` link, status `☐ todo`). `product-manager` owns Roadmap row creation; `architect` owns adding the `adr:` link; `orchestrator` only reads.
 
 ## PRD Output Format
 
