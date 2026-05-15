@@ -209,3 +209,172 @@ the templates — those are downstream implementation tasks owned by
   "Roadmap row: #NN" example/back-link (downstream task).
 - `.github/workflows/workaround-check.yml` — the shape the deferred,
   out-of-scope drift-check CI would follow if added later.
+
+## Amendment — 2026-05-16 (Spec reservation rule)
+
+While dogfooding this ADR to populate the template's own `## Roadmap`
+section with 21 audit-driven milestones, `product-manager` hit a real
+tension between two of the original Decision's rules: "Milestone ↔ Spec
+is 1:1 and mandatory" requires every row to carry a `spec:` link, but
+authoring 21 full Spec files upfront — for milestones not yet picked up
+— is wasteful and front-loads scope decisions that should be made when
+the milestone is actually worked. This amendment ratifies the operating
+interpretation that resolved the tension; it is now live in CLAUDE.md's
+Roadmap section.
+
+**The reservation rule.** Every Roadmap row carries a `spec:` link at
+row-creation time, using the deterministic path `specs/NN-slug.md`
+where `NN` is the stable row number. The Spec **file** is authored by
+`product-manager` only when the milestone is picked up (status moves to
+`◐ in-progress`). The reserved link is present and stable from the
+moment the row exists; the file materializes on disk later.
+
+**Why this does not violate the original Decision.** The Decision's
+1:1-mandatory rule constrains the **link**, not the **file**:
+"Every milestone row has exactly one `spec:` link." That property is
+established at row-creation and never changes — the mapping is a
+property of the index, which is exactly what an index-only table is
+for. ADR-014 requires the link to be *present and stable*, not the
+target to *exist on disk*, and the deterministic `specs/NN-slug.md`
+path keyed to the immutable row number guarantees stability with no
+ambiguity about what the link will resolve to. The
+`implementer`/`test-runner` reference contract is honored because that
+contract only fires when `implementer` is invoked for a milestone, and
+by this ADR's own write-ownership model `product-manager` authors the
+Spec at the `◐ in-progress` transition — which is, by construction,
+before any code is written for that milestone. There is no window in
+which `implementer` resolves the pointer and finds nothing: a row that
+has reached the implementation step has, by the ownership rule, already
+had its Spec authored. The reservation rule therefore tightens *when*
+the file is written without weakening *that* the 1:1 mapping holds or
+*that* the Spec precedes the code.
+
+**Honestly-acknowledged strain.** `product-manager` flagged that rows
+#16–#21 are S-effort prose edits (status discrepancies, CHANGELOG
+back-fill, allowlist expiry) where a full Spec feels disproportionate
+to the work. The reservation rule does not eliminate this — those rows
+still owe a Spec file when picked up. The accepted mitigation is to
+keep those Specs to roughly half a page: enough to carry acceptance
+criteria for the `test-runner` contract, no ceremony beyond that. This
+is a deliberate, eyes-open trade: the 1:1 contract is preserved
+uniformly rather than carved out for "small" milestones (a carve-out
+would reintroduce exactly the "is there a Spec for this?" rediscovery
+ADR-014 exists to remove), and the proportionality cost is paid as
+brevity in the Spec rather than as an exception in the index.
+
+The original Status line (`Accepted — 2026-05-15`) is unchanged; this
+amendment appends an operating interpretation and does not reopen the
+Decision. The Japanese counterpart
+(`014-roadmap-index-single-entry-point.ja.md`) must receive the
+equivalent amendment; that is a `technical-writer` task, not part of
+this change.
+
+## Amendment — 2026-05-16 (CLAUDE.md line-budget vs. the Roadmap)
+
+Populating the 21-row Roadmap pushed `.claude/CLAUDE.md` to 220 lines.
+The `claude-md-authoring` Skill's post-writing checklist reads
+"CLAUDE.md is under 200 lines," and the ~25 lines of Roadmap (header +
+table + rules) are the direct cause. ADR-014's Decision already
+anticipated table bloat at 100+ milestones (the `### Phase N` split),
+but that mechanism does not help at 21 rows, and — more fundamentally —
+splitting the Roadmap *anywhere* is structurally unavailable, not just
+unhelpful. This amendment records the resolution; it does **not**
+itself edit CLAUDE.md (that is a downstream `implementer` task, listed
+below for traceability).
+
+**Why the usual escape is closed for the Roadmap specifically.** The
+Skill's own remediation for an over-length CLAUDE.md is "split a
+section into a subdirectory `CLAUDE.md` or a Skill, not to compress the
+prose." That remediation assumes the section is *relocatable*.
+Invariant 2 (`.claude/skills/claude-md-authoring/invariants.md` §2:
+"Root content survives compaction; subdirectory and path-scoped content
+do not") makes the Roadmap the documented case where that assumption
+fails: the Roadmap is ADR-014's single always-read entry point and is
+only an entry point if it survives compaction. A subdirectory
+`CLAUDE.md` or a Skill is loaded on demand and summarized away on
+compaction — relocating the Roadmap there destroys the exact property
+that justifies it. Invariant 4 closes the remaining door: `@path`
+imports "improve organisation but do NOT save context tokens." For the
+Roadmap *only*, the budget cannot be reclaimed by relocation.
+
+**The "around 200" rule's actual enforcement status.** It is a
+**volatile rule, not an invariant**, and the Skill states verbatim:
+"Treat as 'around 200' if Docs are unreachable; **never enforce it as
+a hard CI failure**" (SKILL.md §"Volatile rules"). The post-writing
+"under 200 lines" line is a checklist prompt, not a gate. A permanent
+overage is therefore *permitted by the Skill itself*; the only open
+question is whether the overage is *minimal*.
+
+**Decision: hybrid (reclaim the recoverable slack, then sanction the
+irreducible residual).** Spending the full ~20-line overage on a
+sanctioned exception when roughly half is cheaply recoverable without
+touching any compaction-durable content is not minimal. Therefore:
+
+1. **Compress the Roadmap row descriptions.** The table is index-only
+   (the linked Spec is the source of truth), so row text does not need
+   to be self-explanatory prose; it needs to be a stable, scannable
+   handle. Tighten each milestone one-liner to a short noun phrase,
+   moving the parenthetical justifications ("incl. …", "note: …",
+   "A-08/C-06") out of the table — they are Spec/ADR content, not
+   index content, and keeping them in the row violates the Decision's
+   "index only — never duplicate rationale" rule anyway. Target: the
+   25-line Roadmap block down to ~18–19 lines while keeping all 21
+   rows.
+2. **One targeted trim elsewhere.** The `## Plan-First &
+   Learning-Aware Defaults` section's third paragraph (the
+   `coaching-context.sh` hook mechanics) is operational detail that is
+   *not* Invariant-2-locked — it is fully reconstructable from
+   `.claude/meta/adr/004-coaching-pillar.md` and the hook file itself,
+   and qualifies as code-derivable under Invariant 3. Move that
+   paragraph's mechanics to the Learning Mode meta references and leave
+   a one-line pointer. Recovers ~6 lines of genuinely relocatable
+   content (it is loaded on demand precisely when Learning Mode is
+   active, so compaction durability is not required for it).
+3. **Sanction the irreducible residual inline.** After (1) and (2),
+   whatever overage remains is attributable to the Roadmap's
+   irreducible core, which Invariant 2 forbids relocating. Add a short
+   sanctioned-exception note to CLAUDE.md's `## CLAUDE.md authoring
+   guidance` section recording that the line guidance yields to the
+   Roadmap by design. Exact wording handed to `implementer` below.
+
+This stays within house style: it is a clarification of a *consequence*
+of ADR-014's existing Decision (the Roadmap lives in root CLAUDE.md and
+must survive compaction — already decided), plus downstream editing
+instructions. It is **not** a new structural decision and therefore
+**does not warrant its own ADR**. ECC precedent (ADR-008, ADR-010 fold
+consequence-clarifications into amendments; new ADR numbers are
+reserved for new structural decisions) places this as an ADR-014
+amendment, not ADR-015. No ADR-015 was created.
+
+**Sanctioned-exception wording for `implementer` to add to CLAUDE.md's
+`## CLAUDE.md authoring guidance` section** (append as a final
+paragraph; do not modify the existing paragraph):
+
+> **Sanctioned line-budget exception (per ADR-014 amendment
+> 2026-05-16).** The `## Roadmap` section is exempt from the
+> ~200-line CLAUDE.md guidance. The Roadmap is the single always-read
+> entry point for design artifacts and must survive compaction
+> (Invariant 2), so it cannot be relocated to a subdirectory
+> `CLAUDE.md` or a Skill without defeating its purpose. The "around
+> 200" rule is a volatile guideline, never a hard CI failure; it
+> yields to the Roadmap by design. Reclaim budget by compressing
+> Roadmap row text (index-only) and trimming non-compaction-durable
+> sections elsewhere — not by moving the Roadmap.
+
+**Downstream `implementer` tasks (recorded for traceability, not
+performed by this ADR):**
+
+- `.claude/CLAUDE.md` — compress the 21 Roadmap row descriptions to
+  short noun phrases; move parenthetical justifications out of the
+  table (they are Spec/ADR content per the Decision's "index only"
+  rule).
+- `.claude/CLAUDE.md` — relocate the `coaching-context.sh` hook
+  mechanics paragraph from `## Plan-First & Learning-Aware Defaults`
+  to the Learning Mode meta references; leave a one-line pointer.
+- `.claude/CLAUDE.md` — append the sanctioned-exception paragraph
+  above to `## CLAUDE.md authoring guidance`.
+- The Japanese counterpart of CLAUDE.md (if present) and of this ADR
+  receive the equivalent edits — a `technical-writer` task, not part
+  of this change.
+
+The original Status line (`Accepted — 2026-05-15`) is unchanged.

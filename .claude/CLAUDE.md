@@ -77,6 +77,8 @@ small edits (typo, single bullet, version bump) do not need the Skill.
 See `.claude/meta/adr/007-claude-md-authoring-skill.md` for the design
 rationale.
 
+**Sanctioned line-budget exception (per ADR-014 amendment 2026-05-16).** The `## Roadmap` section is exempt from the ~200-line CLAUDE.md guidance. The Roadmap is the single always-read entry point for design artifacts and must survive compaction (Invariant 2), so it cannot be relocated to a subdirectory `CLAUDE.md` or a Skill without defeating its purpose. The "around 200" rule is a volatile guideline, never a hard CI failure; it yields to the Roadmap by design. Reclaim budget by compressing Roadmap row text (index-only) and trimming non-compaction-durable sections elsewhere — not by moving the Roadmap.
+
 ## Developer Learning Mode
 
 Default-off learning layer with two orthogonal pillars: the **knowledge pillar**
@@ -115,29 +117,44 @@ small fragments yourself — and adds short `Insight:` notes that explain
 *why* a non-obvious choice was made. Selection is opt-in: choose it
 once via `/output-style ecc-learn`.
 
-When Developer Learning Mode is enabled and a non-default coaching
-style is set, a `UserPromptSubmit` hook at
-`.claude/hooks/coaching-context.sh` injects the active style's preamble
-into every prompt's context — guaranteeing the chosen style is live,
-not just documented. The hook fails open and is silent when Learning
-Mode is disabled or the style is `default`. See the
-`## Developer Learning Mode` section below for how to enable Learning
-Mode and pick a coaching style.
+The coaching hook is implemented in `.claude/hooks/coaching-context.sh`
+(self-documenting inline docblock) and registered in
+`.claude/settings.json` under `UserPromptSubmit`; the coaching pillar
+design rationale is in `.claude/meta/adr/004-coaching-pillar.md`.
 
 ## Roadmap
 
 Single entry point mapping each milestone to its authoritative design source. Each row is one milestone; the linked Spec/ADR is the source of truth for content — this table is an index only, never duplicating acceptance criteria or rationale. See `.claude/meta/adr/014-roadmap-index-single-entry-point.md` for the rationale.
 
+**Spec reservation rule:** Every row carries a `spec:` link at row-creation time using the deterministic path `specs/NN-slug.md`. The Spec *file* is authored by `product-manager` when the milestone is picked up (status moves to `◐ in-progress`). The reserved link satisfies ADR-014's 1:1 mandatory mapping without requiring all 21 Spec files to exist upfront; the `implementer`/`test-runner` contract is triggered only after the file is authored.
+
 | # | Milestone | Status | Design source |
 |---|-----------|--------|---------------|
-| 01 | [replace with one-line milestone description] | ☐ todo | spec: `specs/01-example.md` |
-| 02 | [replace with one-line milestone description] | ☑ done | spec: `specs/02-example.md` + adr: `adr/002-example.md` |
-
-> **These rows are placeholders.** Replace them with real milestones as you plan. Row numbers are stable and never reused.
+| 01 | Commit `verification.yml` as active default | ☑ done | spec: `specs/01-ship-verification-yml-committed.md` |
+| 02 | CodeQL single-switch activation via repository variable | ☑ done | spec: `specs/02-codeql-single-switch-activation.md` |
+| 03 | Cross-session milestone progress persistence | ☐ todo | spec: `specs/03-cross-session-progress-persistence.md` |
+| 04 | CI detector for dangling ADR/skill cross-references | ☐ todo | spec: `specs/04-dangling-reference-detector.md` |
+| 05 | Roadmap drift-detection CI | ☐ todo | spec: `specs/05-roadmap-drift-detection-ci.md` |
+| 06 | EN/JA bilingual parity detector | ☐ todo | spec: `specs/06-bilingual-parity-detector.md` |
+| 07 | Roadmap status-transition ownership assignment | ☐ todo | spec: `specs/07-roadmap-status-transitions.md` |
+| 08 | Orchestrator Analyze row-guard | ☐ todo | spec: `specs/08-orchestrator-row-guard.md` |
+| 09 | Spec filename convention alignment (`NN-slug.md`) | ☐ todo | spec: `specs/09-spec-filename-convention.md` |
+| 10 | Spec/ADR directory location pin in CLAUDE.md | ☐ todo | spec: `specs/10-spec-adr-directory-pinning.md` |
+| 11 | Opt-in trigger guidance for implementation/design verification domains | ☐ todo | spec: `specs/11-verification-domain-opt-in-guidance.md` |
+| 12 | CI coverage gate (80% hard check) | ☐ todo | spec: `specs/12-coverage-ci-gate.md` |
+| 13 | ECC-absent degraded-review signal | ☐ todo | spec: `specs/13-ecc-absent-signal.md` |
+| 14 | Research-tier validation for auth→T2 mis-classifications | ☐ todo | spec: `specs/14-research-tier-validation.md` |
+| 15 | `init.sh` Roadmap placeholder cleanup at fork time | ☐ todo | spec: `specs/15-init-sh-roadmap-cleanup.md` |
+| 16 | ADR-001 "Proposed (stabilized)" status resolution | ☐ todo | spec: `specs/16-adr-001-status-resolution.md` |
+| 17 | CHANGELOG↔ADR-acceptance sync and ADR-001–005 back-fill | ☐ todo | spec: `specs/17-changelog-adr-sync.md` |
+| 18 | CI exemption allowlist expiry/review mechanism | ☐ todo | spec: `specs/18-ci-exemption-allowlist-expiry.md` |
+| 19 | Workaround tracking default-on | ☐ todo | spec: `specs/19-workaround-tracking-default-on.md` |
+| 20 | Commit `compliance.yml` as active default | ☐ todo | spec: `specs/20-ship-compliance-yml-committed.md` |
+| 21 | Quality-gate loop re-entry anchored to Roadmap row | ☐ todo | spec: `specs/21-quality-gate-row-anchor.md` |
 
 **Rules:**
 - One row per milestone; row number stable, never reused (follows ADR-number convention). A split = new row + note on old row.
-- `Design source` names the type explicitly: `spec:` and/or `adr:` links.
+- `Design source` names the type explicitly: `spec:` and/or `adr:` links. `spec:` paths are reserved at row-creation even if the file does not yet exist on disk.
 - Milestone ↔ Spec is 1:1 mandatory; Milestone → ADR is 0:1 or 1:N (only when a structural decision occurred; the ADR's `## References` back-links the row number).
 - Status = implementation state: ☐ todo / ◐ in-progress / ☑ done / ✗ dropped. Dropped rows stay (history not rewritten).
 - Index only — never duplicate acceptance criteria or rationale; the linked Spec/ADR is the source of truth.
@@ -148,7 +165,7 @@ Single entry point mapping each milestone to its authoritative design source. Ea
 
 1. **Issue Analysis**: Feed issues to the orchestrator via GitHub MCP or copy-paste. For defect reports, the orchestrator runs the **ours vs. upstream triage** (3-step protocol via docs-researcher) before deciding the workflow path
 2. **Product Planning**: The product-manager creates a spec, user stories, and acceptance criteria using `.claude/templates/spec-template.md`
-3. **Research & Reuse**: Search GitHub, package registries, and docs before writing new code. When the result will inform a decision (architecture, library selection, API usage, version pin), invoke the **verification-layer** Skill — research domain (`.claude/skills/verification-layer/research/protocol.md`; shared invariants in `.claude/skills/verification-layer/SKILL.md`). The `docs-researcher` (Generator) declares a Tier and the `research-critic` (Critic) reviews using a different tool family with primary-source-only citation. Default config in `.claude/verification.yml.example`; opt out via `research.enabled: false`. The same Skill also covers the **implementation** and **design** domains (default-off; opt in per domain). See ADR-008 (research) and ADR-010 (generalization) for rationale.
+3. **Research & Reuse**: Search GitHub, package registries, and docs before writing new code. When the result will inform a decision (architecture, library selection, API usage, version pin), invoke the **verification-layer** Skill — research domain (`.claude/skills/verification-layer/research/protocol.md`; shared invariants in `.claude/skills/verification-layer/SKILL.md`). The `docs-researcher` (Generator) declares a Tier and the `research-critic` (Critic) reviews using a different tool family with primary-source-only citation. Default config in `.claude/verification.yml`; opt out via `research.enabled: false`. The same Skill also covers the **implementation** and **design** domains (default-off; opt in per domain). See ADR-008 (research) and ADR-010 (generalization) for rationale.
 4. **Architecture**: The architect designs the solution; significant decisions are recorded as ADRs using `.claude/templates/adr-template.md`
 5. **Implementation**: The implementer writes code following TDD (RED → GREEN → IMPROVE). When the implementation is a workaround for an upstream defect, the implementer also places a `WORKAROUND-UPSTREAM(<owner>/<repo>#<issue>, fixed=>=<version>)` marker and copies `.claude/templates/workaround-template.md` to `workarounds/NNN-*.md` (the default `registry_dir`; or `docs/workarounds/NNN-*.md` if you keep a `docs/` tree — match `registry_dir` in `.github/workaround-tracker.yml`)
 6. **Quality Gate**: The code-reviewer (delegates language depth to the matching ECC `<lang>-reviewer`, owns template cross-cutting checks), linter, security-reviewer, and performance-engineer validate the implementation
@@ -196,6 +213,7 @@ Derived projects should:
 4. Add framework-specific code style rules (e.g., Biome, Ruff, gofmt).
 5. Keep the universal sections (workflow, testing requirements, code quality).
 6. Fill the Roadmap section as you plan milestones; let `product-manager` own row creation.
-7. If you do not plan to use Developer Learning Mode, delete `.claude/meta/`,
+7. To activate CodeQL scanning, create a repository variable `CODEQL_ENABLED=true` in GitHub Settings > Secrets and variables > Actions > Variables tab; absent or any other value keeps the job skipped.
+8. If you do not plan to use Developer Learning Mode, delete `.claude/meta/`,
    `.github/workflows/learn-invariants.yml`, and the
    `## Developer Learning Mode` section above.

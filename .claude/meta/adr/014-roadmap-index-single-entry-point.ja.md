@@ -198,3 +198,161 @@ CLAUDE.md、エージェントプロンプト、テンプレート自体の変�
   「Roadmap row: #NN」の例/逆参照が追加される (ダウンストリームタスク)。
 - `.github/workflows/workaround-check.yml` — 後で追加される場合に、
   対象外の drift-check CI が従うべき形。
+
+## Amendment — 2026-05-16 (Spec reservation rule)
+
+本テンプレート自身の `## Roadmap` セクションに監査駆動の 21 マイルストーンを
+投入する dogfooding 作業の中で、`product-manager` は元の決定の 2 つのルールの
+間に実際の緊張を発見した。「マイルストーン ↔ Spec は 1:1 かつ必須」はすべての
+行に `spec:` リンクを要求するが、未着手のマイルストーンに対して 21 本の
+Spec ファイルを先行作成することは無駄であり、マイルストーンが実際に着手される
+時点で行うべきスコープ決定を前倒しすることになる。本 amendment は、その緊張を
+解消した運用上の解釈を批准するものであり、CLAUDE.md の Roadmap セクションに
+すでに反映されている。
+
+**予約ルール (reservation rule)。** すべての Roadmap 行は、行作成時点で
+`spec:` リンクを持つ。パスは `specs/NN-slug.md` という決定論的な形式を使い、
+`NN` は安定した行番号である。Spec **ファイル** は `product-manager` が
+マイルストーンを着手するとき (ステータスが `◐ in-progress` に移行するとき)
+にのみ作成される。予約済みのリンクは行が存在した瞬間から安定して存在し、
+ファイルはその後にディスク上に実体化される。
+
+**これが元の決定に違反しない理由。** 決定の 1:1 必須ルールが制約するのは
+**リンク** であり、**ファイル** ではない: 「すべてのマイルストーン行には
+ちょうど 1 つの `spec:` リンクを持つ」。このプロパティは行作成時点で成立し、
+それ以降変わらない ── マッピングはインデックスのプロパティであり、
+インデックスのみのテーブルがまさに担うものである。ADR-014 が要求するのは
+リンクが *存在し安定していること* であって、ターゲットが *ディスク上に存在すること*
+ではない。また、不変の行番号をキーとする `specs/NN-slug.md` という決定論的な
+パスにより、曖昧さのない安定性が保証される。`implementer`/`test-runner` の
+参照契約は、そのコントラクトが実行されるのが `implementer` がマイルストーンに
+対して呼び出されたときであることから、同様に守られる。本 ADR の書き込み
+オーナーシップモデルにより、`product-manager` は `◐ in-progress` への移行時に
+Spec を作成する ── これはコードが書かれる前であることが構造的に保証されている。
+したがって、`implementer` がポインターを解決してファイルが存在しないという
+ウィンドウは存在しない: 実装ステップに達した行は、オーナーシップルールにより
+すでに Spec が作成されている。予約ルールは 1:1 マッピングが成立することと
+Spec がコードに先行することを弱めることなく、ファイルが書かれる *タイミング*
+を厳密に定める。
+
+**率直に認める緊張。** `product-manager` は、行 #16–#21 が S サイズの
+散文編集 (ステータスの不一致、CHANGELOG の後追い補完、allowlist の有効期限)
+であり、フルの Spec は作業量に対して過剰だと指摘した。予約ルールはこれを
+解消しない ── それらの行も着手時には Spec ファイルを必要とする。
+受け入れた緩和策は、それらの Spec を半ページ程度に留めることである:
+`test-runner` のコントラクトを果たすための受け入れ基準を持つだけで、
+それ以上の形式は要らない。これは意図的な、目を開けたトレードオフである:
+「小さな」マイルストーンに対する例外を設けるのではなく (例外を設けると
+ADR-014 が解消しようとしている「このマイルストーンに Spec はあるか」という
+再発見問題をそのまま再導入してしまう)、1:1 コントラクトを一様に維持し、
+比例コストを Spec の簡潔さとして支払う。
+
+元のステータス行 (`Accepted — 2026-05-15`) は変更しない。本 amendment は
+運用上の解釈を追記するものであり、決定を再開するものではない。日本語版
+(`014-roadmap-index-single-entry-point.ja.md`) は `technical-writer` タスクで
+本 amendment に相当する内容を受け取る必要がある ── 本変更の対象ではない。
+
+## Amendment — 2026-05-16 (CLAUDE.md line-budget vs. the Roadmap)
+
+21 行の Roadmap を投入したことで `.claude/CLAUDE.md` が 220 行に達した。
+`claude-md-authoring` Skill の事後チェックリストには「CLAUDE.md は 200 行以下」
+とあり、その超過の直接の原因は Roadmap の ~25 行 (ヘッダー + テーブル + ルール)
+である。ADR-014 の決定はすでに 100 以上のマイルストーンでのテーブル肥大を
+想定していた (`### Phase N` 分割) が、そのメカニズムは 21 行では役に立たず、
+より根本的には ── Roadmap を *どこかに* 分割することは、単に非実用的なのでは
+なく構造的に不可能である。本 amendment はその解決策を記録する。
+なお、CLAUDE.md 自体の編集は本 ADR では **行わない** (それは下記に
+トレーサビリティのために列挙したダウンストリームの `implementer` タスクである)。
+
+**通常の回避策が Roadmap に対してのみ閉じている理由。** Skill の
+過長 CLAUDE.md に対する修正策は「セクションをサブディレクトリの `CLAUDE.md`
+または Skill に分割する (散文を圧縮するのではなく)」である。この修正策は
+対象セクションが *移動可能* であることを前提としている。Invariant 2
+(`.claude/skills/claude-md-authoring/invariants.md` §2:
+「ルートコンテンツは compaction に残る。サブディレクトリおよびパス指定コンテンツ
+は残らない」) は、Roadmap がまさにその前提が崩れる文書化されたケースにする:
+Roadmap は ADR-014 の単一の常時参照エントリポイントであり、compaction に
+残る場合にのみエントリポイントとして機能する。サブディレクトリの `CLAUDE.md`
+や Skill はオンデマンドでロードされ、compaction 時に要約されてしまう ──
+Roadmap をそこに移動することは、Roadmap を正当化する性質そのものを破壊する。
+Invariant 4 は残りの扉を閉じる: `@path` インポートは「構成を改善するが
+コンテキストトークンを節約しない」。Roadmap *のみ* については、
+再配置によって予算を回収することができない。
+
+**「around 200」ルールの実際の強制ステータス。** これは **volatile rule
+(揮発性ルール) であって invariant (不変条件) ではない**。Skill は次のとおり
+明示している: 「Docs にアクセスできない場合は『around 200』として扱う。
+**CI の hard failure として強制しない**」(SKILL.md §「Volatile rules」)。
+事後の「200 行以下」という行はチェックリストのプロンプトであり、ゲートではない。
+したがって、恒久的な超過は *Skill 自体によって許可されている*。
+唯一の未解決の問いは、その超過が *最小限か* である。
+
+**決定: ハイブリッドアプローチ (回収可能なスラックを回収してから、
+削減不可能な残余を認可する)。** 約半分が compaction 耐久コンテンツに
+触れることなく安価に回収できるときに、~20 行の超過全体を認可済み例外として
+費やすことは最小限ではない。したがって:
+
+1. **Roadmap の行説明を圧縮する。** テーブルはインデックスのみ
+   (リンク先の Spec が Source of Truth) であるため、行テキストは
+   自己説明的な散文である必要はない。安定したスキャン可能なハンドルが
+   あれば十分である。各マイルストーンの 1 行説明を短い名詞句に絞り、
+   括弧書きの補足説明 (「incl. …」「note: …」「A-08/C-06」) をテーブル
+   から外に出す ── それらは Spec/ADR のコンテンツであり、インデックス
+   コンテンツではない。そして行に置くことは決定の「インデックスのみ ──
+   根拠を複製しない」ルールに違反する。目標: 25 行の Roadmap ブロックを
+   21 行すべてを維持しながら ~18–19 行に削減する。
+2. **他の箇所で 1 つのターゲットを絞ったトリミングを行う。**
+   `## Plan-First & Learning-Aware Defaults` セクションの 3 段落目
+   (`coaching-context.sh` フックの仕組み) は、Invariant 2 でロックされた
+   運用上の詳細ではない ── `.claude/meta/adr/004-coaching-pillar.md` と
+   フックファイル自体から完全に再構築可能であり、Invariant 3 の下で
+   コード派生可能なものとして適格である。その段落の仕組みを
+   Learning Mode のメタ参照に移動し、1 行のポインターを残す。
+   ~6 行の真に移動可能なコンテンツを回収する
+   (Learning Mode がアクティブなときにオンデマンドでロードされるため、
+   そのコンテンツに compaction 耐久性は不要である)。
+3. **削減不可能な残余をインラインで認可する。** (1) と (2) の後に残る
+   超過は Invariant 2 が移動を禁じている Roadmap の削減不可能な
+   コアに起因する。CLAUDE.md の `## CLAUDE.md authoring guidance`
+   セクションに、ラインガイダンスが Roadmap に設計上譲歩することを記録する
+   短い認可済み例外ノートを追記する。具体的な文言は下記の
+   `implementer` への指示を参照。
+
+これはハウススタイルの範囲内にある: ADR-014 の既存の決定の *帰結* の
+明確化である (Roadmap はルート CLAUDE.md に存在し、compaction に残る必要がある ──
+すでに決定済み)。加えてダウンストリームの編集指示を含む。
+これは新しい構造的決定ではなく、したがって **独自の ADR を正当化しない**。
+ECC の先例 (ADR-008、ADR-010 は帰結の明確化を amendment に折り込む。
+新しい ADR 番号は新しい構造的決定のために予約する) により、本変更は
+ADR-015 ではなく ADR-014 amendment として位置付けられる。ADR-015 は作成しない。
+
+**`implementer` が CLAUDE.md の `## CLAUDE.md authoring guidance` セクションに
+追記する認可済み例外の文言** (最終段落として追記。既存の段落は変更しない):
+
+> **Sanctioned line-budget exception (per ADR-014 amendment
+> 2026-05-16).** The `## Roadmap` section is exempt from the
+> ~200-line CLAUDE.md guidance. The Roadmap is the single always-read
+> entry point for design artifacts and must survive compaction
+> (Invariant 2), so it cannot be relocated to a subdirectory
+> `CLAUDE.md` or a Skill without defeating its purpose. The "around
+> 200" rule is a volatile guideline, never a hard CI failure; it
+> yields to the Roadmap by design. Reclaim budget by compressing
+> Roadmap row text (index-only) and trimming non-compaction-durable
+> sections elsewhere — not by moving the Roadmap.
+
+**ダウンストリームの `implementer` タスク (トレーサビリティのために記録。
+本 ADR では実施しない):**
+
+- `.claude/CLAUDE.md` — 21 行の Roadmap 行説明を短い名詞句に圧縮する。
+  括弧書きの補足説明をテーブルの外に出す (決定の「インデックスのみ」ルールに
+  従い、Spec/ADR コンテンツである)。
+- `.claude/CLAUDE.md` — `## Plan-First & Learning-Aware Defaults` の
+  `coaching-context.sh` フックの仕組み段落を Learning Mode のメタ参照に
+  移動し、1 行のポインターを残す。
+- `.claude/CLAUDE.md` — 上記の認可済み例外段落を
+  `## CLAUDE.md authoring guidance` に追記する。
+- CLAUDE.md の日本語版 (存在する場合) と本 ADR の日本語版は
+  相当する編集を受け取る ── `technical-writer` タスクであり、
+  本変更の対象ではない。
+
+元のステータス行 (`Accepted — 2026-05-15`) は変更しない。

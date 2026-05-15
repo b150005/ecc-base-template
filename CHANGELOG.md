@@ -30,6 +30,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   dialogue because it breaks the `implementer`/`architect`
   reference contracts; it is permanently recorded in the
   ADR per ADR-012 precedent. Bilingual `.md` and `.ja.md`.
+- ADR-014 gains two amendments (2026-05-16). (1) **Spec
+  reservation rule**: every Roadmap row carries a `spec:`
+  link at row-creation time using the deterministic path
+  `specs/NN-slug.md`; the Spec *file* is authored by
+  `product-manager` only when the milestone is picked up
+  (status moves to `◐ in-progress`). This satisfies the
+  original 1:1 mandatory mapping without requiring all Spec
+  files to exist upfront; the `implementer`/`test-runner`
+  contract fires only after the file is authored, so no
+  window exists where `implementer` resolves the pointer
+  and finds nothing. (2) **CLAUDE.md line-budget sanctioned
+  exception**: the `## Roadmap` section is exempt from the
+  ~200-line CLAUDE.md guidance because it must survive
+  compaction per Invariant 2 and cannot be relocated to a
+  subdirectory `CLAUDE.md` or a Skill without defeating its
+  purpose as the single always-read entry point. The "around
+  200" rule is a volatile guideline, explicitly never a hard
+  CI failure (SKILL.md §"Volatile rules"); it yields to the
+  Roadmap by design. Budget is reclaimed by compressing
+  Roadmap row text (index-only) and trimming genuinely
+  relocatable sections elsewhere — not by moving the Roadmap.
+  Bilingual `.md` and `.ja.md`.
+
+### Added
+
+- This template now dogfoods its own ADR-014 Roadmap. A
+  21-row, gap-analysis-driven milestone backlog was added to
+  `.claude/CLAUDE.md` `## Roadmap`, covering three audit axes:
+  workflow smoothness, documentation/code quality, and
+  template self-improvement. Milestones G1 and G2 shipped in
+  this cycle. **G1** — `.claude/verification.yml` now ships as
+  a committed, active default (research verification is on at
+  fork time, not opt-in-dead); previously only an `.example`
+  file existed, silently disabling the verification layer for
+  every new fork. **G2** — `.github/workflows/security.yml`
+  CodeQL activation changed from a hardcoded `if: false` to a
+  single repository-variable switch `vars.CODEQL_ENABLED`;
+  set the variable to `true` in GitHub Settings > Secrets and
+  variables > Actions > Variables tab to enable scanning;
+  absent or any other value keeps the job skipped. The
+  `vars`-context mechanism for G2 was verified pre-
+  implementation by the verification-layer (docs-researcher
+  Tier 1 → research-critic PASS), which **refuted** an initial
+  `env`-context approach that would have silently never run
+  CodeQL — a concrete example of the verification layer
+  preventing a shipped silent-failure bug.
 
 ## [3.6.1] - 2026-05-10
 

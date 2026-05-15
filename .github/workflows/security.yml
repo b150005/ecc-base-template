@@ -16,8 +16,12 @@ jobs:
       security-events: write
       actions: read
       contents: read
-    # TODO: Remove this line and set languages in the matrix below for derived repos
-    if: false
+    # Activation: create a repository variable CODEQL_ENABLED=true in
+    # GitHub Settings > Secrets and variables > Actions > Variables tab.
+    # Absent or any value other than 'true' → job is skipped (default-off).
+    # Supported languages: javascript, python, go, ruby, java, csharp, cpp, swift, actions
+    # Configure the language matrix in the steps below once the switch is set.
+    if: ${{ vars.CODEQL_ENABLED == 'true' }}
     strategy:
       fail-fast: false
       matrix:
