@@ -1,0 +1,43 @@
+name: Dangling Reference Check
+
+# Verifies that ADR-NNN textual references and .claude/-rooted path mentions
+# in CLAUDE.md, ADR files, Spec files, and agent files resolve to real artifacts.
+# See .claude/meta/scripts/check-dangling-refs.sh and ADR-015 for the rationale.
+#
+# ALWAYS-ON: unlike workaround-check.yml, this workflow requires no per-fork
+# configuration. The subject matter (ADR/CLAUDE.md/Spec cross-references) exists
+# in every fork from day one, so the check is always relevant and always enabled.
+# Derived projects that have no .claude/ tree or specs/ directory may delete this
+# workflow, but the default is on.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".claude/CLAUDE.md"
+      - ".claude/meta/adr/**"
+      - ".claude/agents/**"
+      - "specs/**"
+      - ".claude/meta/scripts/check-dangling-refs.sh"
+      - ".github/workflows/dangling-ref-check.yml"
+  pull_request:
+    paths:
+      - ".claude/CLAUDE.md"
+      - ".claude/meta/adr/**"
+      - ".claude/agents/**"
+      - "specs/**"
+      - ".claude/meta/scripts/check-dangling-refs.sh"
+      - ".github/workflows/dangling-ref-check.yml"
+
+jobs:
+  dangling-ref-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Run dangling reference checks
+        run: bash .claude/meta/scripts/check-dangling-refs.sh

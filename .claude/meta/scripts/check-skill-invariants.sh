@@ -152,6 +152,9 @@ echo "Check 4: local relative-path links resolve"
 # parent traversals). Absolute project paths (e.g. .claude/...) are not
 # checked here because they may be resolved relative to the repo root and
 # would require richer parsing. Reviewers cover those.
+# NOTE: ADR-NNN references and .claude/-rooted path mentions in CLAUDE.md,
+# ADR files, Spec files, and agent files are owned by check-dangling-refs.sh
+# (per ADR-015). This check 4 owns relative-path links in SKILL.md only.
 for d in "${skill_dirs[@]}"; do
   d="${d%/}"
   f="$d/SKILL.md"

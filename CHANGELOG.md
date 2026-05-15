@@ -52,9 +52,86 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Roadmap row text (index-only) and trimming genuinely
   relocatable sections elsewhere — not by moving the Roadmap.
   Bilingual `.md` and `.ja.md`.
+- ADR-015 (`Dangling-Reference Detector — always-on,
+  subject-matter-keyed CI posture`, status `Accepted —
+  2026-05-16`) records the structural decisions for
+  milestone #04: the always-on CI posture (vs. default-off)
+  decided by the subject-matter-presence rule ("a check is
+  always-on when its subject matter is present in every fork
+  from day one; default-off when absent until the adopter
+  opts in"); the MECE scope boundary against
+  `check-skill-invariants.sh` Check 4 (Check 4 owns relative-
+  path links inside `SKILL.md` files; the new detector owns
+  `ADR-NNN` textual references and `.claude/`-rooted path
+  mentions in `CLAUDE.md`, ADRs, Specs, and agent files —
+  a link is validated by exactly one check, never both); the
+  ADR-014 reservation-rule carve-out as a hard constraint
+  (`spec: specs/NN-slug.md` links in the Roadmap `Design
+  source` column are valid-by-design even when the file
+  does not yet exist on disk); and the pattern reuse
+  rule (#05 Roadmap drift CI and #06 bilingual parity CI
+  inherit the always-on posture by the same rule). The
+  subject-matter-presence rule is stated once here so #05
+  and #06 inherit a decided posture rather than re-arguing
+  it. The serious counter-position (Alternative A —
+  default-off / single-switch, consistent with ADR-006) is
+  permanently recorded in the ADR per ADR-012 precedent,
+  with real pros and explicit re-evaluation triggers.
+  ADR-015 also carries a 2026-05-16 amendment adding two
+  carve-outs surfaced during the #04 quality gate: (1)
+  **Class A literal-`N` placeholder skip** — `specs/NN-slug.md`
+  and `ADR-NNN` with literal `N` numeric slots are
+  metasyntactic documentation placeholders, categorically
+  identical to the existing glob/template-token skip, and
+  are not failed; (2) **Class B opt-in/default-off config
+  WARN-not-FAIL** — references to intentionally-absent
+  `.claude/`-rooted `.json`/`.yml`/`.yaml` config files
+  are WARN (not FAIL) when a co-located opt-in signal is
+  present (a sibling `<path>.example` exists on disk, or
+  the referencing-line paragraph carries an `absent`,
+  `default-off`, or `opt-in` vocabulary token); a bare
+  absent config path without co-located signal remains FAIL.
+  The line-level `<!-- ref-allow: -->` escape hatch absorbs
+  genuinely forward-looking references per-line without
+  disabling the check. Bilingual `.md` and `.ja.md`.
 
 ### Added
 
+- Milestone #04 ships an always-on CI detector for dangling
+  ADR/skill cross-references. Two artifacts:
+  - `.github/workflows/dangling-ref-check.yml` — always-on,
+    path-scoped workflow modeled on `skill-invariants.yml`:
+    runs on every push and pull request to `main` touching
+    the scanned document trees or the script/workflow
+    themselves; single `check` job; `permissions: contents:
+    read`; `timeout-minutes: 5`. No per-fork configuration
+    variable or config file required.
+  - `.claude/meta/scripts/check-dangling-refs.sh` — the
+    detector script (`set -euo pipefail`, `pass`/`warn`/
+    `fail_check` accumulator, `exit "$fail"`). Implements
+    two checks: (1) `ADR-NNN` textual references in
+    `CLAUDE.md`, ADRs, Specs, and agent files — normalized
+    to 3-digit zero-pad, verified against `.claude/meta/adr/`;
+    fenced code blocks and inline code spans skipped.
+    (2) `.claude/`-rooted path mentions and non-reservation
+    `specs/` references in `CLAUDE.md` and Specs — verified
+    to resolve on disk; ADR and agent files excluded
+    (historical/conceptual references). The two checks are
+    MECE-bounded against `check-skill-invariants.sh` Check 4
+    (per ADR-015): Check 4 owns relative-path links inside
+    `SKILL.md` files; this detector owns the rest. ADR-014
+    reservation-rule carve-out applied: `specs/NN-slug.md`
+    references in the Roadmap `Design source` column pass
+    even when the file does not yet exist on disk.
+    Class A literal-`N` placeholder paths (e.g.
+    `specs/NN-slug.md` in documentation prose) are skipped.
+    Class B opt-in/default-off absent `.claude/` config
+    paths emit WARN-not-FAIL when a co-located opt-in
+    signal is present. Line-level `<!-- ref-allow: -->`
+    escape hatch available for genuinely forward-looking
+    references. Template passes its own check at ship time
+    with zero suppressions in `CLAUDE.md` — the Spec's
+    Leading metric satisfied verbatim.
 - This template now dogfoods its own ADR-014 Roadmap. A
   21-row, gap-analysis-driven milestone backlog was added to
   `.claude/CLAUDE.md` `## Roadmap`, covering three audit axes:

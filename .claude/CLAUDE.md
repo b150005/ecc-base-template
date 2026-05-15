@@ -133,7 +133,7 @@ Single entry point mapping each milestone to its authoritative design source. Ea
 | 01 | Commit `verification.yml` as active default | ☑ done | spec: `specs/01-ship-verification-yml-committed.md` |
 | 02 | CodeQL single-switch activation via repository variable | ☑ done | spec: `specs/02-codeql-single-switch-activation.md` |
 | 03 | Cross-session milestone progress persistence | ☐ todo | spec: `specs/03-cross-session-progress-persistence.md` |
-| 04 | CI detector for dangling ADR/skill cross-references | ☐ todo | spec: `specs/04-dangling-reference-detector.md` |
+| 04 | CI detector for dangling ADR/skill cross-references | ☑ done | spec: `specs/04-dangling-reference-detector.md`<br>adr: `.claude/meta/adr/015-dangling-reference-detector.md` |
 | 05 | Roadmap drift-detection CI | ☐ todo | spec: `specs/05-roadmap-drift-detection-ci.md` |
 | 06 | EN/JA bilingual parity detector | ☐ todo | spec: `specs/06-bilingual-parity-detector.md` |
 | 07 | Roadmap status-transition ownership assignment | ☐ todo | spec: `specs/07-roadmap-status-transitions.md` |
