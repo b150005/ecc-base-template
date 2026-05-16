@@ -168,6 +168,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   remains `◐ in-progress` (this session is step 7 Documentation;
   steps 8–9 Release/Commit are pending). Bilingual `.md` and
   `.ja.md` for the template.
+- **Milestone #05 — design only; implementation deferred.**
+  Spec `specs/05-roadmap-drift-detection-ci.md` (Approved) defines the
+  Roadmap index↔reality drift-detection CI — the deferred mitigation
+  ADR-014 §Consequences → Negative explicitly names. ADR-017 (`Roadmap
+  drift-detection CI — bidirectional-link contract, status-glyph
+  well-formedness, MECE-bounded against #04`, status `Accepted —
+  2026-05-16`) records four structural decisions for this milestone:
+  (1) **Three drift classes** — forward direction of the bidirectional
+  contract (a Roadmap row's `adr:` link points to an ADR that exists on
+  disk but whose `## References` section lacks a matching
+  `Roadmap row: #NN` back-link); reverse direction (an ADR's
+  `Roadmap row: #NN` back-link names a row whose `adr:` cell does not
+  list that ADR); and status-glyph well-formedness (any glyph other than
+  ☐ / ◐ / ☑ / ✗). Non-existent `adr:` targets also FAIL — unlike
+  `spec:` reserved links, an `adr:` link is added only when the ADR is
+  written so a missing target is never valid-by-design. (2) **MECE
+  contract-partition boundary against the #04 detector** — the split is
+  drawn on *contract*, not file type: #04's `check-dangling-refs.sh`
+  owns reference *resolution* ("does the pointer resolve?"); #05's
+  `check-roadmap-drift.sh` owns index *consistency* ("does the
+  bidirectional contract hold and is every glyph sanctioned?"). A single
+  defect maps to exactly one owner. The deliberate narrow overlap — a
+  Roadmap `adr:` link to a non-existent file FAILing both checks — is a
+  stronger signal, not a boundary violation. (3) **Absence-of-claim
+  exemption** — an ADR is exempt from the bidirectional contract iff its
+  `## References` section carries no `Roadmap row:` line at all.
+  Absence is the valid-by-design state; only a present claim that is
+  inconsistent is drift. This mirrors the discipline of ADR-015's
+  reservation carve-out and Reference-intent rule: keyed to a
+  co-located structural signal, never a path allowlist. (4) **Always-on
+  CI posture inherited from ADR-015** — ADR-015 §Decision point 3 fixed
+  this milestone's always-on posture via the subject-matter-presence
+  rule (naming #05 explicitly); ADR-017 records the posture as inherited
+  and does not re-litigate it. The serious counter-proposal (Alternative
+  A — extend `check-dangling-refs.sh` to also check bidirectional
+  consistency, one script and one workflow) is permanently recorded in
+  ADR-017 with real pros and explicit re-evaluation triggers per the
+  ADR-012/ADR-014/ADR-015/ADR-016 convention. **Implementation is
+  deliberately deferred to a future session**: no detector script
+  (`check-roadmap-drift.sh`), no workflow (`roadmap-drift-check.yml`),
+  and no test suite have been written in this change — they are recorded
+  as downstream `implementer` tasks in ADR-017 §Consequences → Neutral
+  for traceability. Roadmap row #05 remains `◐ in-progress`. Bilingual
+  `.md` and `.ja.md` for both `specs/05-roadmap-drift-detection-ci.md`
+  and ADR-017.
 
 ### Added
 
