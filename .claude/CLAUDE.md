@@ -135,7 +135,7 @@ Single entry point mapping each milestone to its authoritative design source. Ea
 | 03 | Cross-session milestone progress persistence | ☑ done | spec: `specs/03-cross-session-progress-persistence.md`<br>adr: `.claude/meta/adr/016-cross-session-progress-persistence.md` |
 | 04 | CI detector for dangling ADR/skill cross-references | ☑ done | spec: `specs/04-dangling-reference-detector.md`<br>adr: `.claude/meta/adr/015-dangling-reference-detector.md` |
 | 05 | Roadmap drift-detection CI | ☑ done | spec: `specs/05-roadmap-drift-detection-ci.md`<br>adr: `.claude/meta/adr/017-roadmap-drift-detector.md` |
-| 06 | EN/JA bilingual parity detector | ☐ todo | spec: `specs/06-bilingual-parity-detector.md` |
+| 06 | EN/JA bilingual parity detector | ◐ in-progress | spec: `specs/06-bilingual-parity-detector.md`<br>adr: `.claude/meta/adr/018-bilingual-parity-detector.md` |
 | 07 | Roadmap status-transition ownership assignment | ☐ todo | spec: `specs/07-roadmap-status-transitions.md` |
 | 08 | Orchestrator Analyze row-guard | ☐ todo | spec: `specs/08-orchestrator-row-guard.md` |
 | 09 | Spec filename convention alignment (`NN-slug.md`) | ☐ todo | spec: `specs/09-spec-filename-convention.md` |

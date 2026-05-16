@@ -213,6 +213,61 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   for traceability. Roadmap row #05 remains `◐ in-progress`. Bilingual
   `.md` and `.ja.md` for both `specs/05-roadmap-drift-detection-ci.md`
   and ADR-017.
+- **Milestone #06 — design only; implementation deferred.**
+  Spec `specs/06-bilingual-parity-detector.md` (Approved) defines the
+  EN/JA bilingual parity detector — three parity dimensions (heading-tree
+  parity by level+position, full-width-parenthesis detection in `.ja.md`
+  files, presence parity) across 11 acceptance criteria, with an always-on
+  CI posture inherited from ADR-015 §Decision point 3 (which names #06
+  explicitly). ADR-018 (`EN/JA bilingual parity detector —
+  convention-presence in-scope keying, level+position heading
+  normalization, three-way MECE-by-contract against #04 and #05`, status
+  `Accepted — 2026-05-16`) records four structural decisions: (1)
+  **In-scope tree set keyed to the presence of the bilingual convention
+  itself** — a tree is in-scope iff it contains at least one `.ja.md`
+  file. This is a structural pattern-keyed rule, not an enumerated
+  allowlist (the ADR-017 §4 anti-pattern). It supersedes the Spec's
+  conservative interim default and auto-includes new bilingual trees on
+  first `.ja.md` arrival, auto-excludes trees that drop their last
+  `.ja.md`, with no script edit. (2) **EN-only carve-out subsumed by
+  Decision 1** — no separate per-file carve-out signal is required. A
+  tree with zero `.ja.md` files is not in-scope by Decision 1; an
+  unpaired `.md` inside an otherwise-bilingual tree is a presence-parity
+  failure. The only sanctioned EN-only state is "the whole tree is
+  EN-only," eliminating the forbidden per-file path allowlist. (3)
+  **Heading-normalization compares (level, position) only, never heading
+  text** — JA heading text is a translation and must never be
+  string-compared against EN. Numbered prefixes (e.g. `## 1. Context`
+  vs. `## 1. コンテキスト`) are already handled by level+position
+  matching; no prefix-stripping is introduced (it would be dead code and
+  speculative generality). Fenced code block skipping is inherited from
+  #04/#05 unmodified. (4) **Parsing-approach: single-pass with
+  fence-skip, `<!-- ref-allow: -->` escape hatch reused UNMODIFIED from
+  #04/#05** — the same token, same per-line semantics, no new escape
+  syntax, keeping the conceptual load flat across all three detectors.
+  Three-way MECE-by-contract boundary against #04 and #05: #04 owns
+  reference *resolution*, #05 owns Roadmap *index consistency*, #06 owns
+  EN↔JA *translation parity*; the concrete proof the boundary is
+  load-bearing before #06 ships is that `check-roadmap-drift.sh`
+  (milestone #05, shipped this session) already excludes `.ja.md` from
+  its reverse-direction scan, citing #06 as the contract owner. The
+  serious counter-proposal (fold bilingual parity into
+  `check-roadmap-drift.sh` or `check-dangling-refs.sh` — Alternative A)
+  is permanently recorded in ADR-018 with real pros and explicit
+  re-evaluation triggers, per the ADR-012/ADR-014/ADR-015/ADR-016/ADR-017
+  convention. **Implementation is deliberately deferred to a future
+  session**: no detector script
+  (`.claude/meta/scripts/check-bilingual-parity.sh`), no workflow
+  (`.github/workflows/bilingual-parity-check.yml`), and no test suite
+  have been written in this change — they are recorded as downstream
+  `implementer` tasks in ADR-018 §Consequences → Neutral for
+  traceability. Roadmap row #06 remains `◐ in-progress`. Bilingual `.md`
+  and `.ja.md` for `specs/06-bilingual-parity-detector.md` (both authored
+  by `product-manager` this session). Note: the Japanese counterpart of
+  ADR-018 itself (`018-bilingual-parity-detector.ja.md`) has **not** been
+  written in this change — it is owned by `technical-writer` and deferred
+  to a future session, exactly as ADR-017's `.ja.md` was deferred at its
+  design-only landing.
 
 ### Added
 
