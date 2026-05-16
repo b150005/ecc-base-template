@@ -14,6 +14,14 @@
 # A link is validated by exactly one of these two checks, never both.
 # See ADR-015 for the full scope-boundary rationale.
 #
+# MECE boundary against check-roadmap-drift.sh (#05, ADR-017 §2): this
+# script owns reference RESOLUTION (does a pointer resolve to a real
+# file/ADR?). Roadmap bidirectional-link and status-glyph consistency is
+# owned by check-roadmap-drift.sh per ADR-017 — that is index CONSISTENCY,
+# a different contract on the same files. The single deliberate overlap (a
+# Roadmap `adr:` link whose target is absent) fails both checks by design:
+# a stronger signal, not a boundary violation (ADR-017 §2).
+#
 # ADR-014 Reservation-rule carve-out (KEYED TO ROADMAP Design-source COLUMN ONLY):
 #   ADR-014's Spec reservation rule makes a Roadmap `spec: specs/NN-slug.md`
 #   link valid-by-design even when the file does not yet exist on disk.

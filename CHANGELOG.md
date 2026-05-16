@@ -216,6 +216,54 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Milestone #05 — now IMPLEMENTED** (design landed previously
+  under Documentation; implementation completed this session per
+  ADR-017 §Consequences → Neutral downstream tasks). An always-on
+  CI detector for Roadmap index↔reality drift. Three artifacts:
+  - `.claude/meta/scripts/check-roadmap-drift.sh` — the detector
+    (`set -euo pipefail`, `git rev-parse` root resolution,
+    `pass`/`warn`/`fail_check` accumulator, `fail=0`,
+    `GITHUB_STEP_SUMMARY` support, line-level
+    `<!-- ref-allow: -->` escape hatch reused unmodified from
+    #04). Three checks: (1) Status-glyph well-formedness — every
+    Roadmap row's Status cell must hold one of the four
+    ADR-014-sanctioned glyphs (☐ / ◐ / ☑ / ✗). (2) Forward
+    bidirectional contract — a row's `adr:` target must exist on
+    disk AND back-link the row via `Roadmap row: #NN` in its
+    `## References`; a non-existent `adr:` target also FAILs (no
+    reservation carve-out, unlike `spec:` links). (3) Reverse
+    bidirectional contract — an ADR carrying a `Roadmap row: #NN`
+    back-link must be listed in row `#NN`'s `adr:` cell. The
+    Design-source cell is parsed as a `<br>`-joined unit and
+    *every* `adr:` link is extracted (ADR-014 permits 1:N;
+    line-greedy single-match parsing is forbidden per ADR-017
+    §4). The absence-of-claim exemption is keyed structurally:
+    an ADR with no `Roadmap row:` back-link line is exempt — no
+    ADR-filename allowlist (the anti-pattern ADR-015's amendment
+    rejected). `.ja.md` translations are excluded from the
+    reverse scan as derived artifacts (EN/JA back-link parity is
+    milestone #06's distinct contract, a Spec Non-goal here).
+  - `.github/workflows/roadmap-drift-check.yml` — always-on,
+    path-scoped workflow modeled on `dangling-ref-check.yml`:
+    runs on every push and pull request to `main` touching
+    `.claude/CLAUDE.md`, the ADR tree, or the script/workflow
+    themselves; single `roadmap-drift-check` job;
+    `permissions: contents: read`; `timeout-minutes: 5`. The
+    always-on posture is **inherited** from ADR-015's
+    subject-matter-presence rule (§Decision point 3 names #05),
+    not re-litigated (ADR-017 §3). No per-fork configuration.
+  - `.claude/meta/scripts/test-check-roadmap-drift.sh` — TDD
+    suite (15 tests) covering all eight `specs/05` acceptance
+    criteria Given/When/Then plus the multi-`adr:` `<br>`-cell
+    parse, the `.ja.md` boundary, and zero-pad robustness.
+    `.claude/meta/scripts/check-dangling-refs.sh` gains a
+    reciprocal one-line MECE-boundary header note so the
+    resolution-vs-consistency partition is discoverable from
+    both sides (ADR-017 §2). Template passes its own
+    `check-roadmap-drift.sh` at ship time with zero
+    suppressions — the Spec's Leading metric and the
+    green-by-construction requirement satisfied verbatim.
+    Roadmap row #05 flips `◐ in-progress` → `☑ done`.
 - Milestone #04 ships an always-on CI detector for dangling
   ADR/skill cross-references. Two artifacts:
   - `.github/workflows/dangling-ref-check.yml` — always-on,
