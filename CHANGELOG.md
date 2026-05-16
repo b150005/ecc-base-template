@@ -94,6 +94,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   The line-level `<!-- ref-allow: -->` escape hatch absorbs
   genuinely forward-looking references per-line without
   disabling the check. Bilingual `.md` and `.ja.md`.
+- **Milestone #03 — design only; implementation deferred.**
+  Spec `specs/03-cross-session-progress-persistence.md`
+  (Approved) defines cross-session per-milestone in-progress
+  persistence: a `◐` milestone is resumable across a
+  session or compaction boundary without violating ADR-014's
+  index-only Roadmap contract. ADR-016 (`Cross-session
+  milestone progress persistence — repo-local, row-keyed,
+  boundary-triggered`, status `Accepted — 2026-05-16`)
+  records four structural decisions: (1) **Storage location
+  and path convention** — a single repo-local Markdown file
+  at the deterministic path `specs/NN-progress.md`, keyed to
+  the stable, never-reused Roadmap row number; on disk and
+  git-tracked, so compaction-durable without operator action
+  (Invariant 2); outside the Roadmap table (ADR-014); within
+  the already-scoped `specs/` tree (no detector change). (2)
+  **Trigger model** — boundary-triggered (created/updated
+  only when a session or compaction boundary occurs during a
+  `◐` milestone, decided by the inherited subject-matter-
+  presence rule from ADR-015; never on the ☐→◐ transition
+  and never by operator command). (3) **Staleness recognition**
+  — layered: glyph mirror (`status_glyph` must equal the
+  Roadmap row glyph; mismatch ⇒ stale by definition), `head_sha`
+  pin (enables bounded delta reconciliation via
+  `git log <sha>..HEAD`), and `last_updated` date (coarse
+  secondary signal). (4) **Retirement on ◐ → ☑** — the agent
+  that flips the glyph deletes `specs/NN-progress.md` in the
+  same change; deletion not archival (retained record
+  misleads per Spec R-03; git history recovers if needed).
+  The record runs alongside (not replacing) `/save-session`
+  ↔ `/resume-session` by a clean scope partition: the global
+  commands answer "what was I doing this session"; the
+  milestone record answers "what is the in-flight state of
+  this specific milestone." The counter-proposal (Alternative
+  A — rely entirely on `~/.claude/session-data/`, add no
+  repo-local record) is permanently recorded in ADR-016 per
+  ADR-012/ADR-014/ADR-015 precedent, with concrete re-
+  evaluation triggers. **Implementation is deliberately
+  deferred to a future session**: no progress-template file,
+  no agent-prompt amendments, no `## Development Workflow`
+  sentence, and no detector-fixture test have been added in
+  this change. Roadmap row #03 remains `◐ in-progress`.
+  Bilingual `.md` and `.ja.md`.
 
 ### Added
 
