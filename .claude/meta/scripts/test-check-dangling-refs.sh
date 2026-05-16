@@ -517,6 +517,72 @@ EOF
 
 # -----------------------------------------------------------------------
 echo ""
+echo "New#4 — real on-disk specs/NN-progress.md referenced from CLAUDE.md → no finding (ADR-016 detector-compat)"
+# -----------------------------------------------------------------------
+# ADR-016 downstream task: prove the boundary-triggered progress record
+# (specs/03-progress.md, a real-digit path that EXISTS on disk because the
+# boundary trigger creates it before anything references it) resolves
+# normally in Check 2 and produces no dangling-reference finding. No
+# detector code change is anticipated — specs/ is already fully scoped.
+{
+  repo="$(make_repo)"
+  mkdir -p "$repo/.claude" "$repo/specs"
+  # The progress record exists on disk (boundary-trigger create-before-reference)
+  cat > "$repo/specs/03-progress.md" <<'EOF'
+---
+roadmap_row: 3
+status_glyph: "◐"
+workflow_step: 5
+---
+## Done
+- Step 4 (Architecture) — ADR-016 written
+EOF
+  # CLAUDE.md references the real-digit progress path that exists on disk
+  cat > "$repo/.claude/CLAUDE.md" <<'EOF'
+# Test CLAUDE.md
+In-flight state persists to `specs/03-progress.md` per ADR-016.
+EOF
+  add_adr "$repo" 16 "cross-session-progress-persistence"
+
+  exit_code="$(run_detector "$repo")" || true
+  if [[ "$exit_code" == "0" ]]; then
+    pass_test "New#4: real on-disk specs/03-progress.md resolves normally — no false positive"
+  else
+    fail_test "New#4: expected exit 0 for existing specs/03-progress.md, got exit $exit_code"
+  fi
+  rm -rf "$repo"
+}
+
+# -----------------------------------------------------------------------
+echo ""
+echo "New#4b — referenced-but-absent real-digit specs/NN-progress.md → STILL fails (create-before-reference invariant pinned)"
+# -----------------------------------------------------------------------
+# The boundary-trigger ordering means a referenced progress path is
+# always created before it is referenced, so this state should not occur
+# in practice. This test pins the invariant: if a real-digit progress
+# path is referenced while ABSENT, the detector still catches it as the
+# intended-present/actually-absent failure mode (not silently exempted).
+{
+  repo="$(make_repo)"
+  mkdir -p "$repo/.claude"
+  cat > "$repo/.claude/CLAUDE.md" <<'EOF'
+# Test CLAUDE.md
+See `specs/03-progress.md` for the in-flight state of this milestone.
+EOF
+  add_adr "$repo" 16 "cross-session-progress-persistence"
+  # specs/03-progress.md is NOT created — real digits, absent, must fail
+
+  exit_code="$(run_detector "$repo")" || true
+  if [[ "$exit_code" == "1" ]]; then
+    pass_test "New#4b: absent real-digit specs/03-progress.md still fails — create-before-reference invariant pinned"
+  else
+    fail_test "New#4b: expected exit 1 for absent specs/03-progress.md, got exit $exit_code"
+  fi
+  rm -rf "$repo"
+}
+
+# -----------------------------------------------------------------------
+echo ""
 echo "Summary"
 echo "======="
 echo "  Passed: $PASS_COUNT"

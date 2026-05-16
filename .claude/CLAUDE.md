@@ -132,7 +132,7 @@ Single entry point mapping each milestone to its authoritative design source. Ea
 |---|-----------|--------|---------------|
 | 01 | Commit `verification.yml` as active default | ☑ done | spec: `specs/01-ship-verification-yml-committed.md` |
 | 02 | CodeQL single-switch activation via repository variable | ☑ done | spec: `specs/02-codeql-single-switch-activation.md` |
-| 03 | Cross-session milestone progress persistence | ◐ in-progress | spec: `specs/03-cross-session-progress-persistence.md`<br>adr: `.claude/meta/adr/016-cross-session-progress-persistence.md` |
+| 03 | Cross-session milestone progress persistence | ☑ done | spec: `specs/03-cross-session-progress-persistence.md`<br>adr: `.claude/meta/adr/016-cross-session-progress-persistence.md` |
 | 04 | CI detector for dangling ADR/skill cross-references | ☑ done | spec: `specs/04-dangling-reference-detector.md`<br>adr: `.claude/meta/adr/015-dangling-reference-detector.md` |
 | 05 | Roadmap drift-detection CI | ☐ todo | spec: `specs/05-roadmap-drift-detection-ci.md` |
 | 06 | EN/JA bilingual parity detector | ☐ todo | spec: `specs/06-bilingual-parity-detector.md` |
@@ -173,6 +173,8 @@ Single entry point mapping each milestone to its authoritative design source. Ea
 7. **Documentation**: The technical-writer updates docs and changelog. When a workaround is removed, the technical-writer maps `user_impact` to the appropriate CHANGELOG category (`internal` / `changed` / `fixed`)
 8. **Release**: The devops-engineer manages deployment and release
 9. **Commit**: Conventional commits format (feat, fix, refactor, docs, test, chore, perf, ci)
+
+When an `◐ in-progress` milestone crosses a session or compaction boundary, its in-flight workflow state persists to `specs/NN-progress.md` (`NN` = the Roadmap row number) per ADR-016 — created/updated by `product-manager`/`implementer` at the boundary, read by `orchestrator` at the Analyze step, deleted on the `◐ → ☑`/`✗` flip, and composable with (not a replacement for) `/save-session`.
 
 ### Upstream workaround lifecycle
 

@@ -136,6 +136,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   sentence, and no detector-fixture test have been added in
   this change. Roadmap row #03 remains `◐ in-progress`.
   Bilingual `.md` and `.ja.md`.
+- **Milestone #03 — ADR-016 now IMPLEMENTED.** The design
+  (ADR-016, `Accepted — 2026-05-16`) landed in a prior
+  session; this session ships the full implementation. Four
+  artifacts: (1) **`.claude/templates/progress-template.md`**
+  (+ **`.ja.md`**) — a paste-in skeleton with YAML front-matter
+  (`roadmap_row`, `milestone`, `status_glyph`, `workflow_step`,
+  `last_updated`, `head_sha`, `spec_exists`, `adr_links`) and
+  three body sections (Done / Next concrete action / Notes /
+  why work stopped), matching the schema in ADR-016 Decision 1.
+  The template is English-only by convention (same as the
+  upstream-workaround registry: transient in-flight state, no
+  translation drift); the `.ja.md` sibling covers template
+  usage instructions per ADR-005 bilingual convention.
+  (2) **Agent-prompt boundary-persistence contracts** — three
+  agent prompts (`product-manager`, `implementer`,
+  `orchestrator`) each gain one boundary-triggered
+  responsibility: `product-manager`/`implementer` create
+  `specs/NN-progress.md` at the first session/compaction
+  boundary while a milestone is `◐`; `implementer` updates
+  it when a boundary is anticipated and deletes it on the
+  `◐→☑`/`✗` glyph flip; `orchestrator` reads it at the
+  Analyze step and states explicitly when absent. (3) **One
+  sentence in `.claude/CLAUDE.md` `## Development Workflow`**
+  describing the boundary-persistence contract (per ADR-016,
+  composable with `/save-session`). (4) **Two detector
+  fixtures** added to `test-check-dangling-refs.sh` confirming
+  that an on-disk `specs/NN-progress.md` produces no
+  dangling-reference finding, and that the boundary-trigger
+  create-before-reference ordering holds. Roadmap row #03
+  remains `◐ in-progress` (this session is step 7 Documentation;
+  steps 8–9 Release/Commit are pending). Bilingual `.md` and
+  `.ja.md` for the template.
 
 ### Added
 

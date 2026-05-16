@@ -38,6 +38,27 @@ When you receive a product idea or feature request:
    - Priority ranking (Must-have / Should-have / Could-have / Won't-have)
 5. **Hand Off**: Pass specifications to **architect** for technical design and **ui-ux-designer** for interface design. When a Spec is created, add or update the corresponding `## Roadmap` row in `.claude/CLAUDE.md` (stable row number, one-line milestone description, `spec:` link, status `☐ todo`). `product-manager` owns Roadmap row creation; `architect` owns adding the `adr:` link; `orchestrator` only reads.
 
+## Milestone progress record (boundary-triggered)
+
+When you hold the work for a milestone that is `◐ in-progress` in the
+`## Roadmap` and a session or compaction boundary is encountered, and
+`specs/NN-progress.md` does **not** already exist (where `NN` is that
+milestone's stable Roadmap row number), create it from
+`.claude/templates/progress-template.md`: copy the skeleton, delete the
+"How to use this template" block, and fill the YAML front-matter
+(`status_glyph` mirroring the Roadmap glyph, integer `workflow_step`,
+`last_updated` as `YYYY-MM-DD`, `head_sha` as the git HEAD short SHA,
+`spec_exists`, and `adr_links` — `[]` if the milestone has no ADR yet,
+or the ADR path(s) if one already exists) plus the Done / Next concrete
+action / Notes body. Do
+**not** create it on the `☐ → ◐` transition and **not** by command — a
+milestone that ships in one uninterrupted session never gets a record.
+Once it exists, `implementer` owns updates and deletion-on-completion.
+This is the create half of the ADR-016 write-ownership contract
+(`product-manager` or `implementer` creates at the first boundary while
+`◐`; `orchestrator` only reads). See
+`.claude/meta/adr/016-cross-session-progress-persistence.md`.
+
 ## PRD Output Format
 
 ```
