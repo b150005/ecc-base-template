@@ -138,7 +138,7 @@ Single entry point mapping each milestone to its authoritative design source. Ea
 | 06 | EN/JA bilingual parity detector | ☑ done | spec: `specs/06-bilingual-parity-detector.md`<br>adr: `.claude/meta/adr/018-bilingual-parity-detector.md` |
 | 07 | Roadmap status-transition ownership assignment | ☑ done | spec: `specs/07-roadmap-status-transitions.md` |
 | 08 | Orchestrator Analyze row-guard | ☑ done | spec: `specs/08-orchestrator-row-guard.md` |
-| 09 | Spec filename convention alignment (`NN-slug.md`) | ◐ in-progress | spec: `specs/09-spec-filename-convention.md` |
+| 09 | Spec filename convention alignment (`NN-slug.md`) | ☑ done | spec: `specs/09-spec-filename-convention.md` |
 | 10 | Spec/ADR directory location pin in CLAUDE.md | ☐ todo | spec: `specs/10-spec-adr-directory-pinning.md` |
 | 11 | Opt-in trigger guidance for implementation/design verification domains | ☐ todo | spec: `specs/11-verification-domain-opt-in-guidance.md` |
 | 12 | CI coverage gate (80% hard check) | ☐ todo | spec: `specs/12-coverage-ci-gate.md` |
@@ -155,6 +155,7 @@ Single entry point mapping each milestone to its authoritative design source. Ea
 **Rules:**
 - One row per milestone; row number stable, never reused (follows ADR-number convention). A split = new row + note on old row.
 - `Design source` names the type explicitly: `spec:` and/or `adr:` links. `spec:` paths are reserved at row-creation even if the file does not yet exist on disk.
+- Spec filename convention: a Spec file is `specs/NN-slug.md` where `NN` is the row number zero-padded to a two-digit minimum (`1→01`; rows ≥100 written without extra padding) and `slug` is the kebab-case slug already fixed in the row's reserved `spec:` path (copy it from the row, do not re-derive). The JA sibling is `specs/NN-slug.ja.md` (same `NN`/`slug`, `.ja` before `.md`); its heading-tree parity is owned by #06. `specs/NN-progress.md` is excluded — `progress` is ADR-016's reserved suffix, governed by ADR-016's lifecycle, not by this convention. #10 pins the directory; #09 pins the filename — MECE.
 - Milestone ↔ Spec is 1:1 mandatory; Milestone → ADR is 0:1 or 1:N (only when a structural decision occurred; the ADR's `## References` back-links the row number).
 - Status = implementation state: ☐ todo / ◐ in-progress / ☑ done / ✗ dropped. Dropped rows stay (history not rewritten).
 - Index only — never duplicate acceptance criteria or rationale; the linked Spec/ADR is the source of truth.

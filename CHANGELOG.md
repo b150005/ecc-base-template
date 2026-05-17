@@ -357,6 +357,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Milestone #09 — now IMPLEMENTED** (design landed previously under
+  Documentation as ADR-014's 2026-05-17 `(spec filename convention)`
+  amendment; implementation completed this session). A
+  CLAUDE.md-only change: one bullet appended to the `## Roadmap`
+  **Rules:** block immediately after the reservation-rule bullet,
+  stating the normative Spec filename convention — a Spec file is
+  `specs/NN-slug.md` (`NN` zero-padded to a two-digit minimum,
+  `1→01`, rows ≥100 without extra padding; `slug` copied from the
+  row's reserved `spec:` path, not re-derived); the JA sibling is
+  `specs/NN-slug.ja.md` with heading-tree parity owned by #06;
+  `specs/NN-progress.md` is excluded as ADR-016's reserved suffix;
+  #10 pins the directory and #09 pins the filename (MECE). The
+  bullet text is the verbatim wording the ADR-014 amendment
+  supplied. Single bullet, no sub-heading, no table — within the
+  routine-edit carve-out, so no claude-md-authoring Skill
+  invocation. No agent-prompt edits, no spec-template edit, no CI
+  workflow or script, no renames (all eight existing `specs/01-*`
+  … `specs/08-*` already conform — a convention-statement, not a
+  bulk-rename). No new ADR (this is an ADR-014 amendment); Roadmap
+  row #09 stays `spec:`-only (no `adr:` link — ADR-014 has no
+  milestone row of its own, identical to #07/#08). `CLAUDE.md` is
+  EN-only; no bilingual mirror needed. All seven `specs/09`
+  acceptance criteria verified directly against the edited file.
+  Roadmap row #09 flips ◐→☑ done.
+
 - **Milestone #08 — now IMPLEMENTED** (design landed previously under
   Documentation as ADR-014's 2026-05-17 amendment; implementation
   completed this session). An agent-prompt-only change: a named
