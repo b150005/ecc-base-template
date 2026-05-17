@@ -324,6 +324,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Milestone #08 — now IMPLEMENTED** (design landed previously under
+  Documentation as ADR-014's 2026-05-17 amendment; implementation
+  completed this session). An agent-prompt-only change: a named
+  **Analyze pre-dispatch guard** (G1/G2/G3) added in-step to
+  `.claude/agents/orchestrator.md` Workflow step 1 (Analyze) with no
+  new `##`-level section and no Workflow-list restructuring. G1 —
+  a Roadmap row must exist before any sub-agent dispatch (missing row
+  routes to `product-manager`). G2 — the row's `spec:` file must
+  exist on disk for `☐`/`◐` rows (absent Spec routes to
+  `product-manager`; guard fires on row status + `spec:`-file presence
+  alone, with no downstream-agent introspection at guard-evaluation
+  time — the R-02 simpler heuristic adopted per the amendment). G3 —
+  for a `◐ in-progress` row, `specs/NN-progress.md` must be present;
+  if absent, state explicitly that no progress record exists and
+  re-derive state from `git log` (G3 is a promote-and-replace: the
+  prior informal fallback sentence in Workflow step 1 is absorbed into
+  the named G3, not duplicated). `orchestrator` remains read-only
+  throughout (ADR-014 §Decision). No new ADR (this is an ADR-014
+  amendment), no CI workflow, no other agent-prompt edits. `orchestrator.md`
+  is EN-only; no bilingual mirror needed. Roadmap row #08 flips ◐→☑ done.
+
 - **Milestone #07 — now IMPLEMENTED** (design landed previously under
   Documentation as ADR-014's 2026-05-17 amendment; implementation
   completed this session). A documentation-only change: one bullet
