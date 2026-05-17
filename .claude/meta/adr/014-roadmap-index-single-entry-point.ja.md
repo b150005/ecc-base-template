@@ -1139,3 +1139,482 @@ ADR-012 / ADR-014 / ADR-015 / ADR-016 / ADR-017 / ADR-018 の慣例に従い、
 元のステータス行 (`Accepted — 2026-05-15`) は変更しない; 本 amendment は
 ADR-014 の既存の Spec 予約ルール決定のファイル名コンポーネント帰結明確化を
 追記するものであり、決定を再開するものではない。
+
+## Amendment — 2026-05-17 (spec/adr directory pin)
+
+本 amendment は、この ADR 自身の 2026-05-16 **Spec 予約ルール** amendment が
+すでに *使用している* が *名前付きディレクトリルールとして明記していない*
+ディレクトリコンポーネントを規範化し、ADR オーサリング慣行がこれまですべての
+ADR で使用してきた並列の `.claude/meta/adr/` ディレクトリをピンする。
+`specs/10-spec-adr-directory-pinning.md` (Roadmap row #10) が権威的なスコープであり、
+規約がカバーしなければならない内容 (Spec の正規 `specs/` ディレクトリ、ADR の正規
+`.claude/meta/adr/` ディレクトリ、同一ディレクトリ EN/JA 兄弟規約、遡及適合) を
+記述し、構造的な *どのように* を `architect` に委ねている (リスク R-01 (a)-(d)、R-02、R-03)。
+本 amendment はその決定を記録する。これは **ADR-014 の既存の決定の帰結明確化**
+であり ── 具体的には、すでに承認された 2026-05-16 Spec 予約 amendment の帰結明確化で
+あり、その予約パス *まさに* `specs/NN-slug.md` のディレクトリコンポーネントを #10 が
+規範として名付ける ── #09 amendment (同じパスのファイル名コンポーネントをピン) と
+合成される。新しいディテクター、CI ワークフロー、コントラクト境界、キーイングルール、
+またはファイル成果物は導入しない。
+
+### The (b)/(c) decision — ADR-014 amendment, not new ADR-019, by the ADR-018 Alternative-B discriminator <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal; it is intentionally never created (see Counter-proposal below) -->
+
+Spec の R-01 (b)/(c) は `architect` に明示的な選択肢 「ADR-014 amendment か新しい
+ADR-019 か」を渡しており、ADR-018 の Alternative-B 識別基準を逐語的に適用するよう <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+指示している: *#10 は新しいディテクター + 新しい MECE コントラクト境界 + 新しい
+キーイング/メカニズムを導入するか (⇒ 新しい ADR)、それとも既存 ADR のすでに認可
+された決定の帰結明確化/拡張か (⇒ amendment)?* 条項ごとに誠実に適用する:
+
+- **新しいディテクター? No.** Spec の Non-goals と Out of scope は CI ディレクトリ
+  適合ディテクターを *明示的に禁じている* (「CI ディレクトリ適合チェックの追加。
+  そのようなチェックを追加するかどうかは architect に延期された構造的決定 …
+  #10 はドキュメント/規約記述マイルストーン; CI 強制は任意の帰結」; 「CI ディレクトリ
+  適合チェックの追加 ── architect に延期された構造的決定」)。ADR-017 と ADR-018 は
+  それぞれが新しいスクリプト + 新しいワークフロー (`check-roadmap-drift.sh` /
+  `check-bilingual-parity.sh`) を導入したからこそ新 ADR 相当と自己分類した。
+  #10 はスクリプトもワークフローも **ゼロ** 導入する ── #09 amendment (Non-goals が
+  CI ファイル名ディテクターを禁じた)、#08 amendment (Non-goals が CI ワークフローを
+  禁じた)、#07 amendment (ディテクターなし) と同一。
+- **新しい MECE コントラクト境界? 新しいパーティションなし ── スコープ限定の
+  記述のみ。** 境界の *記述* は必要 (Spec Goal「#09 と合成」、受け入れ基準 8、
+  R-01 (d)、R-02) だが、#04/#05/#06 のディテクターファミリーコントラクトパーティションに
+  4 番目のディテクターを追加しない。#10 がそのパーティションの *外側* に
+  完全に位置することを記述する: #10 は、予約された `spec:` パスのプレフィックスが
+  表すディレクトリと ADR がどこに存在するかについてのドキュメント/規約記述であり、
+  #09 のファイル名スコープと MECE で、#04 のパス解決スコープと #05 の
+  Roadmap 構造スコープに対してスコープ限定される。これは ADR-014 予約ルール帰結が
+  どこに位置するかのスコープ限定であり、ADR-017 の不在宣言や ADR-018 の
+  規約存在のような新しいキーイングルールではない。
+- **新しいキーイング/メカニズム/ファイル成果物? No.** 免除キーイングルール、
+  許可リスト対パターン選択、解析戦略、新しいファイル成果物、新しいスクリプトはない。
+  `specs/` は 2026-05-16 Spec 予約 amendment がすべての予約された `spec:` リンクに
+  義務付ける決定論的 `specs/NN-slug.md` パスのすでにあるディレクトリコンポーネントであり;
+  `.claude/meta/adr/` はこれまでに作成されたすべての 18 個の ADR がすでに存在する
+  ディレクトリである (検証済み: ADR-001 … ADR-018 + `.ja.md` 兄弟、すべて
+  `.claude/meta/adr/` 下)。#10 はそれらのすでに使用されているディレクトリを
+  ファイルに対して規範として名付ける; 第 2 のディレクトリスキームもメカニズムも追加しない。
+- **既存の決定の帰結明確化? Yes、決定的に ── #09 amendment が直面しなかった
+  1 つのインタラクションがあり、以下で明示的に推論する。** ADR-014 の 2026-05-16
+  Spec 予約 amendment はすでに不変の行番号をキーとした予約パス方式として逐語的に
+  `specs/NN-slug.md` を使用している; `specs/` ディレクトリはそのプレフィックスである。
+  #10 の規約は、その既に認可されたパスのディレクトリコンポーネントの、名前付き
+  規範ルールとしての記述であり、ちょうど #09 がそのファイル名コンポーネントを記述した
+  ように。これは ADR-014 amendment と同一の構造形状 ── #09 amendment (同じ予約
+  パスのファイル名コンポーネント)、#07 amendment (ADR-014 が事前フラグした暫定慣行
+  を形式化)、#08 amendment (ADR-014 の Analyze 参照が検証しなければならない内容を
+  強化) ── いずれも ADR-014 amendment で解決し、ADR-019 ではない。 <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+
+**#09 との唯一の本物の相違点、そしてなぜそれが判定を覆さないか。** #09 の
+ファイル名コンポーネントは他のいかなる CLAUDE.md セクションにも触れなかった ──
+`specs/NN-slug.md` ファイル名はどこにも競合する散文がなかった。#10 のディレクトリ
+ピンは CLAUDE.md の `## Document Templates` セクションと相互作用し、そのセクションは
+**現行のテキストでレイアウトの強制を明示的に否認している**:「成果物をどこに置くかは
+あなたが決める … テンプレートはレイアウトを強制しない ── テンプレートだけを強制する」、
+説明的な `adr/en/` / `adr/ja/` 分割を伴う。*このリポジトリ* のために `specs/` と
+`.claude/meta/adr/` をピンすることは、したがってその散文と単に無言で並存するのでは
+なく; `## Document Templates` のスタンスを *変更している* と読まれる可能性がある。
+両方の読みを真剣に受け止めた:
+
+- **Reading 1 (真の構造的変更 ⇒ ADR-019):** <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+  `## Document Templates` の「あなたが決める」ガイダンスは意図的な、
+  フォーク向けの設計決定 (フォークは独自のレイアウトを選択する)。ディレクトリを
+  ピンすることはこのリポジトリに対してそれを *逆転させる*; 表明された設計スタンスの
+  逆転は新しい構造的決定であり、ADR-017/ADR-018 の構造的な半分であり、
+  スタンドアロン ADR-019 を正当化する。 <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+- **Reading 2 (帰結明確化 ⇒ ADR-014 amendment、採択):**
+  `## Document Templates` の「あなたが決める」ガイダンスと #10 のピンは、**正しく
+  スコープされれば矛盾しない** ── 2 つの異なるオーディエンスを統治する。
+  `## Document Templates` は *フォーク* に語りかける (「テンプレートはレイアウトを
+  強制しない」); #10 のピンは *このリポジトリのドッグフーディング姿勢* に語りかける。
+  `specs/` ディレクトリは ADR-014 自身の 2026-05-16 予約 amendment によって
+  **このリポジトリに対してすでに義務付けられている** (すべての Roadmap 行の予約済み
+  `spec:` リンクは `specs/NN-slug.md` ── ディレクトリはここでは自由な選択ではなく、
+  ADR-014 が決定している)。#10 は `## Document Templates` が解除するディレクトリ
+  制約を *導入* するのではなく; *このリポジトリのための ADR-014 の予約ルールが
+  すでに固定したディレクトリを、規約として名付ける* ことをし、`adr/en/` / `adr/ja/`
+  の例をフォークにスコープすることで `## Document Templates` のフォーク向け自由を
+  明示的に保持する。正しくフレームされれば、`## Document Templates` の散文は
+  *逆転していない* ── オーディエンスによって *分割されている* (フォーク = 自由;
+  このリポジトリ = ADR-014 ピン)、そして #10 は ADR-014 の予約ルールがすでに
+  決定したこのリポジトリ側を記述する。それは予約ルールの帰結明確化であり、
+  #09 と同種である。
+
+**判定: Reading 2。ADR-014 amendment。ADR-019 は作成しない。** <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+決定的な事実は `specs/` ディレクトリが **そもそもこのリポジトリに対して自由な選択
+ではない** ── ADR-014 の 2026-05-16 予約 amendment がすでにすべての予約済み `spec:`
+リンクを `specs/NN-slug.md` に固定している。#10 は「Spec の `## Document Templates`
+フリー配置スタンスを逆転させている」はずがない、なぜならそのスタンスは *このリポジトリ
+の Spec には一度も有効ではなかった* ── このリポジトリにおいて ADR-014 自体に
+よってすでに上書きされていたから。#10 はその ADR-014 が決定したディレクトリに名前を
+付け、長年の ADR ディレクトリ慣行をその並列として追加する; `## Document Templates`
+編集は例がフォーク向けであることを明確にする *スコープ注記* であり、このリポジトリに
+適用していたスタンスの逆転ではない。既存の ADR 決定がすでに固定したディレクトリに
+名前を付け、既存の散文をそれが常に暗黙的に対象としていたオーディエンスにスコープする
+スコープ明確化編集は、帰結明確化であり ── #09 amendment の条項ごとの適用がファイル名
+コンポーネントについて結論づけたのと全く同じ。兄弟対称性の罠 (#05/#06 → ADR-017/
+ADR-018、したがって #10 → ADR-019) は #09 と同一に逆転する: #05/#06 自身の <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+識別基準を #10 に適用すると **amendment** になる、なぜなら 3 つの構造的条項 (新しい
+ディテクター、新しいパーティション、新しいキーイング/メカニズム) がすべて不在だからである。
+Roadmap row #10 は `spec:` のみのまま維持される (マイルストーン → ADR は 0:1;
+ADR-014 はそれ自身のマイルストーン行を持たないため、row #10 から ADR-014 への
+`adr:` リンクを追加することは存在しないマイルストーン→ADR マッピングを主張することに
+なる ── #07、#08、#09 amendment の行推論と同一)。
+
+### The normative directory convention
+
+規約は 2026-05-16 Spec 予約 amendment がすでに義務付ける `specs/NN-slug.md`
+パスのディレクトリコンポーネントに名前を付け、ADR オーサリング慣行が常に使用して
+きた ADR ディレクトリを加える。新しいパス方式は追加しない;
+既存のものを名前付きルールとして記述する:
+
+| ルール | 記述 | 明確化する出典 |
+|---|---|---|
+| 正規 Spec ディレクトリ | Spec ファイルはリポジトリルートの `specs/` に存在する。これはすべての Roadmap 行がすでに保持する `specs/NN-slug.md` 予約パスのディレクトリコンポーネントである; `product-manager` は行の予約済み `spec:` リンクにすでに固定されたディレクトリにファイルを作成する (行からパスをコピーし、ディレクトリを選択しない)。 | ADR-014 2026-05-16 Spec 予約 amendment (予約パスのプレフィックスが *まさに* `specs/`)。 |
+| 正規 ADR ディレクトリ | ADR ファイルはリポジトリルートの `.claude/meta/adr/` に、3 桁ゼロパディング数値プレフィックス (`NNN-slug.md`) で存在する。これまでに作成されたすべての ADR (ADR-001 … ADR-018、+ `.ja.md` 兄弟) が準拠; `architect` は新しい ADR をそこに作成する。 | ADR オーサリング慣行 (既存の 18 個すべての ADR と遡及的に整合); #10 はデファクトのディレクトリを規範として名付ける。3 桁プレフィックスの *ファイル名* 形式は ADR オーサリング慣行であり、**#10 のスコープではない** (Spec Non-goal)。 |
+| 同一ディレクトリ EN/JA 兄弟 | EN Spec とその JA 兄弟は `specs/NN-slug.md` と `specs/NN-slug.ja.md` として **同一の** `specs/` ディレクトリに共存する; ディレクトリは言語で **分割しない** (`specs/en/` や `specs/ja/` はない)。`## Document Templates` の `adr/en/` / `adr/ja/` 分割はフォーク **向けの** 説明的なもので、このリポジトリの規約ではない。ペアの見出しツリーパリティは #06 / ADR-018 が所有; 本規約は *同一場所配置* のみを記述し、パリティチェックを再定義または拡張しない。 <!-- ref-allow: specs/en/ and specs/ja/ are non-existing illustrative paths documenting what this convention does NOT use; their non-existence is the point --> | ADR-018 (パリティチェックがコンテンツパリティを所有; 本規約がその per-file-pair キーイング ── ADR-018 2026-05-17 amendment ── が前提とする同一ディレクトリ配置を所有)。 |
+| `## Document Templates` オーディエンス スコープ | `## Document Templates` の「成果物をどこに置くかはあなたが決める … テンプレートはレイアウトを強制しない」ガイダンスは **フォーク向け**: フォークが独自のレイアウトを選択できることを伝える。このリポジトリのピンと **矛盾しない**、なぜならこのリポジトリの `specs/` ディレクトリはすでに ADR-014 が決定している (予約ルール) からであり、自由な選択ではない。`adr/en/`/`adr/ja/` の例はフォークに明示的にスコープされている。 | ADR-014 2026-05-16 Spec 予約 amendment (このリポジトリの Spec ディレクトリが自由でない理由) + Spec R-03。 |
+
+本規約は **既存のすべての Spec および ADR ファイルと遡及的に整合** し
+(`specs/01-*.md` … `specs/10-*.md` + `.ja.md` 兄弟はすべて `specs/` 下; ADR-001 …
+ADR-018 + `.ja.md` 兄弟はすべて `.claude/meta/adr/` 下)、これが一括移動ではなく
+規約 *記述* amendment であることを確認する ── #07 と #09 amendment が確立した
+「すべての歴史的な成果物と遡及的に整合しており、動作変更ではない」プロパティと
+全く同じ。
+
+### (a) Documentation placement — the CLAUDE.md `## Document Templates` section, scoped, plus a one-line MECE pointer in the `## Roadmap` Rules block
+
+#10 は *オーディエンス* において #09 と異なる: #09 は Spec オーサリングのみに
+関係した (`product-manager`、すでに `## Roadmap` Rules ブロックを読むため、
+1 つの Rules 箇条書きで十分だった)。#10 は Spec オーサリング (`product-manager`)
+**と** ADR オーサリング (`architect`) の **両方** に関係する。配置決定は各ディレクトリ
+規約をその著者がすでに読む場所に **追加ファイル読み取りゼロ** で配置し、同じルールの
+第 2 の権威的ソースを作ることを回避しなければならない (ADR-014 が除去しようとした
+「どの文書が権威的か」再発見)。決定、Spec の R-01 (a) 「追加ファイル読み取りなしに
+オーサリングステップで出会う」基準に対して:
+
+- **プライマリ単一ソース: CLAUDE.md の `## Document Templates` セクション、
+  オーディエンス スコープで編集。** これが自然な単一ソースである、なぜなら
+  `## Document Templates` は *すでに文書をどこに置くかについてのセクション* だからで
+  ── すでに ADR と Spec のテンプレートに名前を付け、すでに配置について議論している
+  (「あなたが決める」)。`product-manager` (Spec) と `architect` (ADR) の両方が
+  オーサリングの一部としてこのセクションからテンプレートを解決する; ADR-014 の
+  元のダウンストリームタスクはすでに `architect` を adr-template に、`product-manager`
+  を spec-template にルーティングし、どちらも *ここ* で参照されている。両方のピンされた
+  ディレクトリをすでに配置を統治するセクションに記述することで、各著者が **追加ファイル
+  読み取りゼロ** でオーサリングステップにそのディレクトリ規約と出会う ──
+  R-01 (a) 基準が *両方の* オーディエンスのために、*1 つの* ソースから構造的に満たされる。
+  ディレクトリルールを他のどこかに置くこと (新しい `## Spec/ADR directory convention`
+  見出し、または Rules ブロックのみ) は予算を新しいセクションで膨張させるか、
+  ルールを 2 つの場所に分割する (Rules ブロックが Spec オーサリングを統治;
+  `## Document Templates` がテンプレート/配置を統治) ── 2 ソース再発見を再導入する。
+- **なぜ `## Roadmap` Rules ブロックをプライマリにしないか (#09 の選択)?**
+  #09 の Rules ブロック配置は *ファイル名が Rules ブロックがすでに記述する予約
+  `spec:` パスのプロパティだったから* 正しかった ── `product-manager` はそのブロックを
+  Spec 作成のために読み、ファイル名はすでにそこにある予約ルール箇条書きの完成形である。
+  しかし Rules ブロックは `architect` が ADR を作成するために **読まない** (ADR オーサリングは
+  #04 Architecture ワークフローステップであり、Roadmap 行書き込みではない ── `architect`
+  の Roadmap インタラクションは *`adr:` リンク追加* であり、書き込みオーナーシップで
+  統治され、ディレクトリ選択ではない)。Rules ブロックを ADR ディレクトリソースにすると
+  `architect` が ADR オーサリング時に通常は読まないセクションを読むことを強いる ──
+  ADR オーサリングオーディエンスの R-01 (a) に失敗する追加ファイル/セクション読み取り。
+  `## Document Templates` セクションは *両方の* 著者がすでに通過する唯一の場所であり、
+  したがって正しい単一ソースである; これは #08 と #09 amendment が使用した
+  配置-コントラクトオーナー-に-従う推論であり、*2 オーディエンス* コントラクトに適用したもの。
+- **二次的、非権威的クロスリファレンス: `## Roadmap` Rules ブロックの 1 行。**
+  Rules ブロックはすでに #09 ファイル名箇条書きを持つ (「#10 pins the directory;
+  #09 pins the filename — MECE.」)。既存の #09 箇条書きの前方参照を誠実に保つため
+  (すでに #10 に言及している)、#09 箇条書きは `## Document Templates` をディレクトリ
+  ソースとして指す **1 つの短いクローズ** で拡張される ── ディレクトリルールを
+  再記述するのではなく (それが第 2 のソースになる)。これはポインタであり、重複ではない:
+  Rules ブロック読者に「ディレクトリ規約は `## Document Templates` にある」と伝え、
+  単一ソースプロパティを保ちながら MECE 記述を Roadmap 側からも発見可能にする、
+  ちょうど #09 amendment がその MECE 境界を「その箇条書きに」再記述したとおり。
+- **CLAUDE.md 行予算ガイダンスを尊重する。** `## Document Templates` は認可された
+  例外 `## Roadmap` セクション *ではない*、したがって編集は最小限でなければならない。
+  決定は *既存の配置段落のスコープ書き換え* (正味新セクションなし、おおよそ
+  正味中立の行数 ── 既存の 4 行「あなたが決める」段落を、フォーク/このリポジトリの
+  分割と 2 つのピンされたディレクトリを同程度の長さで記述するよう書き換える) に加え、
+  すでに存在する #09 Rules 箇条書きの 1 クローズ拡張。新しい `##` 見出しなし;
+  予算は実質的に変わらない (下記判断 (c) が Skill の含意を扱う)。
+
+### (c) Edit scope + claude-md-authoring Skill judgement
+
+- **CLAUDE.md の編集が必要 ── 2 つの場所、両方最小限。** (1) `## Document
+  Templates` セクションの配置段落は **その場で書き換えられる**: `specs/` を Spec の
+  正規ディレクトリとして、`.claude/meta/adr/` を ADR の正規ディレクトリとして、
+  *このリポジトリのドッグフーディング姿勢について* 記述; 既存の「成果物をどこに置くかは
+  あなたが決める … テンプレートはレイアウトを強制しない」ガイダンスと `adr/en/` /
+  `adr/ja/` の例を *フォーク* に明示的にスコープする; このリポジトリの同一ディレクトリ
+  EN/JA 兄弟規約を記述。(2) `## Roadmap` の既存 #09 Rules 箇条書きが **1 つの
+  クローズ** を獲得し、`## Document Templates` をディレクトリソースとして指す
+  (ディレクトリルールは再記述しない)。他の CLAUDE.md セクションは変更しない。
+- **`architect.md` への編集は不要。** `architect` はすでに `## Document Templates`
+  から adr-template を解決し (ADR-014 の元のダウンストリームタスクが `architect` を
+  そこにルーティング) #04 Architecture ワークフローステップを通じて。規約は `architect`
+  がすでに読むセクションからすでに開く template のディレクトリに名前を付ける; 新しい
+  プロンプト義務ではない。これは #09 amendment が `product-manager.md` について
+  使用した推論と同一 (「規約は … `product-manager` がすでに所有するパスに名前を付ける
+  … 新しいプロンプト義務ではない」) そして #07/#08 amendment が「エージェントプロンプトの
+  編集は不要」と結論づけるために使用した推論でもある。
+- **`product-manager.md` への編集は不要。** `product-manager` はすでに予約済み
+  `specs/NN-slug.md` パスに Spec を作成する (ADR-014 予約ルール + #09 ファイル名
+  amendment + #07 `☐→◐` トリガー)。ディレクトリはすでに予約されたパスのプレフィックス;
+  `## Document Templates` でそれを規範として記述し、`product-manager` がすでに読む
+  Rules ブロックからそこへポインタを追加することは新しいプロンプト義務を追加しない ──
+  同じエージェントについての #09 の結論と同一。
+- **spec/adr テンプレートへの編集は不要。** ディレクトリは *ファイルが作成される場所*
+  のプロパティであり (Spec の場合は予約済み `spec:` パスのプレフィックス; ADR の場合は
+  ADR オーサリング慣行)、`## Document Templates` と予約ルールによって統治される。
+  テンプレートの *コンテンツ* (その `## References` `Roadmap row: #NN` バックリンク) は
+  影響を受けない。テンプレートにディレクトリノートを追加すると同じルールのソースが
+  2 つになる ── ADR-014 が除去しようとした「どの文書が権威的か」再発見問題まさにそれ、
+  そして #09 amendment が spec-template 編集を拒否するために使用した同一推論。
+  単一ソース: `## Document Templates`、Rules ブロックポインタを伴う。
+- **claude-md-authoring Skill: #10 CLAUDE.md 編集に必要 ──
+  これが #09 の判断 (c) からの真の逸脱である。** #09 の延期された編集は *既存の
+  リストへの 1 箇条書きの追加* であり ── まさに「Routine small edits (… single bullet …)」
+  カーブアウトの範囲内であり、Skill は *不要* だった。#10 の延期された編集は
+  **`## Document Templates` セクションの既存の散文を書き換える** ── 定常配置記述の
+  *意味* を変える (未修飾の「あなたが決める」からオーディエンス分割の「フォークが決める;
+  このリポジトリはピンされている」へ)。既存のセクションの散文の意味を書き換えることは
+  「typo、単一箇条書き、バージョンバンプ」のルーティン編集では **ない**; それは
+  CLAUDE.md の `## CLAUDE.md authoring guidance` と ADR-007 が Skill の Pre/Post
+  チェックリストと不変条件ルールを通じてルーティングする「significant restructuring」
+  クラスである (Skill の 4 つの不変条件に対して `## Document Templates` 書き換えを
+  検証しなければならない ── 特にセクションがコンパクション耐性を保ち、テンプレート
+  レイアウト中立性についての不変条件が黙って違反されないことを)。**判断:
+  claude-md-authoring Skill は #10 `## Document Templates` 書き換えに必要。**
+  既存の #09 Rules 箇条書きの 1 クローズ拡張は、単独では、ルーティン単一行編集である;
+  しかし同じ実装変更が `## Document Templates` の散文も書き換えるため、Skill が
+  変更全体を統治する。これは #09 amendment の (c) の意図的な逆: #09 は *設計上*
+  単一箇条書きとして ルーティン編集カーブアウトの範囲内に留まるよう設計された;
+  #10 の `## Document Templates` インタラクションは単一箇条書きなしでは
+  定常の「あなたが決める」散文をスコープ未設定のまま残せない (Spec が黙って解決を
+  禁じる正確な R-03 の緊張)、したがって Skill が適用される。
+
+### (d) MECE boundary statement — #10 (directory) vs #09 (filename) vs #04 vs #05 vs #11 vs `## Document Templates` free-placement vs ADR-014 reservation rule (R-01 (d), R-02)
+
+境界は **各オーナーが所有するもの** で引かれており、将来のマイルストーン著者が
+ディレクトリの懸念をファイル名ピンや、パス解決ディテクターや、Roadmap 構造ディテクターや、
+検証ドメインガイダンスマイルストーンや、フォーク向け配置ガイダンスや、予約ルールに
+誤ってルーティングできないよう、ここと実装者の箇条書きに再記述する:
+
+| オーナー | 所有する問い | トリガーポイント |
+|---|---|---|
+| #04 `check-dangling-refs.sh` | 文書散文中のパス/参照は実際のファイル/ADR に **解決するか**? | コミット時 (CI) |
+| #05 `check-roadmap-drift.sh` | **双方向 Roadmap インデックスコントラクト** は成立しており、すべてのステータスグリフは **整形式か**? | コミット時 (CI) |
+| #09 (spec filename amendment) | Spec ファイルの **ファイル名形式は何か** (`NN-slug.md`、最小 2 桁、`.ja.md` 兄弟形式、`progress` 除外)? | ドキュメント/規約 (CI なし; 明示的に延期された任意の帰結) |
+| #10 (本 amendment) | Spec および ADR ファイルは *このリポジトリ* において **どのディレクトリ** に存在するか (`specs/`、`.claude/meta/adr/`)、そして EN/JA 兄弟が同一場所配置か? | ドキュメント/規約 (#10 自身のスコープに CI なし) |
+| #11 (verification-domain opt-in guidance) | 実装/設計 verification ドメインのオプトイン **トリガーガイダンス**。 | ドキュメント/規約 (予約済みだがファイル未作成の Roadmap row) <!-- ref-allow: #11 is a reserved-but-absent Roadmap row per the ADR-014 reservation rule; the MECE boundary must name it before its Spec is authored at pickup --> |
+| `## Document Templates` フリー配置ガイダンス | **フォーク** が独自のドキュメントレイアウトを選択できること (テンプレートはそれを強制しない)。 | ドキュメント (フォーク向け; #10 のこのリポジトリピンと直交するオーディエンス) |
+| ADR-014 予約ルール | すべての行が行作成時に予約済み `spec:` リンク `specs/NN-slug.md` を持つ *こと*、不変の行番号をキーとして。 | 行作成時 (プロセス) |
+
+懸念はちょうど 1 つのオーナーにマッピングされる: *壊れた散文パス* は #04 (コミット時
+解決); *不正なグリフまたは壊れた双方向 ADR リンク* は #05 (コミット時整合性);
+*Spec ファイルの名前が何か* は #09; *Spec または ADR がこのリポジトリでどのディレクトリ
+に存在するか* は #10; *verification ドメインのオプトイントリガーガイダンス* は #11;
+*フォークが独自のレイアウトを選択できること* は `## Document Templates` フォーク向け
+ガイダンス; *予約済み `spec:` リンクがそもそも存在すること* は ADR-014 予約ルール。
+完全な正規 Spec パス `specs/NN-slug.md` は #10 のディレクトリスコープと #09 の
+ファイル名スコープの **合成** であり: どちらも他方を包含せず、ディレクトリに不確かな
+将来の著者は #10 を (いま `## Document Templates` に記述)、ファイル名に不確かな
+著者は #09 を (The `## Roadmap` Rules 箇条書き) 読む。`## Document Templates` の
+縫い目は明示的であり、このテーブルで最も鋭い縫い目: #10 とフォーク向けガイダンスは
+**矛盾しない**、なぜなら **異なるオーディエンスに対処する** ── ガイダンスは *フォーク*
+に自由だと伝える; #10 は *このリポジトリの* ピンされたディレクトリを記述し、それは
+ADR-014 の予約ルールが Spec についてはすでに決定していた。オーディエンスによって
+MECE であり、矛盾によってではない; `## Document Templates` 書き換えはその
+オーディエンス分割を散文で明示的にし、R-03 が要求するとおり矛盾として読まれることを
+防ぐ。
+
+### Composability with ADR-014's reservation rule, #09, and #06/ADR-018 (no gap)
+
+- **ADR-014 2026-05-16 Spec 予約 amendment。** #10 はその amendment がすでに義務付ける
+  `specs/NN-slug.md` 予約パスのディレクトリコンポーネント (`specs/`) に名前を付ける;
+  #09 はそのファイル名コンポーネントに名前を付けた。3 つはギャップなく合成可能:
+  予約 amendment は *行作成時から予約済み `spec:` リンクが `specs/NN-slug.md` の
+  形式で存在する* と言い; #10 は *ディレクトリプレフィックスはこのリポジトリに対して
+  `specs/` にピンされている* と言い; #09 は *ピックアップ時に作成されるファイルは
+  `NN-slug.md` の名前を使用する* と言う。第 2 のパス方式は導入しない。
+- **#09 (spec filename amendment)。** #10 と #09 は構造上 MECE (ディレクトリ対
+  ファイル名) であり、その CLAUDE.md の置き場所は意図的に異なり重複しない:
+  #09 は `## Roadmap` Rules 箇条書きに存在する (そのオーディエンス `product-manager`
+  がそこで読む); #10 の権威的記述は `## Document Templates` に存在する (その 2 つの
+  オーディエンス `product-manager` と `architect` が両方ともオーサリング時に
+  そこを通過する)。Rules 箇条書きの 1 クローズポインタが 2 つをつなぎ、どちらのルールも
+  再記述せず ── ルールごとに単一ソース、クロスリファレンスされ、重複しない。
+- **#06 / ADR-018 (bilingual parity)。** #10 は EN/JA 兄弟の *同一 `specs/`
+  ディレクトリへの同一場所配置* を記述; ADR-018 の 2026-05-17 per-file-pair
+  amendment はまさにその同一場所配置を *前提とする* (それは **同一の** ディレクトリで
+  `<stem>.md` から `<stem>.ja.md` を導出する ── 言語分割ディレクトリはそのキーイングを
+  壊す)。#10 は ADR-018 のキーイングがすでに依存している同一ディレクトリ規約を確認する;
+  ADR-018 はペアの見出しツリー/全角括弧 *コンテンツ* パリティを所有する。
+  重複なし ── 誤配置ディレクトリの欠陥は #10 の規約、見出し順序の欠陥は #06 のチェック。
+  #10 はパリティルールを導入せず `check-bilingual-parity.sh` に触れない。
+
+### Downstream implementer tasks (recorded for traceability, not performed by this amendment — implementation is a future session, per the #03/ADR-016 · #05/ADR-017 · #06/ADR-018 · #07/ADR-014-amendment · #08/ADR-014-amendment · #09/ADR-014-amendment two-session decision-then-implementation split)
+
+- `.claude/CLAUDE.md` の `## Document Templates` セクション ── **既存の配置段落を
+  その場で書き換える** (「You decide where to place the resulting documents …
+  The template does not impose a layout — only the templates.」段落) で:
+  (1) `specs/` が **このリポジトリのドッグフーディング姿勢において** 正規 Spec ディレクトリ、
+  `.claude/meta/adr/` が正規 ADR ディレクトリであることを記述; (2) 既存の「成果物を
+  どこに置くかはあなたが決める」ガイダンスと `adr/en/` / `adr/ja/` の例を **フォーク
+  に明示的にスコープ** する (「派生プロジェクトは独自のレイアウトを選択できる; テンプレートは
+  いずれも強制しない ── このリポジトリは `specs/` と `.claude/meta/adr/` を独自の
+  規約としてピンする」); (3) このリポジトリの同一ディレクトリ EN/JA 兄弟規約を記述する
+  (`specs/NN-slug.md` + `specs/NN-slug.ja.md` は同一の `specs/` ディレクトリに、
+  `specs/en/` / `specs/ja/` ではなく)、見出しツリーパリティは #06 が所有することに
+  言及。行数をおおよそ正味中立に保つ (追加ではなく書き換え)。**この編集は
+  claude-md-authoring Skill によって統治される** (上記判断 (c) ── 既存の散文の
+  意味を書き換える; Skill の Pre/Post チェックリストを実行し 4 つの不変条件を検証する、
+  特に `## Document Templates` のコンパクション耐性と、テンプレートレイアウト中立性
+  不変条件がオーディエンススコープによって黙って違反されないことを)。
+- `.claude/CLAUDE.md` の `## Roadmap` **Rules** ブロック ── **既存の** #09 ファイル名
+  箇条書き (「#10 pins the directory; #09 pins the filename — MECE.」で終わるもの) を
+  `## Document Templates` をディレクトリ権威ソースとして指す **1 つの短いクローズ** で
+  拡張する ── 例えば追記:「see `## Document Templates` for the pinned `specs/`
+  and `.claude/meta/adr/` directories.」 Rules ブロックにディレクトリルールを **再記述
+  しない** (それが禁じられた第 2 のソースを作成する); クローズはポインタのみ。この
+  1 クローズ拡張は、単独では、ルーティン単一行編集だが、Skill が統治する
+  `## Document Templates` 書き換えと同じ変更でリリースされる。
+- **エージェントプロンプトの編集なし** (上記判断 (c))。実装者は
+  `product-manager.md`、`architect.md`、`orchestrator.md`、`implementer.md`
+  にディレクトリ規約の散文を追加してはならない;
+  `## Document Templates` が単一ソース。`product-manager` の予約パスでの
+  オーサリング動作は ADR-014 行+`spec:` 書き込みオーナーシップ、#09 ファイル名
+  amendment、#07 の `☐→◐` ピックアップトリガーですでにカバーされている;
+  `architect` の ADR オーサリングはすでに `## Document Templates` から adr-template
+  を解決する。
+- **spec/adr テンプレートの編集なし** (上記判断 (c))。テンプレートの `## References`
+  `Roadmap row: #NN` 例は影響を受けない; ディレクトリは `## Document Templates` セクションが
+  記述する予約パス / ADR オーサリング慣行のプロパティであり、テンプレートコンテンツでは
+  ない。テンプレートにノートを追加すると同じルールのソースが 2 つになる。
+- **CI ワークフローとスクリプトなし** (Spec Non-goals / Out of scope:
+  「#10 はドキュメント/規約記述マイルストーン; CI 強制は任意の帰結であり、
+  このマイルストーンの成果物ではない」; 「CI ディレクトリ適合チェックの追加 ──
+  architect に延期された構造的決定」)。将来の機械的ディレクトリ適合チェックは
+  可能性ある後のマイルストーンであり、**#10 ではない**、下記の反対案トリガー条件下で
+  再評価される ── (d) MECE テーブルに従い #04/#05 のコミット時チェックとは異なる。
+- **移動またはリネームなし。** 既存のすべての Spec ファイル
+  (`specs/01-*.md` … `specs/10-*.md` + `.ja.md` 兄弟) とすべての ADR ファイル
+  (`.claude/meta/adr/001-*.md` … `.claude/meta/adr/018-*.md` + `.ja.md` 兄弟)
+  はすでにピンされたディレクトリに存在する; #10 は規約記述であり一括移動ではない
+  (Spec Non-goals)。
+- **Roadmap 行の変更なし。** Row #10 の `Design source` セルは `spec:` のみのまま ──
+  これは ADR-014 amendment であり、ADR-014 はそれ自身のマイルストーン行を持たない
+  ため、row #10 に `adr:` リンクは追加しない (マイルストーン → ADR は 0:1; #07、#08、
+  #09 amendment の行推論と同一)。`product-manager` は #07 遷移マトリックスに従い
+  step-6 quality gate 後に行グリフ `◐→☑` を反転; `architect` はここに `adr:` リンクを
+  追加しない。
+- 本 ADR の日本語版
+  (`014-roadmap-index-single-entry-point.ja.md`) はミラーされた amendment を
+  受け取る必要がある ── `technical-writer` タスクであり、本変更の対象ではない。
+  **本 amendment は ADR-014 に一時的な EN/JA 見出し不一致を作り出す (EN は
+  1 つの `##` レベル見出しとその `###` サブ見出しを獲得し; JA は本変更前に
+  見出しパリティにあった) ── `technical-writer` のミラーが反映されるまで
+  #06 bilingual-parity detector (`check-bilingual-parity.sh`) は ADR-014 EN/JA
+  ペアで FAIL する。これは期待されるキューに入った `technical-writer` タスクであり、
+  この EN amendment を省略する理由ではない**、まさに 2026-05-17 のステータス遷移
+  (#07)、Analyze 行ガード (#08)、spec filename (#09) amendment が行ったとおり。
+
+### Counter-proposal
+
+深刻な反対案は **新しい ADR-019 ── spec/adr ディレクトリピンを ADR-014 amendment <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+ではなくスタンドアロン ADR として形式化する、なぜなら #10 は ADR-014 amendment より
+むしろ `## Document Templates` のスタンスを *変更する* からである** である。
+ADR-012 / ADR-014 / ADR-015 / ADR-016 / ADR-017 / ADR-018 の慣例に従い、
+却下された代替案を藁人形としてではなく真剣に記録する。議論:
+
+1. Spec は `architect` に明示的な (b)/(c) 選択肢 (「ADR-014 amendment か新しい
+   ADR-019 か」) を渡しており、構造的に並行した兄弟マイルストーン #05 と #06 は <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+   どちらも延期された構造的質問の Spec を *新しい* ADR (017、018) で解決しており、
+   amendment ではない。プロセスの対称性は #10 → ADR-019 を示唆する。 <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+2. **#09 が持たなかった ADR-019 への #10 の最も強力な主張:** #10 のピンは <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+   既存の CLAUDE.md セクション (`## Document Templates`) の **意味を編集し**、
+   未修飾の「テンプレートはレイアウトを強制しない」をオーディエンス分割ルールに変える。
+   #09 は *追加* するだけだった; #10 は *定常の設計記述を書き換える*。既存の、
+   意図的な設計スタンスの意味を変えることは、ADR-017/ADR-018 の「新しい構造的決定」
+   の半分であり、帰結明確化ではない ── そしてそれはまさに、レビュアーが「ディレクトリピン
+   ADR」として指し示せるファーストクラスの引用可能な ADR を正当化する種類の変更であり、
+   長い ADR-014 トレイルに埋め込まれた 6 番目の amendment よりも。
+3. ADR-019 はそれ自身の Roadmap バックリンク (`Roadmap row: #10`) を持ち、 <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+   row は `adr:` リンクを獲得する ── #05/#06 が行使する同じ双方向コントラクトを
+   #10 に与え、その兄弟と同じ成果物形状になる。
+
+**反対案が採用されなかった理由:**
+
+- 議論 2 の前提 ── 「#10 は `## Document Templates` のスタンスを *変更する*」 ──
+  は精査すると偽である、そしてこれが決定的な点である。`## Document Templates` の
+  「成果物をどこに置くかはあなたが決める」ガイダンスは **このリポジトリの Spec
+  ファイルには一度も有効ではなかった**: ADR-014 自身の 2026-05-16 Spec 予約
+  amendment がすでにすべての予約済み `spec:` リンクを `specs/NN-slug.md` に固定し、
+  *#10 が存在する前に* このリポジトリの `specs/` ディレクトリを固定していた。#10 は
+  このリポジトリの Spec に適用していたスタンスを逆転させない ── そのスタンスは、
+  このリポジトリにおいて ADR-014 自体によってすでに上書きされていた。`## Document
+  Templates` 書き換えは **スコープ明確化** (ガイダンスはフォーク向け; このリポジトリは
+  ADR-014 ピン) であり、散文ですでに真のオーディエンス分割を明示的にする。
+  既存の ADR 決定がすでに固定したディレクトリに名前を付け、定常の散文をそれが
+  常に暗黙的に対象としていたオーディエンスにスコープすることは、帰結明確化である ──
+  同じ予約パスのファイル名コンポーネントについての #09 の帰結明確化と、そして
+  #07/#08 amendment の ADR-014 が事前フラグした慣行の形式化と、構造的に同一の形状。
+- ADR-017 と ADR-018 は特定の、明記された識別基準に基づいて新 ADR に値すると
+  自己分類した: それぞれが **新しいディテクター + 新しい MECE コントラクト境界 +
+  新しい免除キーイングルール** を導入した。#10 はそれらを **いずれも** 導入しない ──
+  Spec の Non-goals と Out of scope は新しい CI ディテクターまたはスクリプトを
+  明示的に禁じている; MECE 記述はディテクターファミリー分割の外部に #10 を置く
+  スコープ限定であり、その分割内の 4 番目のパーティションではない; そして免除キーイングも、
+  許可リスト対パターン選択も、新しいファイル成果物も、新しいメカニズムも存在しない。
+  兄弟対称性の議論は #07、#08、#09 と全く同じように精査で逆転する:
+  #05/#06 自身の識別基準を #10 に適用すると「amendment」になる、なぜなら #05/#06
+  にとって支配的だった構造的な半分が #10 には不在だからである。
+- 発見しやすさは ADR-014 amendment の方が *良い*、悪くない: 「予約された `spec:`
+  パスのプレフィックスはどのディレクトリか」を読者が探す正規の場所は、Roadmap、予約
+  ルール、および `specs/NN-slug.md` パス方式自体を定義した ADR であり ── #09 の
+  ファイル名明確化が存在するのと同じ ADR。別個の ADR-019 は予約パスコントラクトを <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+  3 つの ADR に *分断* する (ADR-014 予約ルール + ADR-019 ディレクトリ + #09 amendment <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+  ファイル名)、ADR-014 が除去しようとした「どの文書が権威的か」再発見をまさに再導入する。
+  ディレクトリ明確化をファイル名明確化と予約ルールの隣、すべて ADR-014 に保つことは、
+  ADR-014 が体現する単一ソース規律である。
+- 双方向バックリンクの議論は無意味: ADR-014 はそれ自身のマイルストーン行を
+  持たないため、それへの amendment は正しく `Roadmap row:` 行を持たず #05 ドリフト
+  コントラクトをトリガーしない。バックリンクを作成するためだけに新しい ADR-019 を <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+  強制することは、真の構造的決定を反映するのではなく双方向成果物を製造することになる ──
+  #07、#08、#09 amendment による同じ異論の解決と同一。
+- claude-md-authoring Skill 要件 (判断 (c)) は新しい ADR を正当化する構造的決定の
+  証拠では **ない**。Skill は CLAUDE.md 散文編集が *どのように実行されるか* を統治する
+  (Pre/Post チェックリスト、不変条件検証); *決定が構造的かどうか* を再分類しない。
+  ADR-007 は基礎となる決定が新しい ADR であるか amendment であるかに関わらず、
+  重要な CLAUDE.md 散文変更を Skill を通じてルーティングする ── Skill 要件と
+  ADR 対 amendment 分類は直交する軸。その実装がたまたま散文を書き換える帰結明確化は、
+  *編集* のために Skill を必要とし、*決定* については amendment のまま。
+
+**この反対案を再評価するトリガー条件:**
+
+- 将来のマイルストーンがディレクトリ規約の *機械的な CI 強制* を genuinely 追加する
+  場合 (すべての Spec が `specs/` 下に、すべての ADR が `.claude/meta/adr/` 下に、
+  同一ディレクトリ EN/JA 兄弟を伴い存在するかを静的に検証する新しいディテクター) ──
+  それは新しいディテクター + 新しい境界 + 新しいキーイングであり、ADR-017/ADR-018
+  識別基準の構造的な半分であり、本 amendment の規約をその継承されたベースラインとする
+  独自の ADR を持つに値する。Spec はこの CI チェックを「このマイルストーンの成果物ではなく、
+  任意の帰結」と明示的にフラグしている。
+- このリポジトリの `specs/` または `.claude/meta/adr/` ディレクトリ自体が再構成される
+  場合 (例えば予約ルールが置き換えられる、または `specs/` がリネームされる、または
+  ADR が `.claude/meta/` の外に移動する) ── 基礎となるパスメカニズムへの真の変更で
+  あり、amendment によって拡張するのではなく所有する決定を再開する。
+- `## Document Templates` フォーク向けガイダンスがフォークプロファイルごとに
+  *異なるディレクトリルール* を必要とすることが判明し、CLAUDE.md の単一
+  オーディエンススコープ記述と ADR-014 amendment がそれを表現できなくなる場合 ──
+  その時点でプロファイルごとのディレクトリルールを持つ専用 ADR が正当化される可能性。
+- ディレクトリ規約が `## Document Templates` のフリー配置ガイダンスと (オーディエンスに
+  よって MECE で共存するのではなく) genuinely *矛盾する* と判明した場合 ── 例えば
+  将来の決定がテンプレート *自体* (このリポジトリだけでなく) に `specs/` を義務付け、
+  フォークの自由を除去する場合 ── これは設計スタンスの真の逆転であり、スコープ明確化ではなく、
+  独自の ADR を正当化する。
+
+反対案は ADR-012 / ADR-014 / ADR-015 / ADR-016 / ADR-017 / ADR-018 の慣例に従い、
+決定の最も深刻な異論の歴史的記録として本 amendment に残る。
+
+元のステータス行 (`Accepted — 2026-05-15`) は変更しない; 本 amendment は
+ADR-014 の既存の Spec 予約ルール決定のディレクトリコンポーネント帰結明確化を
+追記するものであり、決定を再開するものではない。

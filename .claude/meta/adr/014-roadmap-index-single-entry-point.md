@@ -1470,3 +1470,602 @@ The original Status line (`Accepted — 2026-05-15`) is unchanged; this
 amendment appends a runtime-precondition clarification of an
 already-sanctioned Analyze-step mechanism and does not reopen the
 Decision.
+
+## Amendment — 2026-05-17 (spec/adr directory pin)
+
+This amendment makes normative the **directory** component of the
+`specs/NN-slug.md` reserved-path scheme this ADR's 2026-05-16 **Spec
+reservation rule** amendment already *uses* but never *states as a
+named directory rule*, and pins the parallel `.claude/meta/adr/`
+directory the ADR-authoring practice has used for every ADR to date.
+`specs/10-spec-adr-directory-pinning.md` (Roadmap row #10) is the
+authoritative scope; it states *what* the convention must cover
+(canonical `specs/` directory for Specs, canonical `.claude/meta/adr/`
+directory for ADRs, same-directory EN/JA sibling convention,
+retroactive conformance) and defers the structural *how* to `architect`
+(its Risk R-01 (a)–(d), R-02, R-03). This amendment records that
+decision. It is a **consequence-clarification of ADR-014's existing
+Decision** — specifically of the already-accepted 2026-05-16
+Spec-reservation amendment, whose reserved path *is* `specs/NN-slug.md`
+and whose `specs/` directory component #10 names normative — composed
+with the #09 amendment, which pinned the filename component of the same
+path. No new detector, CI workflow, contract boundary, keying rule, or
+file artifact is introduced.
+
+### The (b)/(c) decision — ADR-014 amendment, not new ADR-019, by the ADR-018 Alternative-B discriminator <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal; it is intentionally never created (see Counter-proposal below) -->
+
+The Spec's R-01 (b)/(c) hands `architect` the explicit choice "ADR-014
+amendment or a new ADR-019" and instructs the architect to apply <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+ADR-018's Alternative-B discriminator verbatim: *does #10 introduce a
+NEW detector + a NEW MECE contract boundary + a NEW keying/mechanism
+(⇒ new ADR), or is it a consequence-clarification / extension of an
+existing ADR's already-sanctioned Decision (⇒ amendment)?* Applied
+honestly, clause by clause:
+
+- **New detector? No.** The Spec's Non-goals and Out of scope
+  *explicitly forbid* a CI directory-conformance detector as a #10
+  deliverable ("Adding a new CI directory-conformance check. Whether to
+  add such a check is a structural decision deferred to the architect …
+  #10 is a documentation/convention-statement milestone; CI enforcement
+  is an optional consequence"; "Adding a CI directory-conformance
+  check — a structural decision deferred to the architect"). Verified
+  against the Spec text (Non-goals line 31, Out of scope line 110).
+  ADR-017 and ADR-018 each self-classified as new-ADR-worthy *because*
+  each introduced a new script + new workflow (`check-roadmap-drift.sh`
+  / `check-bilingual-parity.sh`). #10 introduces **zero** scripts and
+  **zero** workflows — identical to the #09 amendment (Non-goals forbid
+  a CI filename detector), the #08 amendment (Non-goals forbid a CI
+  workflow), and the #07 amendment (no detector). The structural half
+  that dominated for ADR-017/ADR-018 is absent here.
+- **New MECE contract partition? No new partition — a
+  scope-delineation statement only.** A boundary *statement* is
+  required (Spec Goal "Compose with #09", Acceptance criterion 8, R-01
+  (d), R-02), but it does **not** add a fourth detector to the
+  #04/#05/#06 detector-family contract partition. It states that #10
+  sits *outside* that partition entirely: #10 is a
+  documentation/convention statement about *which directory* the
+  reserved `spec:` path's prefix denotes and where ADRs live, composed
+  MECE with #09's filename scope and delineated against #04's
+  path-resolution scope and #05's Roadmap-structural scope. This is a
+  scope-delineation of where an ADR-014 reservation-rule consequence
+  lives — the identical structural shape as the #09 amendment's "states
+  #09 sits *outside* that partition entirely" clause — not a new keying
+  rule like ADR-017's absence-of-claim or ADR-018's
+  convention-presence.
+- **New keying / mechanism / file artifact? No.** There is no
+  exemption-keying rule, no allowlist-vs-pattern choice, no parsing
+  strategy, no new file artifact, no new script. `specs/` is *already*
+  the directory component of the deterministic `specs/NN-slug.md` path
+  the 2026-05-16 Spec-reservation amendment mandates for every reserved
+  `spec:` link; `.claude/meta/adr/` is *already* the directory every
+  one of the 18 ADRs authored to date lives in (verified: ADR-001
+  through ADR-018 plus `.ja.md` siblings all under
+  `.claude/meta/adr/`). #10 names those already-used directories
+  normative for the files; it adds no second directory scheme and no
+  mechanism.
+- **Consequence-clarification of an existing Decision? Yes,
+  decisively — with one interaction the #09 amendment did not
+  face, reasoned through explicitly below.** ADR-014's 2026-05-16
+  Spec-reservation amendment already uses `specs/NN-slug.md` verbatim
+  as the reserved-path scheme keyed to the immutable row number; the
+  `specs/` directory is its prefix. The #10 convention is the
+  statement, as a named normative rule, of the directory component of
+  that already-sanctioned path, exactly as #09 stated its filename
+  component. This is the identical structural shape as the #09
+  amendment (filename component of the same reserved path), the #07
+  amendment (formalized an interim practice ADR-014 pre-flagged), and
+  the #08 amendment (strengthened what ADR-014's Analyze read must
+  verify) — all resolved by ADR-014 amendment, not by ADR-019. <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+
+**The one genuine difference from #09, and why it does not flip the
+verdict.** #09's filename component touched no other CLAUDE.md section —
+the `specs/NN-slug.md` filename had no competing prose anywhere. #10's
+directory pin interacts with the CLAUDE.md `## Document Templates`
+section, whose **current text explicitly disclaims imposing a layout**:
+"You decide where to place the resulting documents … The template does
+not impose a layout — only the templates," with an illustrative
+`adr/en/` / `adr/ja/` split. Pinning `specs/` and `.claude/meta/adr/`
+for *this repo* is therefore not merely silent alongside that prose; it
+could be read as *changing* the `## Document Templates` stance. Both
+readings were taken seriously:
+
+- **Reading 1 (genuine structural change ⇒ ADR-019):** the <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+  `## Document Templates` "you decide" guidance is a deliberate,
+  fork-facing design decision (forks choose their own layout). Pinning
+  directories *reverses* it for this repo; reversing a stated design
+  stance is a new structural decision, the ADR-017/ADR-018 structural
+  half, warranting a standalone ADR-019. <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+- **Reading 2 (consequence-clarification ⇒ ADR-014 amendment, chosen):**
+  the `## Document Templates` "you decide" guidance and #10's pin are
+  **not in contradiction once correctly scoped** — they govern two
+  different audiences. `## Document Templates` speaks to the *fork*
+  ("the template does not impose a layout"); #10's pin speaks to *this
+  repo's dogfooding posture*. The `specs/` directory is **already
+  mandated for this repo** by ADR-014's own 2026-05-16 reservation
+  amendment (every Roadmap row's reserved `spec:` link is
+  `specs/NN-slug.md` — the directory is not a free choice here, it is
+  ADR-014-determined). #10 does not *introduce* a directory constraint
+  that `## Document Templates` lifts; it *names, as a convention, the
+  directory ADR-014's reservation rule already fixed for this repo* and
+  adds the parallel ADR-directory statement, while explicitly preserving
+  `## Document Templates`'s fork-facing freedom by scoping the
+  `adr/en/` / `adr/ja/` example to forks. Framed correctly, the
+  `## Document Templates` prose is not *reversed* — it is *partitioned*
+  by audience (fork = free; this repo = ADR-014-pinned), and #10 states
+  the this-repo half that ADR-014's reservation rule already
+  determined. That is a consequence-clarification of the reservation
+  rule, identical in kind to #09.
+
+**Verdict: Reading 2. ADR-014 amendment. No ADR-019 is created.** The <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+decisive fact is that the `specs/` directory is **not a free choice for
+this repo in the first place** — ADR-014's 2026-05-16 reservation
+amendment already nailed every reserved `spec:` link to
+`specs/NN-slug.md`. #10 cannot be "reversing the `## Document
+Templates` free-placement stance for Specs" because that stance was
+*never operative for this repo's Specs* — it was already overridden, in
+this repo, by ADR-014 itself. #10 names that ADR-014-determined
+directory and adds the long-standing ADR-directory practice as its
+parallel; the `## Document Templates` edit is a *scoping note* clarifying
+the example is fork-facing, not a reversal of a stance that applied to
+this repo. A scope-clarifying edit to existing prose, naming a
+directory an existing ADR Decision already fixed, is a
+consequence-clarification, exactly as the #09 amendment's clause-by-
+clause application concluded for the filename component. The
+sibling-symmetry trap ("#05/#06 → ADR-017/ADR-018, therefore #10 →
+ADR-019") inverts identically to #09: applying #05/#06's *own stated <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+discriminator* yields **amendment**, because all three structural
+clauses (new detector, new partition, new keying/mechanism) are absent.
+Roadmap row #10 stays `spec:`-only (Milestone → ADR is 0:1; ADR-014 has
+no milestone row of its own, so adding an `adr:` link from row #10 to
+ADR-014 would assert a milestone→ADR mapping that does not exist —
+identical reasoning to the #07, #08, and #09 amendments).
+
+### The normative directory convention
+
+The convention names the directory component of the `specs/NN-slug.md`
+path the 2026-05-16 Spec-reservation amendment already mandates, plus
+the ADR directory the ADR-authoring practice has always used. It adds
+no new path scheme; it states the existing ones as named rules:
+
+| Rule | Statement | Source it clarifies |
+|---|---|---|
+| Canonical Spec directory | Spec files live in `specs/` at the repository root. This is the directory component of the `specs/NN-slug.md` reserved path every Roadmap row already carries; `product-manager` authors the file at the directory already fixed in the row's reserved `spec:` link (copy the path from the row, do not choose a directory). | ADR-014 2026-05-16 Spec-reservation amendment (the reserved path's prefix *is* `specs/`). |
+| Canonical ADR directory | ADR files live in `.claude/meta/adr/` at the repository root, with a three-digit zero-padded numeric prefix (`NNN-slug.md`). Every ADR authored to date (ADR-001 … ADR-018, plus `.ja.md` siblings) conforms; `architect` authors new ADRs there. | The ADR-authoring practice (retroactively consistent with all 18 existing ADRs); #10 names the de-facto directory normative. The three-digit-prefix *filename* form is the ADR-authoring practice, **not** #10's scope (Spec Non-goal). |
+| Same-directory EN/JA siblings | The EN Spec and its JA sibling coexist in the **same** `specs/` directory as `specs/NN-slug.md` and `specs/NN-slug.ja.md`; the directory is **not** split by language (no `specs/en/` or `specs/ja/`). The `adr/en/` / `adr/ja/` split in `## Document Templates` is illustrative **for forks**, not this repo's convention. Heading-tree parity of the pair is owned by #06 / ADR-018; this convention states only the *co-location*, it does not redefine or extend the parity check. <!-- ref-allow: specs/en/ and specs/ja/ are non-existing illustrative paths documenting what this convention does NOT use; their non-existence is the point --> | ADR-018 (parity check owns content parity; this convention owns the same-directory placement its per-file-pair keying — ADR-018 2026-05-17 amendment — presupposes). |
+| `## Document Templates` audience scope | The `## Document Templates` "you decide where to place … the template does not impose a layout" guidance is **fork-facing**: it tells a fork it may choose its own layout. It is **not** in tension with this repo's pin, because this repo's `specs/` directory is already ADR-014-determined (the reservation rule), not a free choice. The `adr/en/`/`adr/ja/` example is explicitly scoped to forks. | ADR-014 2026-05-16 Spec-reservation amendment (the reason this repo's Spec directory is not free) + Spec R-03. |
+
+The convention is **retroactively consistent with every existing Spec
+and ADR file** (`specs/01-*.md` … `specs/10-*.md` plus `.ja.md`
+siblings all under `specs/`; ADR-001 … ADR-018 plus `.ja.md` siblings
+all under `.claude/meta/adr/`), confirming this is a
+convention-*statement* amendment, not a bulk-move — exactly the
+"retroactively consistent with every historical artifact, not a
+behavior change" property the #07 and #09 amendments established.
+
+### (a) Documentation placement — the CLAUDE.md `## Document Templates` section, scoped, plus a one-line MECE pointer in the `## Roadmap` Rules block
+
+#10 differs from #09 in *audience*: #09 concerned only Spec authoring
+(`product-manager`, who already reads the `## Roadmap` Rules block, so
+one Rules bullet sufficed). #10 concerns **both** Spec authoring
+(`product-manager`) **and** ADR authoring (`architect`). The placement
+decision must put each directory convention where its author already
+reads, with **zero additional file reads**, and must avoid creating a
+second authoritative source for the same rule (the "which document is
+authoritative" rediscovery ADR-014 exists to remove). The decision,
+against the Spec's R-01 (a) "encountered at the authoring step without
+an additional file read" criterion:
+
+- **Primary single source: the CLAUDE.md `## Document Templates`
+  section, edited to be audience-scoped.** This is the natural single
+  source because `## Document Templates` is *already the section about
+  where documents are placed* — it already names the ADR and Spec
+  templates and already discusses placement ("you decide where to
+  place"). Both `product-manager` (Spec) and `architect` (ADR)
+  resolve their template from this section as part of authoring;
+  ADR-014's original downstream tasks already route `architect` to the
+  adr-template and `product-manager` to the spec-template referenced
+  *here*. Stating both pinned directories in the section that already
+  governs placement means each author encounters its directory
+  convention at the authoring step with **zero additional file reads** —
+  the R-01 (a) criterion is met by construction, for *both* audiences,
+  from *one* source. Putting the directory rule anywhere else (a new
+  `## Spec/ADR directory convention` heading, or only the Rules block)
+  would either bloat the budget with a new section or split the rule
+  across two places (Rules block governs Spec authoring;
+  `## Document Templates` governs template/placement) — reintroducing
+  the two-source rediscovery.
+- **Why not the `## Roadmap` Rules block as the primary (the #09
+  choice)?** #09's Rules-block placement was correct *because the
+  filename is a property of the reserved `spec:` path the Rules block
+  already states* — `product-manager` reads that block to author a
+  Spec, and the filename is the completion of the reservation-rule
+  bullet already there. But the Rules block is **not** read by
+  `architect` to author an ADR (ADR authoring is the #04 Architecture
+  workflow step, not a Roadmap-row write — `architect`'s Roadmap
+  interaction is the *`adr:` link add*, governed by ADR-014
+  write-ownership, not directory choice). Making the Rules block the
+  ADR-directory source would force `architect` to read a section it
+  does not otherwise read at ADR-authoring time — an extra file/section
+  read, failing R-01 (a) for the ADR audience. The `## Document
+  Templates` section is the one location *both* authors already
+  traverse, so it is the correct single source; this is the placement-
+  follows-the-contract-owner reasoning the #08 and #09 amendments used,
+  applied to a *two-audience* contract.
+- **Secondary, non-authoritative cross-reference: one line in the
+  `## Roadmap` Rules block.** The Rules block already carries the #09
+  filename bullet ("#10 pins the directory; #09 pins the filename —
+  MECE"). To keep the existing #09 bullet's forward reference honest
+  (it already names #10), the #09 bullet is extended by **one short
+  clause** pointing to `## Document Templates` as the directory source —
+  *not* restating the directory rule (that would be the second source).
+  This is a pointer, not a duplicate: it tells a Rules-block reader
+  "the directory convention is in `## Document Templates`," preserving
+  the single-source property while keeping the MECE statement
+  discoverable from the Roadmap side, exactly as the #09 amendment
+  restated its MECE boundary "in that bullet."
+- **It respects the CLAUDE.md line-budget guidance.** `## Document
+  Templates` is **not** the sanctioned-exception `## Roadmap` section,
+  so the edit must be minimal. The decision is a *scoping rewrite of
+  the existing placement paragraph* (no net new section, roughly
+  net-neutral line count — the existing four-line "you decide" paragraph
+  is rewritten to state the fork/this-repo partition and the two pinned
+  directories in comparable length) plus a one-clause extension of the
+  already-present #09 Rules bullet. No new `##` heading; the budget is
+  not materially moved (judgement (c) below addresses the Skill
+  implication of editing existing prose).
+
+### (c) Edit scope + claude-md-authoring Skill judgement
+
+- **CLAUDE.md requires editing — two locations, both minimal.** (1) The
+  `## Document Templates` section's placement paragraph is **rewritten
+  in place** to: state `specs/` as the canonical Spec directory and
+  `.claude/meta/adr/` as the canonical ADR directory *for this repo's
+  dogfooding posture*; scope the existing "you decide where to place …
+  the template does not impose a layout" guidance and the `adr/en/` /
+  `adr/ja/` example explicitly to *forks*; state the same-directory
+  EN/JA sibling convention for this repo. (2) The existing #09 Rules
+  bullet in `## Roadmap` gains **one clause** pointing to
+  `## Document Templates` as the directory source (no directory rule
+  restated). No other CLAUDE.md section changes.
+- **`architect.md` does NOT require editing.** `architect` already
+  resolves the adr-template from `## Document Templates` (ADR-014's
+  original downstream task routes `architect` there) and the #04
+  Architecture workflow step. The convention names the directory of the
+  template `architect` already opens from the section it already reads;
+  it is not a new prompt obligation. This is the identical reasoning
+  the #09 amendment used for `product-manager.md` ("the convention
+  names the … path `product-manager` already owns … not a new prompt
+  obligation") and the #07/#08 amendments used to conclude "no agent
+  prompt requires editing."
+- **`product-manager.md` does NOT require editing.** `product-manager`
+  already authors the Spec at the reserved `specs/NN-slug.md` path
+  (ADR-014 reservation rule + #09 filename amendment + #07 `☐→◐`
+  trigger). The directory is the prefix of that already-reserved path;
+  stating it normative in `## Document Templates` and pointing to it
+  from the Rules block `product-manager` already reads adds no prompt
+  obligation — identical to the #09 conclusion for the same agent.
+- **The spec/adr templates do NOT require editing.** The directory is a
+  property of *where the file is created* (the reserved `spec:` path's
+  prefix for Specs; the ADR-authoring practice for ADRs), governed by
+  `## Document Templates` and the reservation rule. The templates'
+  *content* (their `## References` `Roadmap row: #NN` back-link) is
+  unaffected. Adding a directory note to a template would create a
+  second source for the same rule — the exact "which document is
+  authoritative" rediscovery ADR-014 exists to remove, and the
+  identical reasoning the #09 amendment used to refuse a spec-template
+  edit. Single source: `## Document Templates`, with the Rules-block
+  pointer.
+- **claude-md-authoring Skill: REQUIRED for the #10 CLAUDE.md edit —
+  this is the genuine divergence from #09's judgement (c).** #09's
+  deferred edit was *one bullet appended* to an existing list — squarely
+  the "Routine small edits (… single bullet …)" carve-out, so the Skill
+  was *not* required. #10's deferred edit **rewrites existing prose in
+  the `## Document Templates` section** — it changes the *meaning* of a
+  standing placement statement (from unqualified "you decide" to an
+  audience-partitioned "forks decide; this repo is pinned"). Rewriting
+  the semantics of an existing section's prose is **not** a "typo,
+  single bullet, version bump" routine edit; it is the
+  "significant restructuring" class CLAUDE.md's `## CLAUDE.md authoring
+  guidance` and ADR-007 route through the Skill's Pre/Post checklist
+  and invariant rules (the `## Document Templates` rewrite must be
+  checked against the four invariants — particularly that the section
+  stays compaction-durable and that no invariant about template
+  layout-neutrality is silently violated). **Judgement: the
+  claude-md-authoring Skill IS required for the #10 `## Document
+  Templates` rewrite.** The one-clause extension of the existing #09
+  Rules bullet, taken alone, is a routine single-line edit; but because
+  the same implementation change also rewrites `## Document Templates`
+  prose, the Skill governs the change as a whole. This is the
+  deliberate inverse of the #09 amendment's (c): #09 was *designed* as a
+  single bullet precisely to stay under the carve-out; #10's
+  `## Document Templates` interaction *cannot* be reduced to a single
+  bullet without leaving the standing "you decide" prose un-scoped (the
+  exact R-03 tension the Spec forbids resolving silently), so the Skill
+  applies.
+
+### (d) MECE boundary statement — #10 (directory) vs #09 (filename) vs #04 vs #05 vs #11 vs `## Document Templates` free-placement vs ADR-014 reservation rule (R-01 (d), R-02)
+
+The boundary is drawn on **what each owns**, restated here and in the
+Rules-block pointer so a future milestone author cannot mis-route a
+directory concern to a filename pin, a path-resolution detector, a
+Roadmap-structural detector, a verification-domain guidance milestone,
+the fork-facing placement guidance, or the reservation rule:
+
+| Owner | Owns the question | Trigger point |
+|---|---|---|
+| #04 `check-dangling-refs.sh` | Does a path/reference in document prose **resolve** to a real file/ADR? | commit time (CI) |
+| #05 `check-roadmap-drift.sh` | Does the **bidirectional Roadmap-index contract** hold and is every Status glyph **well-formed**? | commit time (CI) |
+| #09 (spec filename amendment) | **What is the filename form** of a Spec file (`NN-slug.md`, two-digit-min, `.ja.md` sibling form, `progress` exclusion)? | documentation/convention (no CI; explicitly deferred optional consequence) |
+| #10 (this amendment) | **Which directory** do Spec and ADR files live in for *this repo* (`specs/`, `.claude/meta/adr/`), and that EN/JA siblings are co-located? | documentation/convention (no CI in #10's own scope) |
+| #11 (verification-domain opt-in guidance) | Opt-in **trigger guidance** for implementation/design verification domains. | documentation/convention (reserved-but-absent Roadmap row) <!-- ref-allow: #11 is a reserved-but-absent Roadmap row per the ADR-014 reservation rule; the MECE boundary must name it before its Spec is authored at pickup --> |
+| `## Document Templates` free-placement guidance | That a **fork** may choose its own document layout (the template imposes none). | documentation (fork-facing; orthogonal audience to #10's this-repo pin) |
+| ADR-014 reservation rule | *That* every row carries a reserved `spec:` link `specs/NN-slug.md` at row-creation, keyed to the immutable row number. | row-creation (process) |
+
+A concern maps to exactly one owner: a *broken prose path* is #04's
+(commit-time resolution); a *malformed glyph or broken bidirectional
+ADR-link* is #05's (commit-time consistency); *what a Spec file is
+named* is #09's; *which directory a Spec or ADR lives in for this repo*
+is #10's; *verification-domain opt-in trigger guidance* is #11's; *that
+a fork may pick its own layout* is the `## Document Templates`
+fork-facing guidance's; *that a reserved `spec:` link exists at all* is
+the ADR-014 reservation rule's. The full canonical Spec path
+`specs/NN-slug.md` is the **composition** of #10's directory scope and
+#09's filename scope: neither subsumes the other; a future author
+uncertain about directory reads #10 (now stated in `## Document
+Templates`), one uncertain about filename reads #09 (the `## Roadmap`
+Rules bullet). The `## Document Templates` seam is explicit and is the
+sharpest seam in this table: #10 and the fork-facing guidance are **not
+in conflict** because they address **different audiences** — the
+guidance tells a *fork* it is free; #10 states *this repo's* pinned
+directories, which ADR-014's reservation rule already determined for
+Specs regardless. They are MECE by audience, not by contradiction; the
+`## Document Templates` rewrite makes that audience partition explicit
+in the prose so it cannot be read as a contradiction, exactly as R-03
+requires.
+
+### Composability with ADR-014's reservation rule, #09, and #06/ADR-018 (no gap)
+
+- **ADR-014 2026-05-16 Spec-reservation amendment.** #10 names the
+  directory component (`specs/`) of the `specs/NN-slug.md` reserved
+  path that amendment already mandates; #09 named its filename
+  component. The three compose with no gap: the reservation amendment
+  says *a reserved `spec:` link of form `specs/NN-slug.md` is present
+  from row-creation*; #10 says *the directory prefix is `specs/`,
+  pinned for this repo*; #09 says *the file authored at pickup uses the
+  `NN-slug.md` name*. No second path scheme is introduced.
+- **#09 (spec filename amendment).** #10 and #09 are MECE by
+  construction (directory vs filename) and their CLAUDE.md homes are
+  deliberately different and non-duplicating: #09 lives in the
+  `## Roadmap` Rules bullet (its audience, `product-manager`, reads it
+  there); #10's authoritative statement lives in `## Document
+  Templates` (its two audiences, `product-manager` and `architect`,
+  both traverse it at authoring). The Rules bullet's one-clause pointer
+  links the two without restating either rule — single source per rule,
+  cross-referenced, not duplicated.
+- **#06 / ADR-018 (bilingual parity).** #10 states the EN/JA siblings'
+  *co-location* in the same `specs/` directory; ADR-018's 2026-05-17
+  per-file-pair amendment *presupposes* exactly that co-location (it
+  derives `<stem>.md` from a `<stem>.ja.md` in the **same** directory —
+  split language directories would break its keying). #10 confirms the
+  same-directory convention ADR-018's keying already depends on; ADR-018
+  owns the heading-tree/full-width-paren *content* parity of the pair.
+  No overlap — a misplaced-directory defect is #10's convention, a
+  heading-order defect is #06's check. #10 introduces no parity rule
+  and does not touch `check-bilingual-parity.sh`.
+
+### Downstream implementer tasks (recorded for traceability, not performed by this amendment — implementation is a future session, per the #03/ADR-016 · #05/ADR-017 · #06/ADR-018 · #07/ADR-014-amendment · #08/ADR-014-amendment · #09/ADR-014-amendment two-session decision-then-implementation split)
+
+- `.claude/CLAUDE.md` `## Document Templates` section — **rewrite the
+  existing placement paragraph in place** (the "You decide where to
+  place the resulting documents … The template does not impose a
+  layout — only the templates." paragraph) so it: (1) states `specs/`
+  is the canonical Spec directory and `.claude/meta/adr/` the canonical
+  ADR directory **for this repository's dogfooding posture**; (2)
+  scopes the existing "you decide where to place" guidance and the
+  `adr/en/` / `adr/ja/` example **explicitly to forks** ("a derived
+  project may choose its own layout; the template imposes none — this
+  repository pins `specs/` and `.claude/meta/adr/` as its own
+  convention"); (3) states the EN/JA sibling co-location for this repo
+  (`specs/NN-slug.md` + `specs/NN-slug.ja.md` in the **same** `specs/`
+  directory, not `specs/en/` / `specs/ja/`), noting heading-tree parity
+  is owned by #06. Keep it roughly net-neutral in line count (rewrite,
+  not append). **This edit is governed by the claude-md-authoring
+  Skill** (judgement (c) above — it rewrites the semantics of existing
+  prose; run the Skill's Pre/Post checklist and verify the four
+  invariants, particularly compaction-durability of `## Document
+  Templates` and that no template-layout-neutrality invariant is
+  silently violated by the audience-scoping).
+- `.claude/CLAUDE.md` `## Roadmap` **Rules** block — extend the
+  **existing** #09 filename bullet (the one ending "#10 pins the
+  directory; #09 pins the filename — MECE.") with **one short clause**
+  pointing to `## Document Templates` as the authoritative directory
+  source — e.g. append: "see `## Document Templates` for the pinned
+  `specs/` and `.claude/meta/adr/` directories." Do **not** restate the
+  directory rule in the Rules block (that would create the forbidden
+  second source); the clause is a pointer only. This one-clause
+  extension, taken alone, is a routine single-line edit, but it ships
+  in the same change as the `## Document Templates` rewrite, which the
+  Skill governs.
+- **No agent-prompt edits** (judgement (c) above). The implementer must
+  **not** add directory-convention prose to `product-manager.md`,
+  `architect.md`, `orchestrator.md`, or `implementer.md`;
+  `## Document Templates` is the single source. `product-manager`'s
+  authoring-at-the-reserved-path behavior is already covered by its
+  ADR-014 row+`spec:` write-ownership, the #09 filename amendment, and
+  the #07 `☐→◐` pickup trigger; `architect`'s ADR-authoring already
+  resolves the adr-template from `## Document Templates`.
+- **No spec/adr-template edits** (judgement (c) above). The templates'
+  `## References` `Roadmap row: #NN` example is unaffected; the
+  directory is a property of the reserved path / ADR-authoring practice
+  the `## Document Templates` section states, not of template content.
+  Adding a template note would create a second source for the same
+  rule.
+- **No CI workflow and no script** (Spec Non-goals / Out of scope:
+  "#10 is a documentation/convention-statement milestone; CI
+  enforcement is an optional consequence"; "Adding a CI
+  directory-conformance check — a structural decision deferred to the
+  architect"). A future mechanical directory-conformance check is a
+  possible later milestone, **not** #10, re-evaluated under the
+  Counter-proposal trigger conditions below — distinct from #04/#05's
+  commit-time checks per the (d) MECE table.
+- **No moves or renames.** Every existing Spec file
+  (`specs/01-*.md` … `specs/10-*.md` plus `.ja.md` siblings) and every
+  existing ADR file (`.claude/meta/adr/001-*.md` …
+  `.claude/meta/adr/018-*.md` plus `.ja.md` siblings) already lives in
+  the pinned directory; #10 is a convention-statement, not a bulk-move
+  (Spec Non-goals).
+- **No Roadmap row change.** Row #10's `Design source` cell stays
+  `spec:`-only — this is an ADR-014 amendment, ADR-014 has no milestone
+  row of its own, so no `adr:` link is added to row #10 (Milestone →
+  ADR is 0:1; identical to the #07, #08, and #09 amendments' row
+  reasoning). `product-manager` flips the row glyph `◐→☑` after the
+  step-6 quality gate per the #07 transition matrix; `architect` adds
+  no `adr:` link here.
+- The Japanese counterpart of this ADR
+  (`014-roadmap-index-single-entry-point.ja.md`) must receive the
+  mirrored amendment, and the Japanese counterpart of CLAUDE.md (if
+  present) the mirrored `## Document Templates` rewrite and Rules-block
+  pointer-clause — a `technical-writer` task, **not** part of this
+  change. **This amendment creates a transient EN/JA heading mismatch
+  on ADR-014 (EN gains one `##`-level heading plus its `###`
+  sub-headings; JA was in heading parity before this change) until
+  `technical-writer` mirrors it; the #06 bilingual-parity detector
+  (`check-bilingual-parity.sh`, shipped) will FAIL on the ADR-014
+  EN/JA pair until the mirror lands. This is the expected, queued
+  `technical-writer` task — not a reason to omit this EN amendment**,
+  exactly as the 2026-05-17 status-transition (#07), Analyze row-guard
+  (#08), and spec-filename (#09) amendments did.
+
+### Counter-proposal
+
+The serious counter-position is **new ADR-019 — formalize the spec/adr <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+directory pin as a standalone ADR rather than an ADR-014 amendment,
+because #10 *changes the `## Document Templates` stance* rather than
+merely clarifying a consequence of the reservation rule**. It is
+recorded here per the
+ADR-012 / ADR-014 / ADR-015 / ADR-016 / ADR-017 / ADR-018 convention of
+taking a rejected alternative seriously rather than as a strawman. The
+argument:
+
+1. The Spec hands `architect` an explicit (b)/(c) choice ("ADR-014
+   amendment or a new ADR-019") and structurally parallel sibling <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+   milestones #05 and #06 both resolved their deferred-structural-
+   question Specs with *new* ADRs (017, 018). Symmetry of process
+   argues #10 → ADR-019. <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+2. **#10's strongest claim to ADR-019 that #09 did not have:** #10's <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+   pin **edits the semantics of an existing CLAUDE.md section**
+   (`## Document Templates`), turning an unqualified "the template does
+   not impose a layout" into an audience-partitioned rule. #09 only
+   *appended* a bullet; #10 *rewrites a standing design statement*.
+   Changing the meaning of an existing, deliberate design stance is
+   the ADR-017/ADR-018 "new structural decision" half, not a
+   consequence-clarification — and it is precisely the kind of change
+   that warrants a first-class, citable ADR a reviewer can point to as
+   "the directory-pin ADR," rather than the sixth amendment buried in a
+   long ADR-014 trail.
+3. ADR-019 would carry its own Roadmap back-link (`Roadmap row: #10`) <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+   and row #10 would gain an `adr:` link — the same bidirectional
+   contract #05/#06 exercise — giving #10 the same artifact shape as
+   its siblings, and matching #10's directory rule with a dedicated ADR
+   the way #10 is the directory complement of #09's filename rule.
+
+**Why the counter was not adopted:**
+
+- The argument 2 premise — "#10 *changes* the `## Document Templates`
+  stance" — is false on inspection, and this is the decisive point.
+  The `## Document Templates` "you decide where to place" guidance
+  **was never operative for this repo's Spec files**: ADR-014's own
+  2026-05-16 Spec-reservation amendment already nailed every reserved
+  `spec:` link to `specs/NN-slug.md`, fixing the `specs/` directory for
+  this repo *before #10 exists*. #10 does not reverse a stance that
+  applied to this repo's Specs — that stance was already overridden, in
+  this repo, by ADR-014 itself. The `## Document Templates` rewrite is
+  a **scoping clarification** (the guidance is fork-facing; this repo
+  is ADR-014-pinned) that makes an *already-true* audience partition
+  explicit in the prose. Naming a directory an existing ADR Decision
+  already fixed, and scoping standing prose to the audience it always
+  implicitly addressed, is a consequence-clarification — the identical
+  structural shape as #09's filename-component clarification of the
+  same reserved path, and as the #07/#08 amendments' formalization of
+  ADR-014-pre-flagged practice.
+- ADR-017 and ADR-018 self-classified as new-ADR-worthy on a specific,
+  stated discriminator: each introduced a **new detector + a new MECE
+  contract boundary + a new exemption-keying rule**. #10 introduces
+  **none** — the Spec's Non-goals and Out of scope *explicitly forbid*
+  a new CI detector or script; the MECE statement is a
+  scope-delineation placing #10 *outside* the detector-family partition
+  and against #09/#04/#05/#11, not a fourth partition within it; and
+  there is no exemption keying, no allowlist-vs-pattern choice, no new
+  file artifact, no new mechanism. The sibling-symmetry argument
+  inverts on inspection exactly as it did for #07, #08, and #09:
+  applying #05/#06's own stated discriminator to #10 yields
+  "amendment," because the structural half that dominated for #05/#06
+  is absent for #10.
+- Discoverability is *better*, not worse, as an ADR-014 amendment: the
+  canonical place a reader looks for "what directory is the reserved
+  `spec:` path's prefix" is the ADR that defined the Roadmap, the
+  reservation rule, and the `specs/NN-slug.md` path scheme itself — the
+  same ADR #09's filename clarification lives in. A separate ADR-019 <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+  would *fragment* the reserved-path contract across three ADRs (ADR-014
+  reservation rule + ADR-019 directory + the #09 amendment filename), <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+  reintroducing exactly the "which document is authoritative"
+  rediscovery ADR-014 exists to remove. Keeping the directory
+  clarification beside the filename clarification and the reservation
+  rule, all in ADR-014, is the single-source discipline ADR-014
+  embodies.
+- The bidirectional-back-link argument is moot: ADR-014 has no
+  milestone row of its own, so an amendment to it correctly carries
+  *no* `Roadmap row:` line and triggers no #05 drift contract. Forcing
+  a new ADR-019 purely to manufacture a back-link creates the <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+  bidirectional artifact rather than reflecting a genuine structural
+  decision — identical to the #07, #08, and #09 amendments' resolution
+  of the same objection.
+- The claude-md-authoring Skill requirement (judgement (c)) is **not**
+  evidence of a structural decision warranting a new ADR. The Skill
+  governs *how the CLAUDE.md prose edit is performed* (Pre/Post
+  checklist, invariant verification); it does not reclassify *whether
+  the decision is structural*. ADR-007 routes any significant CLAUDE.md
+  prose change through the Skill regardless of whether the underlying
+  decision is a new ADR or an amendment — the Skill requirement and the
+  ADR-vs-amendment classification are orthogonal axes. A
+  consequence-clarification whose implementation happens to rewrite
+  prose still needs the Skill for the *edit* and is still an amendment
+  for the *decision*.
+
+**Trigger conditions for re-evaluating this counter-proposal:**
+
+- A future milestone genuinely adds a *mechanical CI enforcement* of
+  the directory convention (a new detector that statically verifies
+  every Spec is under `specs/` and every ADR under `.claude/meta/adr/`,
+  with same-directory EN/JA siblings) — that would be a new detector +
+  new boundary + new keying, the ADR-017/ADR-018 discriminator's
+  structural half, warranting its own ADR with this amendment's
+  convention as its inherited normative baseline. The Spec explicitly
+  flags the CI check as "an optional consequence, not a deliverable of
+  this milestone."
+- This repo's `specs/` or `.claude/meta/adr/` directory is itself
+  restructured (e.g. the reservation rule is replaced, or `specs/` is
+  renamed, or ADRs move out of `.claude/meta/`) — a genuine change to
+  the underlying path mechanism, which would reopen the owning Decision
+  rather than extend it by amendment.
+- The `## Document Templates` fork-facing guidance is found to require
+  *divergent directory rules per fork profile* such that a single
+  audience-scoped statement in CLAUDE.md plus an ADR-014 amendment can
+  no longer express it — at which point a dedicated ADR with
+  per-profile directory rules may be warranted.
+- The directory convention is found to genuinely *contradict* (not
+  merely coexist by audience with) the `## Document Templates`
+  free-placement guidance — e.g. if a future decision makes the
+  template *itself* (not just this repo) impose `specs/`, removing the
+  fork's freedom — which would be a real reversal of a design stance,
+  not a scoping clarification, and would warrant its own ADR.
+
+The counter-proposal stays in this amendment as the historical record
+of the decision's most serious objection, per the
+ADR-012 / ADR-014 / ADR-015 / ADR-016 / ADR-017 / ADR-018 convention.
+
+The original Status line (`Accepted — 2026-05-15`) is unchanged; this
+amendment appends a directory convention-statement of an
+already-sanctioned path scheme (the `specs/` prefix of the reservation
+rule's reserved path, plus the de-facto ADR directory) and does not
+reopen the Decision.

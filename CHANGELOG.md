@@ -213,6 +213,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   for traceability. Roadmap row #05 remains `◐ in-progress`. Bilingual
   `.md` and `.ja.md` for both `specs/05-roadmap-drift-detection-ci.md`
   and ADR-017.
+- **Milestone #10 — design only; implementation deferred.**
+  Spec `specs/10-spec-adr-directory-pinning.md` defines the Spec/ADR
+  directory location pin. The structural decision (ADR-014 amendment
+  vs. new ADR-019) was decided this session by the architect as
+  ADR-014's `## Amendment — 2026-05-17 (spec/adr directory pin)` — a
+  consequence-clarification of ADR-014's existing Spec-reservation
+  Decision, not a new ADR-019 (the counter-proposal is permanently
+  recorded in the amendment per the
+  ADR-012/ADR-014/ADR-015/ADR-016/ADR-017/ADR-018 convention). Key
+  resolutions: directory pin `specs/` (Specs) + `.claude/meta/adr/`
+  (ADRs); (a) placement = CLAUDE.md `## Document Templates` rewritten
+  audience-scoped (fork = free; this repo = ADR-014-pinned) + a
+  one-clause MECE pointer in the `## Roadmap` Rules block; (c)
+  claude-md-authoring Skill IS required for the #10 CLAUDE.md edit —
+  the genuine divergence from #09: #10 rewrites existing
+  `## Document Templates` prose semantics (restructuring class), vs
+  #09's single-bullet routine-edit carve-out; no agent-prompt edits,
+  no spec/adr-template edits, no CI workflow/script, no moves/renames;
+  (d) MECE boundary: #10 (directory) vs #09 (filename) vs #04 vs #05
+  vs #11 vs `## Document Templates` fork-facing guidance vs ADR-014
+  reservation rule — MECE by owner and by audience; serious
+  Counter-proposal (standalone ADR-019) recorded and rejected with 4
+  re-evaluation trigger conditions; Roadmap row #10 stays `spec:`-only
+  (ADR-014 has no milestone row of its own; identical to #07/#08/#09
+  amendments). Implementation deferred to a future session. Bilingual
+  `.md` and `.ja.md` (JA mirror lands in the same session to keep
+  `check-bilingual-parity.sh` green).
 - **Milestone #09 — design only; implementation deferred.**
   Spec `specs/09-spec-filename-convention.md` (Approved) defines the
   Spec filename convention: the canonical form `specs/NN-slug.md` where
