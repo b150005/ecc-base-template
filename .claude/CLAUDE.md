@@ -61,10 +61,20 @@ All agents detect the project ecosystem at runtime by reading this file and proj
 - ADR template: `.claude/templates/adr-template.md` (`.ja.md` for Japanese)
 - Spec/PRD template: `.claude/templates/spec-template.md` (`.ja.md` for Japanese)
 
-You decide where to place the resulting documents. Single-language projects can
-write directly under a top-level directory of your choice (e.g. `adr/001-foo.md`);
-bilingual projects can split by language (e.g. `adr/en/001-foo.md`,
-`adr/ja/001-foo.md`). The template does not impose a layout — only the templates.
+**Forks** decide their own layout: a single-language fork under any top-level
+directory (e.g. `adr/001-foo.md`), a bilingual fork split by language (e.g.
+`adr/en/001-foo.md`, `adr/ja/001-foo.md`). The template imposes no layout on
+forks — only the templates. **This repository is pinned** (dogfooding posture,
+a different audience — not in tension with the fork freedom above): Spec files
+live in `specs/`, ADR files in `.claude/meta/adr/` (three-digit zero-padded
+prefix), both at the repo root. Not a free choice here — `specs/` is fixed by
+ADR-014's reservation rule (every row's reserved `spec:` link is
+`specs/NN-slug.md`) and `.claude/meta/adr/` is where every ADR to date lives;
+`product-manager` authors a Spec at the row's reserved path, `architect` a new
+ADR in `.claude/meta/adr/`. An EN Spec and its JA sibling co-exist in the
+**same** `specs/` directory (`specs/NN-slug.md`, `specs/NN-slug.ja.md`) — not
+split by language (the `adr/en/` / `adr/ja/` example is fork-illustrative);
+heading-tree parity of the pair is owned by Roadmap #06.
 
 ## CLAUDE.md authoring guidance
 
@@ -139,7 +149,7 @@ Single entry point mapping each milestone to its authoritative design source. Ea
 | 07 | Roadmap status-transition ownership assignment | ☑ done | spec: `specs/07-roadmap-status-transitions.md` |
 | 08 | Orchestrator Analyze row-guard | ☑ done | spec: `specs/08-orchestrator-row-guard.md` |
 | 09 | Spec filename convention alignment (`NN-slug.md`) | ☑ done | spec: `specs/09-spec-filename-convention.md` |
-| 10 | Spec/ADR directory location pin in CLAUDE.md | ◐ in-progress | spec: `specs/10-spec-adr-directory-pinning.md` |
+| 10 | Spec/ADR directory location pin in CLAUDE.md | ☑ done | spec: `specs/10-spec-adr-directory-pinning.md` |
 | 11 | Opt-in trigger guidance for implementation/design verification domains | ☐ todo | spec: `specs/11-verification-domain-opt-in-guidance.md` |
 | 12 | CI coverage gate (80% hard check) | ☐ todo | spec: `specs/12-coverage-ci-gate.md` |
 | 13 | ECC-absent degraded-review signal | ☐ todo | spec: `specs/13-ecc-absent-signal.md` |
@@ -155,7 +165,7 @@ Single entry point mapping each milestone to its authoritative design source. Ea
 **Rules:**
 - One row per milestone; row number stable, never reused (follows ADR-number convention). A split = new row + note on old row.
 - `Design source` names the type explicitly: `spec:` and/or `adr:` links. `spec:` paths are reserved at row-creation even if the file does not yet exist on disk.
-- Spec filename convention: a Spec file is `specs/NN-slug.md` where `NN` is the row number zero-padded to a two-digit minimum (`1→01`; rows ≥100 written without extra padding) and `slug` is the kebab-case slug already fixed in the row's reserved `spec:` path (copy it from the row, do not re-derive). The JA sibling is `specs/NN-slug.ja.md` (same `NN`/`slug`, `.ja` before `.md`); its heading-tree parity is owned by #06. `specs/NN-progress.md` is excluded — `progress` is ADR-016's reserved suffix, governed by ADR-016's lifecycle, not by this convention. #10 pins the directory; #09 pins the filename — MECE.
+- Spec filename convention: a Spec file is `specs/NN-slug.md` where `NN` is the row number zero-padded to a two-digit minimum (`1→01`; rows ≥100 written without extra padding) and `slug` is the kebab-case slug already fixed in the row's reserved `spec:` path (copy it from the row, do not re-derive). The JA sibling is `specs/NN-slug.ja.md` (same `NN`/`slug`, `.ja` before `.md`); its heading-tree parity is owned by #06. `specs/NN-progress.md` is excluded — `progress` is ADR-016's reserved suffix, governed by ADR-016's lifecycle, not by this convention. #10 pins the directory; #09 pins the filename — MECE; see `## Document Templates` for the pinned `specs/` and `.claude/meta/adr/` directories.
 - Milestone ↔ Spec is 1:1 mandatory; Milestone → ADR is 0:1 or 1:N (only when a structural decision occurred; the ADR's `## References` back-links the row number).
 - Status = implementation state: ☐ todo / ◐ in-progress / ☑ done / ✗ dropped. Dropped rows stay (history not rewritten).
 - Index only — never duplicate acceptance criteria or rationale; the linked Spec/ADR is the source of truth.

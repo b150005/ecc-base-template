@@ -384,6 +384,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Milestone #10 — now IMPLEMENTED** (design landed previously under
+  Documentation as ADR-014's 2026-05-17 `(spec/adr directory pin)`
+  amendment; implementation completed this session). A
+  CLAUDE.md-only change in two places. (1) The `## Document
+  Templates` placement paragraph was **rewritten in place** to be
+  audience-scoped: forks decide their own layout (the template
+  imposes no layout on forks — preserved, not reversed), while *this
+  repository's* dogfooding posture pins Spec files to `specs/` and
+  ADR files to `.claude/meta/adr/` (three-digit zero-padded prefix),
+  both at the repo root, with EN/JA Spec siblings co-located in the
+  **same** `specs/` directory (`specs/NN-slug.md`,
+  `specs/NN-slug.ja.md`, not language-split) and heading-tree parity
+  owned by #06. The two audiences are explicitly framed as
+  non-conflicting (R-03). (2) The existing #09 filename bullet in
+  the `## Roadmap` **Rules:** block gained **one pointer clause**
+  ("see `## Document Templates` for the pinned `specs/` and
+  `.claude/meta/adr/` directories") — a pointer only, not a
+  restatement of the rule (no forbidden second source). Because the
+  `## Document Templates` edit rewrites existing prose semantics
+  (restructuring class, the genuine divergence from #09's
+  single-bullet routine carve-out), the **claude-md-authoring Skill
+  was invoked** (Pre/Post checklists + all four invariants verified
+  against the edited section; Invariant 2 compaction-durability and
+  template-layout-neutrality specifically checked). No agent-prompt
+  edits, no spec/adr-template edits, no CI workflow or script, no
+  moves or renames (all 16 existing `specs/*` and 36 existing
+  `.claude/meta/adr/*` files already conform — a
+  convention-statement, not a bulk-move; verified empirically). No
+  new ADR (this is an ADR-014 amendment, identical reasoning to
+  #07/#08/#09); Roadmap row #10 stays `spec:`-only (no `adr:`
+  link — ADR-014 has no milestone row of its own). `CLAUDE.md` is
+  EN-only; no bilingual mirror needed. All eight `specs/10`
+  acceptance criteria verified directly against the edited file.
+  Roadmap row #10 flips ◐→☑ done.
+
 - **Milestone #09 — now IMPLEMENTED** (design landed previously under
   Documentation as ADR-014's 2026-05-17 `(spec filename convention)`
   amendment; implementation completed this session). A
