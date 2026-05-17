@@ -150,7 +150,7 @@ Single entry point mapping each milestone to its authoritative design source. Ea
 | 08 | Orchestrator Analyze row-guard | ☑ done | spec: `specs/08-orchestrator-row-guard.md` |
 | 09 | Spec filename convention alignment (`NN-slug.md`) | ☑ done | spec: `specs/09-spec-filename-convention.md` |
 | 10 | Spec/ADR directory location pin in CLAUDE.md | ☑ done | spec: `specs/10-spec-adr-directory-pinning.md` |
-| 11 | Opt-in trigger guidance for implementation/design verification domains | ☐ todo | spec: `specs/11-verification-domain-opt-in-guidance.md` |
+| 11 | Opt-in trigger guidance for implementation/design verification domains | ☑ done | spec: `specs/11-verification-domain-opt-in-guidance.md` |
 | 12 | CI coverage gate (80% hard check) | ☐ todo | spec: `specs/12-coverage-ci-gate.md` |
 | 13 | ECC-absent degraded-review signal | ☐ todo | spec: `specs/13-ecc-absent-signal.md` |
 | 14 | Research-tier validation for auth→T2 mis-classifications | ☐ todo | spec: `specs/14-research-tier-validation.md` |

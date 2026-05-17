@@ -384,6 +384,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Milestone #11 — now IMPLEMENTED** (designed AND implemented this
+  same session — no prior-session design-only bullet exists; this is a
+  deliberate single-session collapse, and the architect's `### Downstream
+  implementer tasks` heading was updated to record it). A SKILL.md-only
+  prose change: one new `## Project adoption triggers` section inserted
+  between `## Configuration` and `## When to invoke` in
+  `.claude/skills/verification-layer/SKILL.md`. The section contains
+  ≥3 project-characteristic adoption triggers per domain
+  (`implementation` and `design`), framed additively — partial match as
+  a guide, not a checklist gate. Triggers are distinct from and do not
+  duplicate the per-change runtime triggers in
+  `implementation/protocol.md` and `design/protocol.md` `## When to
+  invoke`; an outbound pointer directs readers to those files for the
+  subsequent question. Structural decision: **ADR-014 amendment** (NOT
+  new ADR-019, NOT ADR-010 amendment). The ADR-018 Alternative-B
+  discriminator triad was applied clause-by-clause: no new detector
+  (eliminates new ADR-019 trigger 1), no new MECE partition
+  (eliminates trigger 2), no new keying (eliminates trigger 3);
+  ADR-010's default-off Decision is preserved verbatim, disqualifying
+  an ADR-010 amendment. A serious counter-proposal (author ADR-019 to
+  record a new structural convention) was raised and rejected with
+  explicit re-evaluation trigger conditions recorded in the ADR-014
+  amendment. MECE/scope facts: populates the slot pre-reserved for #11
+  at ADR-014 §(d) MECE table line 1800 (classification:
+  "documentation/convention"); no new CI detector, no new MECE
+  partition, no `.claude/verification.yml` active-default change
+  (`implementation.enabled`/`design.enabled` remain `false`); no
+  agent-prompt edits, no spec/adr-template edits, no script or
+  workflow. The CLAUDE.md change is a single Roadmap-row glyph flip
+  (`☐→◐` at pickup by `product-manager`) — the lightest routine edit;
+  claude-md-authoring Skill correctly NOT invoked (identical to
+  #07/#08/#09/#10). Bilinguality: SKILL.md is English-only by design
+  (frontmatter declares it; correctly no `.ja.md` sibling exists or was
+  created). The ADR-014 amendment shipped with its `.ja.md` mirror
+  same-session (51/51 heading parity verified). The JA Spec sibling
+  `specs/11-verification-domain-opt-in-guidance.ja.md` is authored by
+  `technical-writer` in this same step-7 documentation pass.
+  Roadmap row #11 flips ◐→☑ done.
+
 - **Milestone #10 — now IMPLEMENTED** (design landed previously under
   Documentation as ADR-014's 2026-05-17 `(spec/adr directory pin)`
   amendment; implementation completed this session). A

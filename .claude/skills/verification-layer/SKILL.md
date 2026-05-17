@@ -145,6 +145,58 @@ disable it explicitly with a documented reason.
 See [`.claude/verification.yml.example`](../../verification.yml.example)
 for the full template with annotated knobs.
 
+## Project adoption triggers
+
+The project-adoption question — "should this project enable this domain
+at all?" — is distinct from the per-change question "for this specific
+change, does the Critic spawn?" The latter is answered by each domain's
+`protocol.md` `## When to invoke`; this section answers the former.
+
+The signals below are additive: a fork uses partial match as a guide,
+not a checklist gate. No single signal is a hard requirement.
+
+### implementation
+
+Consider setting `implementation.enabled: true` when your project
+exhibits one or more of these standing characteristics:
+
+- **Non-trivial custom algorithms or unusual data structures.** The
+  codebase contains bespoke logic (e.g. a custom scheduler, a
+  hand-rolled cache eviction policy, domain-specific graph traversal)
+  where a plausible-looking implementation can behave correctly on
+  common inputs yet diverge on the edge cases that matter.
+- **Small team with limited independent reviewer diversity.** Few
+  engineers review each change, increasing the likelihood that all
+  reviewers share the same mental model of the implementation and miss
+  a shared blind spot.
+- **Partial test-oracle ownership by the Generator.** The same author
+  who writes the implementation also controls the tests that judge it,
+  reducing the chance that those tests falsify the implementation's
+  assumptions.
+
+### design
+
+Consider setting `design.enabled: true` when your project exhibits one
+or more of these standing characteristics:
+
+- **High ADR cadence.** Architecture decisions are frequent and
+  consequential; the cost of a weak ADR propagates across many
+  subsequent changes before the mistake surfaces.
+- **Long architectural reversibility horizon.** Decisions are expensive
+  to undo once shipped (e.g. a public API contract, a database schema
+  with live customers, a platform dependency that takes quarters to
+  replace), so the penalty for not considering rejected alternatives
+  seriously is disproportionately large.
+- **Downstream consumers spanning multiple independent teams.** A
+  flawed ADR accepted here propagates to teams that have no visibility
+  into the original trade-off analysis, amplifying the cost of a
+  suboptimal choice.
+
+Once a domain is enabled, the per-change runtime trigger for that
+domain lives in its own `## When to invoke`:
+[implementation/protocol.md](./implementation/protocol.md) and
+[design/protocol.md](./design/protocol.md).
+
 ## When to invoke
 
 Per domain. Each domain's `protocol.md` states its own triggers and

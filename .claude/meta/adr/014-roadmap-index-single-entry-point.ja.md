@@ -1618,3 +1618,315 @@ ADR-012 / ADR-014 / ADR-015 / ADR-016 / ADR-017 / ADR-018 の慣例に従い、
 元のステータス行 (`Accepted — 2026-05-15`) は変更しない; 本 amendment は
 ADR-014 の既存の Spec 予約ルール決定のディレクトリコンポーネント帰結明確化を
 追記するものであり、決定を再開するものではない。
+
+## Amendment — 2026-05-17 (verification-domain opt-in trigger guidance)
+
+本 amendment は、`specs/11-verification-domain-opt-in-guidance.md` の
+リスク R-01 が `architect` に委ねた構造的決定を記録する: デフォルト off の
+`implementation` / `design` verification-layer ドメインに対するフォーク向け
+プロジェクト採用トリガーガイダンスを *どこに* 配置するか、そしてその配置が
+新しい ADR-019 を正当化するか帰結明確化として amendment で扱うか。 <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+`specs/11-…` (Roadmap row #11) が権威的なスコープであり、ガイダンスが
+カバーしなければならない内容 (ドメインごとに具体的なプロジェクト特性トリガー
+3 つ以上、`protocol.md` ファイルの変更単位ランタイムトリガーとは明示的に区別、
+CI 強制なし、`.claude/verification.yml` のアクティブデフォルト変更なし) と
+その 8 つの受け入れ基準を記述し、構造的な *どのように* (配置ファイル/セクション、
+ADR 戦略、分割か単一か) を `architect` に委ねている (R-01 (a)-(d))。本 amendment は
+その決定を記録する。これは **ADR-014 のすでに認可された MECE パーティションの
+帰結明確化** であり ── 具体的には、2026-05-17 の spec/adr ディレクトリピン
+amendment の §(d) MECE 境界テーブルの帰結明確化であり、**それは #11 の Spec が
+存在する前に既に #11 の境界を名付け「documentation/convention」と分類している**。
+これは ADR-010 の決定の明確化では *ない*: ADR-010 のデフォルト off スタンスは
+逐語的に保持され変更されない (Spec 行 22、28、76、117; AC-5 行 60)。新しい
+ディテクター、CI ワークフロー、コントラクト境界、キーイングルール、MECE
+パーティション、またはファイル成果物は導入しない。
+
+### The (b)/(c) decision — ADR-014 amendment, not new ADR-019, by the ADR-018 Alternative-B discriminator <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal; it is intentionally never created (see Counter-proposal below) -->
+
+Spec の R-01 (b) は `architect` に明示的な選択肢 「新しい ADR-019 か ADR-010 <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+amendment か (ADR-018 の Alternative-B 識別基準を適用)」を渡している。条項ごとに <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+誠実に、file:line 証拠とともに適用する ── ホスト候補は Spec の暫定的な
+「ADR-010」から **ADR-014** に修正する。理由は最終条項に示す:
+
+- **新しいディテクター? No.** Spec の Non-goals 行 26 (「フォークが有効化した
+  ドメインを強制または監査する CI ディテクターまたはチェックの追加。新しい
+  ディテクターは ADR-014:1800 の『documentation/convention』分類に違反する
+  新しい MECE パーティションを作成する。これはスコープ外でありこのマイルストーンの
+  帰結として提案してはならない」) と Out of scope 行 113 (「フォークの
+  verification ドメイン設定を検査する CI ディテクター、監査チェック、または
+  リンティングルールの追加」) はディテクターを #11 の成果物として *明示的に
+  禁じている*。ADR-015 と ADR-017 はそれぞれ新しいスクリプト + 新しいワークフロー
+  (`check-dangling-refs.sh` / `check-roadmap-drift.sh`) を導入したからこそ新
+  ADR 相当と自己分類した; ADR-018 も同様 (`check-bilingual-parity.sh`)。
+  #11 はスクリプトもワークフローも **ゼロ** 導入する ── #07 (ディテクターなし)、
+  #08 (Non-goals が CI ワークフローを禁じた)、#09 (Non-goals が CI ファイル名
+  ディテクターを禁じた)、#10 (Non-goals が CI ディレクトリディテクターを
+  禁じた) amendment と同一。ADR-015/ADR-017/ADR-018 で支配的だった構造的な
+  半分はここには存在しない。#11 は純粋な散文ガイダンスである。
+- **新しい MECE パーティション/境界? No ── 境界はすでに存在し既に #11 を
+  名付けている。** 決定的なチェック: ADR-014 の 2026-05-17 spec/adr
+  ディレクトリピン amendment の §(d) MECE テーブル (本ファイル行 1800) は
+  *すでに* 行 `| #11 (verification-domain opt-in guidance) | Opt-in trigger
+  guidance for implementation/design verification domains. |
+  documentation/convention (reserved-but-absent Roadmap row) |` を含み、
+  行 1808 は *すでに*「*verification-domain opt-in trigger guidance* is
+  #11's」を既存の documentation/convention パーティション内の独立した
+  オーナーとして記述している。#11 は **行もパーティションも追加しない** ──
+  ADR-014 が Spec オーサリング前に #11 のために予約した境界スロットを
+  *埋める* のであり、(d) テーブル自身の `ref-allow` コメントが予期した通り
+  (「#11 is a reserved-but-absent Roadmap row … the MECE boundary must
+  name it before its Spec is authored at pickup」)。これは ADR-015 の
+  absence-of-claim キーイングと ADR-018 の convention-presence キーイングの
+  逆である: 新しいパーティションがないので新しいキーイングもない ── 事前宣言
+  され事前分類されたスロットの populate のみ。
+- **新しいキーイング/メカニズム/ファイル成果物? No.** 除外キーイングルール、
+  allowlist 対 pattern の選択、パース戦略、新しいファイル、新しいスクリプト、
+  agent-prompt の変更はない。成果物は既存の 2 ファイルに追記される
+  ドキュメント散文である (Downstream implementer tasks 参照)。Spec
+  Key-interaction 6 (行 80) は architect の決定を配置のみにスコープし、
+  行 26 はあらゆるメカニズムを禁じる。
+- **ADR-010 の決定を再開する? No ── スタンスを *説明* し、変更しない。**
+  Spec 行 22 (「`.claude/verification.yml` のアクティブデフォルトを変更しない …
+  デフォルト off は ADR-010 の認可されたスタンス; ガイダンスはスタンスを
+  説明し、変更しない」)、行 28、行 76 (「ADR-010 … #11 はそのスタンスを
+  変更しない。ADR-010 の決定や帰結を変更せずに opt-in 決定を informed に
+  するドキュメントを追加する」)、行 117 (「ADR-010 の決定や帰結の変更 …
+  デフォルト off スタンスは正しい」)、AC-5 (行 60: #11 出荷後も
+  `.claude/verification.yml` の `implementation.enabled`/`design.enabled`
+  は `false` のまま) がこれを明確にする。#11 は変更されない ADR-010 決定
+  *の* 下流ドキュメントであり、それ *の* 変更ではない。
+- **既存決定の帰結明確化? Yes ── 正しいホストは ADR-010 ではなく
+  ADR-014。** Spec の R-01 は「ADR-010 amendment」を amendment 候補として
+  暫定的に名付ける。識別基準を厳密に適用するとこれは修正される: ADR-010 の
+  決定は *手付かず* (上記条項) なので、#11 は *ADR-010 の決定の*
+  帰結明確化ではありえない ── 明確化される ADR-010 帰結は存在しない;
+  スタンスは単に *引用* されるだけ。#11 が帰結明確化する対象は **ADR-014 の
+  MECE パーティション** である: §(d) 境界テーブルはすでに #11 を
+  「documentation/convention」と分類しスロットを予約しており、#11 は
+  #07/#08/#09/#10 と構造的に同一である ── いずれも documentation/convention
+  マイルストーンで、その構造的決定が ADR-014 amendment として記録されたのは、
+  各々が ADR-014 がすでに所有する境界の帰結を *埋めるか明確化する* だけで、
+  決定を再開しなかったからである。#11 を ADR-014 にホストすることで §(d)
+  MECE テーブルとその所有 ADR が同居する (#11 を名付けるテーブルと #11 の
+  スロットを埋める amendment が同一ファイルに存在); ADR-010 にホストすると
+  MECE 簿記が 2 つの ADR に分割され利益がなく、存在しない ADR-010 決定帰結が
+  明確化されているかのように誤って示唆する。ADR-014 が正しいホストである
+  のは、ADR-018 が三方向コントラクトパーティションを 1 つの ADR に保つために
+  用いたのと同じ簿記局所性の根拠による。
+
+**結論。** トライアドは **満たされない** (新しいディテクターなし、新しい
+MECE パーティションなし、新しいキーイングなし); ADR-010 の決定は **再開
+されない**。#11 は *ADR-014 自身の §(d) MECE テーブルが #11 のために事前予約
+したスロットを populate する* 帰結明確化である。新しい ADR-019 ではなく、 <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+ADR-010 amendment でもなく、**ADR-014 amendment** として記録する ──
+ADR-018 の Alternative B が論じ通し、#07/#08/#09/#10 amendment が適用したのと
+同じ判断。 <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+
+### The placement decision (R-01 (a), (c))
+
+**単一の配置: `.claude/skills/verification-layer/SKILL.md` に新しい
+`## Project adoption triggers` セクションを、既存の `## Configuration`
+セクションの直後、`## When to invoke` の直前に追加する。** 分割しない;
+`verification.yml.example` には置かない; `protocol.md` ファイルにも置かない。
+Spec が surface した 3 候補 (Key-interaction 2、3、6) に対する根拠:
+
+- **なぜ `verification.yml.example` ではなく SKILL.md か。** AC-6 (Spec
+  行 62) はフォーク管理者が「採用ステップの一部でないファイルを読まずに」
+  ガイダンスに遭遇することを要求する。採用ステップは CLAUDE.md
+  `## Development Workflow` step 3 であり、すでに管理者を *verification-layer
+  Skill* (`.claude/skills/verification-layer/SKILL.md`) と
+  `.claude/verification.yml` に誘導している ── `verification.yml.example`
+  には **誘導していない**。`verification.yml.example` はその行 2-8 ヘッダー
+  自身により「DOCUMENTATION REFERENCE ONLY … never read by the
+  verification layer」であり、採用ステップファイルではなく *フィールド
+  リファレンス* である。決定ガイダンスをそこだけに置くと管理者が非採用
+  ステップファイルを発見する必要が生じ (AC-6 不合格)、アクティブな
+  `.claude/verification.yml` から drift する傾向もある (注釈付きコピーが
+  2 つ)。アクティブな `.claude/verification.yml` は AC-5 とタスク
+  (「`.claude/verification.yml` に触れるな」) により制約ロックされているため、
+  ガイダンスはアクティブ config にも置けない。SKILL.md は採用ステップが
+  すでに義務付けている唯一のファイルで *かつ* ここで書き込み可能なものである。
+- **なぜ `## Configuration` に折り込まず隣接する新セクションか。** SKILL.md
+  `## Configuration` (行 126-146) は「各 knob のデフォルトは何でなぜ非対称か」
+  に答える。#11 は *隣接するが別個の* 質問「どのようなプロジェクトに対して
+  二重コストの支払いが knob を flip する価値があるか」に答える。
+  `## Project adoption triggers` を `## Configuration` (knob) と
+  `## When to invoke` (変更単位ランタイムトリガー) の *間に* 置くことで
+  3 つの質問が自然な読み順 ── *デフォルトは何か → プロジェクトはそれを
+  変えるべきか → 変えたら Critic はいつ発火するか* ── に並び、管理者は
+  config 決定のまさにその地点で採用ガイダンスを読む。追加ファイル参照は
+  ゼロ (AC-6 はクロスリファレンスではなく隣接で満たされる)。
+- **なぜ `protocol.md` ファイルではないか。** `implementation/protocol.md`
+  と `design/protocol.md` の `## When to invoke` は、プロジェクトが既に
+  opt-in した後の *変更単位* 質問 (「この特定の変更で Critic は spawn する
+  か?」) に答える。AC-3/AC-4 (Spec 行 56、58) はプロジェクト採用ガイダンスが
+  それらのセクションと *明確に区別され重複しない* ことを要求する。#11 の
+  ガイダンスを変更単位トリガーと同じファイルに同居させることはまさに R-02
+  のスコープクリープリスクである; SKILL.md (ドメインナビゲーターと共有
+  invariant が存在する 1 つ上のレベル) に保つことで 2 つの質問を文言だけで
+  なくファイルで構造的に分離する。新セクションは後続の変更単位質問のために
+  読者を `protocol.md` の `## When to invoke` セクションへ *先へ* 誘導し
+  (Spec Key-interaction 1)、その内容を再記述しない。
+
+この配置は **単一の場所で自己完結** している (R-01 (c): 分割しない)。追加する
+クロスリファレンスは *外向きポインタ* (「有効化後の変更単位トリガーは
+`implementation/protocol.md` / `design/protocol.md` の `## When to invoke`
+参照」) のみで、重複なしに Spec Key-interaction 1 を満たす (AC-4)。
+
+### Downstream implementer tasks (performed in this same session — for #11 the two-session decision-then-implementation split used by #03/ADR-016 · #05/ADR-017 · #06/ADR-018 · #07/ADR-014-amendment · #08/ADR-014-amendment · #09/ADR-014-amendment · #10/ADR-014-amendment was deliberately collapsed: #11's implementation is a single prose-only SKILL.md section, fully enumerated below and verifiable against the Spec's eight ACs, requiring no separate review cycle; the task list is retained verbatim for traceability and as the precedent shape for milestones whose implementation *is* deferred)
+
+implementer ステップ (Spec step 5) は機械的で、Spec の 8 つの AC に対して
+検証可能である:
+
+- `.claude/skills/verification-layer/SKILL.md` ── **新しい
+  `## Project adoption triggers` セクションを 1 つ追加し、既存の
+  `## Configuration` セクション (行 146 で終わる) の直後、`## When to
+  invoke` (行 148) の直前に配置する。** セクションは散文として以下を含む
+  (その中のどこにもディテクター/CI/強制の言葉なし ── AC-7、AC-8):
+  1. *プロジェクト採用* 質問 (「このプロジェクトはそもそもドメインを
+     有効化すべきか?」) を `protocol.md` `## When to invoke` セクションが
+     所有する *変更単位* 質問 (「この変更で Critic は spawn するか?」) と
+     区別する 1 文のフレーミング ── AC-3 を満たす。
+  2. `implementation.enabled: true` の具体的プロジェクト特性トリガーを
+     **3 つ以上** 名付ける `### implementation` サブセクション (Spec AC-1 /
+     Goal 行 18 の例を逐語コピーせず参考に: 非自明なカスタムアルゴリズム;
+     レビュアー多様性が限られた小規模チーム; Generator による部分的な
+     test-oracle 所有)。「opt-in の価値を高めるシグナル」としてフレーム、
+     ゲートではなく加法的 (Spec R-03 緩和、行 108) ── いずれも変更単位の
+     「今 spawn するか?」トリガーではない (AC-1)。
+  3. `design.enabled: true` の具体的プロジェクト特性トリガーを **3 つ以上**
+     名付ける `### design` サブセクション (Spec AC-2 / Goal 行 19 の例:
+     高い ADR ケイデンス; 長いアーキテクチャ可逆性ホライゾン; 複数の
+     独立チームにまたがる下流コンシューマ)。同じ加法的フレーミング;
+     いずれも変更単位トリガーではない (AC-2)。2 つのトリガーセットは
+     可視的に区別され混同されてはならない (Spec User-story 行 2)。
+  4. 末尾の 1 行 *外向きポインタ*: ドメインが有効化されたら変更単位
+     ランタイムトリガーはそのドメインの `protocol.md` `## When to invoke`
+     に存在する ── **リンクし、再記述しない** (AC-4 / Spec Key-interaction
+     1 を満たす; 再記述は AC-4 不合格)。
+  5. `.claude/verification.yml` のアクティブ値が変わるという言及なし;
+     セクションはドキュメントのみ (AC-5 と一貫、レビュアーは手付かずの
+     アクティブ config に対して検証する)。
+- **`.claude/verification.yml` 編集なし** (タスク制約; Spec AC-5、Out of
+  scope 行 112)。アクティブ config の `implementation.enabled: false` /
+  `design.enabled: false` は逐語的に維持される。
+- **`.claude/verification.yml.example` 編集なし。** 配置は SKILL.md
+  単一場所 (上記配置決定); example ファイルも編集すると R-01 (c) が拒否する
+  分割と drift する 2 つ目の注釈付きコピーが生じる。(将来の管理者が
+  example の `implementation:`/`design:` コメントブロックに「SKILL.md
+  `## Project adoption triggers` 参照」の 1 行ポインタを望む場合、それは
+  任意の別個の非 #11 の nicety であり ── 配置単一ソースを保つため明示的に
+  #11 の成果物では **ない**。)
+- **`protocol.md` 編集なし。** `implementation/protocol.md` と
+  `design/protocol.md` の変更単位 `## When to invoke` と `## Configuration`
+  ブロックは正しくスコープ外 (Spec Non-goals 行 30、Out of scope 行 115)。
+  #11 はそれらを *指す*; 変更しない。
+- **CI ワークフローなし、スクリプトなし** (Spec Non-goals 行 26、Out of
+  scope 行 113)。#11 は documentation/convention; 設定監査ディテクターは
+  #11 の帰結として明示的に禁じられており、延期任意でもない (#09/#10 と
+  異なり、Spec は「延期」ではなく端的に禁じる)。
+- **agent-prompt 編集なし。** `product-manager.md`、`architect.md`、
+  `orchestrator.md`、`implementer.md`、または Critic agent 散文の変更なし。
+  SKILL.md が単一ソース; orchestrator/product-manager はそれを既存の
+  `## Development Workflow` step 3 ルート (すでに verification-layer Skill を
+  名付けている) 経由でポリシーコンテキストとして読む (Spec Target-users
+  行 3 / User-story 行 4)。
+- **Roadmap row 変更なし。** Row #11 の `Design source` セルは `spec:`
+  のみのまま ── これは ADR-014 amendment であり、ADR-014 は自身の
+  マイルストーン row を持たないので、row #11 に `adr:` リンクは追加しない
+  (Milestone → ADR は 0:1; #07、#08、#09、#10 amendment の row 推論と同一)。
+  `product-manager` が step-6 品質ゲート通過後に #07 遷移マトリクスに従い
+  row グリフを `◐→☑` に flip する; `architect` はここで `adr:` リンクを
+  追加しない。(ADR-014 の write-ownership により `architect` が `adr:`
+  リンクを追加するのは *新しい* ADR が作成された場合のみ; row を所有しない
+  ADR-014 への amendment は追加しない ── #07-#10 の前例。)
+- 本 ADR の日本語版 (`014-roadmap-index-single-entry-point.ja.md`) は
+  **この同一セッションで** ミラー amendment を受け取る (このタスクが
+  編集する ADR の architect 所有 ADR JA 兄弟パリティ; レポート参照)。
+  CLAUDE.md の日本語版 (存在する場合) と JA Spec 兄弟
+  (`specs/11-…ja.md`) は `technical-writer` タスクのままで、この変更の
+  一部では **ない**。EN↔JA ミラーが同一セッションで着地するため、#06
+  bilingual-parity ディテクター (`check-bilingual-parity.sh`) は commit
+  時に ADR-014 ペアで一致した見出しツリーを見る ── 本 amendment は
+  transient FAIL を導入しない (#07-#10 amendment が JA ミラーを
+  `technical-writer` に延期し transient FAIL を受容したのとは異なる;
+  ここでのタスク制約は同一セッション ADR JA パリティを要求する)。
+
+### MECE / no-detector / no-new-partition statement (Spec R-01 (d), AC-7, AC-8)
+
+この配置は **新しい CI ディテクターなし**、**本ファイルの §(d) テーブル
+(行 1800) と矛盾する新しい MECE パーティションなし** を導入する。#11 は
+§(d) テーブルが #11 の Spec が存在する前に既に予約し分類した
+`documentation/convention` スロットを *populate* する (行 1800 行; 行 1808
+オーナー文); そのテーブルに行を追加せず、#04/#05/#06 のディテクター
+ファミリーコントラクトパーティションに 4 つ目のディテクターを追加せず、
+新しいキーイングもない。#11 (verification-domain プロジェクト採用ガイダンス、
+SKILL.md 散文)、変更単位ランタイムトリガー (`implementation/protocol.md` /
+`design/protocol.md` `## When to invoke`)、#04 (`check-dangling-refs.sh`
+パス解決)、#05 (`check-roadmap-drift.sh` Roadmap 構造一貫性) の境界は
+将来のマイルストーン作者に対して明確なまま: *プロジェクトレベルの
+「このドメインを有効化すべきか?」* 質問は #11 の SKILL.md セクション;
+*変更単位の「今 Critic が spawn するか?」* 質問は protocol ファイル;
+*壊れた散文パス* は #04; *Roadmap-index/グリフ欠陥* は #05。二オーナー
+曖昧性は作成されない。
+
+### Counter-proposal
+
+深刻な反対案は **ADR-014 を amend するのではなく新しい ADR-019 を作成する** <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+であり ── ADR-012 / ADR-014 / ADR-015 / ADR-016 / ADR-017 / ADR-018 の <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+慣例に従い、strawman としてではなく拒否された代替案を真剣に扱う歴史的記録
+としてここに残す。論拠: #11 は最初の verification-layer *採用ガイダンス*
+マイルストーンである; Skill にこれまで存在しなかった読者向け決定フレーム
+ワーク概念 (変更単位トリガーとは区別される「プロジェクト特性トリガー」) を
+導入する; 専用の ADR-019 はその概念に単一の引用可能なホームと独自の clean <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+な Counter-proposal スロットを与え、すでに長い ADR-014 の 7 番目の
+amendment としてネストするより良い。
+
+**反対案を採用しなかった理由:**
+
+- 決定的な問題は **ADR-018 トライアドが満たされない** ことである。ADR-015、
+  ADR-017、ADR-018 はそれぞれ新しいディテクター + 新しい MECE 境界 + 新しい
+  キーイングを出荷したからこそ新 ADR 相当と自己分類した。#11 は 3 つの
+  **いずれも** 出荷しない (上記条項、Spec 行証拠付き): Spec はディテクターを
+  *禁じ* (行 26、113)、パーティションを *追加せず* (§(d) テーブルが既に
+  #11 を名付ける)、キーイングを *導入しない* (散文のみ)。ECC 前例自身の
+  具体的シグナルが欠如している; 新 ADR は Spec の R-01 が architect に適用
+  するよう指示した識別基準と矛盾する。
+- 「最初の採用ガイダンスマイルストーン」新規性論はやりすぎである: それに
+  よれば #07 (最初の status-ownership)、#08 (最初の Analyze row-guard)、
+  #09 (最初のファイル名ピン)、#10 (最初のディレクトリピン) もそれぞれ
+  新 ADR を正当化したことになる。4 つすべてが ADR-014 amendment であった
+  のはまさにトピックの新規性が識別基準ではない ── *新しい構造的
+  メカニズム* がそうである ── からであり、4 つすべて (#11 同様) が
+  ADR-014 がすでに所有する境界の帰結を明確化した。直前の 4 つの兄弟決定
+  との一貫性が引用可能ホームの利便性を上回る。
+- 「単一の引用可能なホーム」の利益は新 ADR なしで実現される: 本 amendment
+  *が* その引用可能ホームであり、#11 を名付ける §(d) MECE テーブルと
+  同居する ── テーブルとそのスロットを populate する決定を 1 ファイルに
+  保つのは分割するより *良い* 簿記であり、ADR-018 が三方向コントラクト
+  パーティションに用いたのと同じ局所性論である。
+
+**この反対案を再評価するトリガー条件 (すなわち ADR-019 が正当化される <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+とき):**
+
+- 将来のマイルストーンがフォークが有効化した verification ドメインを
+  監査または強制する **CI ディテクター** を追加する (#11 の Spec が
+  まさに禁じるもの) ── そのディテクター + その MECE 境界 + そのキーイングが
+  トライアドを満たし独自の ADR を正当化する (ADR-014 amendment ではなく、
+  #11 を遡及的に再分類するのでもない)。
+- プロジェクト採用ガイダンスが散文を超える **新しい構造的規約** を要求
+  すると判明する ── 例えば agent が Analyze 時にパースする機械可読な
+  capability-to-domain マッピング ── メカニズムとキーイングルールを導入し
+  トライアドを満たす。
+- §(d) MECE テーブルが再構成され #11 の `documentation/convention`
+  スロットがもはや存在しないか再描画され、本 amendment が populate する
+  事前予約境界が除去される ── その時点で #11 のホームはパーティションと
+  ともに再検討される。
+
+反対案は ADR-012 / ADR-014 / ADR-015 / ADR-016 / ADR-017 / ADR-018 の
+慣例に従い、決定の最も深刻な異論の歴史的記録として本 amendment に残る。
+
+元のステータス行 (`Accepted — 2026-05-15`) は変更しない; 本 amendment は
+ADR-014 自身の §(d) MECE テーブルが #11 のために事前予約したスロットを
+populate する配置決定を記録するものであり、決定を再開するものではない
+(ADR-010 の決定も再開せず、逐語的に維持する)。

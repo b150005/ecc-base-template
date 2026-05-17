@@ -2069,3 +2069,354 @@ amendment appends a directory convention-statement of an
 already-sanctioned path scheme (the `specs/` prefix of the reservation
 rule's reserved path, plus the de-facto ADR directory) and does not
 reopen the Decision.
+
+## Amendment — 2026-05-17 (verification-domain opt-in trigger guidance)
+
+This amendment records the structural decision deferred to `architect`
+by `specs/11-verification-domain-opt-in-guidance.md` Risk R-01: *where*
+the fork-facing project-adoption trigger guidance for the default-off
+`implementation` and `design` verification-layer domains lands, and
+*whether* that placement warrants a new ADR-019 or is a <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+consequence-clarification handled by amendment. `specs/11-…` (Roadmap
+row #11) is the authoritative scope; it states *what* the guidance must
+cover (≥3 concrete project-characteristic triggers per domain,
+explicitly distinct from the per-change runtime triggers in the
+`protocol.md` files, no CI enforcement, no change to `.claude/verification.yml`
+active defaults) and its eight acceptance criteria; it defers the
+structural *how* (placement file/section, ADR strategy, split-vs-single)
+to `architect` (R-01 (a)–(d)). This amendment records that decision. It
+is a **consequence-clarification of ADR-014's already-sanctioned MECE
+partition** — specifically of the 2026-05-17 spec/adr-directory-pin
+amendment's §(d) MECE boundary table, **which already names #11's
+boundary and classifies it "documentation/convention" before #11's Spec
+existed**. It is *not* a clarification of ADR-010's Decision: ADR-010's
+default-off posture is preserved verbatim and unchanged (Spec lines 22,
+28, 76, 117; AC-5 line 60). No new detector, CI workflow, contract
+boundary, keying rule, MECE partition, or file artifact is introduced.
+
+### The (b)/(c) decision — ADR-014 amendment, not new ADR-019, by the ADR-018 Alternative-B discriminator <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal; it is intentionally never created (see Counter-proposal below) -->
+
+The Spec's R-01 (b) hands `architect` the explicit choice "new ADR-019 <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+or an ADR-010 amendment (applying the ADR-018 Alternative-B
+discriminator)." Applied honestly, clause by clause, with file:line <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+evidence — and the host candidate corrected from the Spec's tentative
+"ADR-010" to **ADR-014**, for the reason given in the final clause:
+
+- **New detector? No.** The Spec's Non-goals line 26 ("Adding a CI
+  detector or check that enforces or audits which domains a fork has
+  enabled. A new detector would create a new MECE partition violating
+  ADR-014:1800's 'documentation/convention' classification for #11.
+  This is out of scope and must not be proposed as a consequence of
+  this milestone") and Out of scope line 113 ("Adding a CI detector,
+  audit check, or linting rule that inspects a fork's verification
+  domain configuration") *explicitly forbid* a detector as a #11
+  deliverable. ADR-015 and ADR-017 each self-classified as
+  new-ADR-worthy *because* each introduced a new script + new workflow
+  (`check-dangling-refs.sh` / `check-roadmap-drift.sh`); ADR-018 the
+  same (`check-bilingual-parity.sh`). #11 introduces **zero** scripts
+  and **zero** workflows — identical to the #07 (no detector), #08
+  (Non-goals forbid a CI workflow), #09 (Non-goals forbid a CI filename
+  detector), and #10 (Non-goals forbid a CI directory detector)
+  amendments. The structural half that dominated for
+  ADR-015/ADR-017/ADR-018 is absent here. #11 is pure prose guidance.
+- **New MECE partition / boundary? No — the boundary already exists and
+  already names #11.** The decisive check: ADR-014's 2026-05-17
+  spec/adr-directory-pin amendment §(d) MECE table at this file's
+  line 1800 *already* contains the row `| #11 (verification-domain
+  opt-in guidance) | Opt-in trigger guidance for implementation/design
+  verification domains. | documentation/convention (reserved-but-absent
+  Roadmap row) |`, and line 1808 *already* states "*verification-domain
+  opt-in trigger guidance* is #11's" as a distinct owner inside the
+  existing documentation/convention partition. #11 adds **no row and no
+  partition** — it *fills in* a boundary slot ADR-014 reserved for it
+  before its Spec was authored, exactly as the (d) table's own
+  `ref-allow` comment anticipated ("#11 is a reserved-but-absent
+  Roadmap row … the MECE boundary must name it before its Spec is
+  authored at pickup"). This is the inverse of ADR-015's
+  absence-of-claim keying and ADR-018's convention-presence keying:
+  there is no new keying because there is no new partition — only the
+  population of a pre-declared, pre-classified slot.
+- **New keying / mechanism / file artifact? No.** There is no
+  exemption-keying rule, no allowlist-vs-pattern choice, no parsing
+  strategy, no new file, no new script, no agent-prompt change. The
+  deliverable is documentation prose appended to two existing files
+  (see Downstream implementer tasks). Spec Key-interaction 6 (line 80)
+  scopes the architect's decision to placement only; line 26 forbids
+  any mechanism.
+- **Reopen ADR-010's Decision? No — it explains the posture, it does
+  not change it.** Spec line 22 ("Leave `.claude/verification.yml`
+  active defaults unchanged … Default-off is ADR-010's accepted
+  posture; the guidance explains the posture, it does not change it"),
+  line 28, line 76 ("ADR-010 … #11 does not change that posture. It
+  adds the documentation that makes the opt-in decision informed
+  without modifying ADR-010's Decision or Consequences"), line 117
+  ("Changing ADR-010's Decision or Consequences … the default-off
+  posture is correct"), and AC-5 (line 60: `.claude/verification.yml`
+  `implementation.enabled`/`design.enabled` remain `false` after #11
+  ships) make this unambiguous. #11 is downstream documentation *of* an
+  unchanged ADR-010 Decision, not a modification *of* it.
+- **Consequence-clarification of an existing Decision? Yes — and the
+  correct host is ADR-014, not ADR-010.** The Spec's R-01 tentatively
+  names "an ADR-010 amendment" as the amendment candidate. Applying the
+  discriminator rigorously corrects this: ADR-010's Decision is
+  *untouched* (clause above), so #11 cannot be a consequence-clarification
+  *of ADR-010's Decision* — there is no ADR-010 consequence being
+  clarified; the posture is merely *cited*. What #11 *is* a
+  consequence-clarification of is **ADR-014's MECE partition**: the
+  §(d) boundary table already classified #11 "documentation/convention"
+  and reserved it a slot, and #11 is structurally identical to
+  #07/#08/#09/#10 — all documentation/convention milestones whose
+  structural decision was recorded as an ADR-014 amendment because each
+  only *filled in or clarified a consequence of* a boundary ADR-014
+  already owned, never reopening a Decision. Hosting #11 in ADR-014
+  keeps the §(d) MECE table and its owning ADR co-located (the table
+  that names #11 and the amendment that populates #11's slot live in
+  the same file); hosting it in ADR-010 would split the MECE
+  bookkeeping across two ADRs for no benefit and would falsely imply an
+  ADR-010 Decision consequence is being clarified when none is. ADR-014
+  is the correct host on the same locality-of-bookkeeping grounds
+  ADR-018 used to keep its three-way contract partition in one ADR.
+
+**Conclusion.** Triad **not** met (no new detector, no new MECE
+partition, no new keying); ADR-010's Decision **not** reopened. #11 is a
+consequence-clarification that *populates a slot ADR-014's own §(d) MECE
+table pre-reserved for it*. Recorded as an **ADR-014 amendment**, not a
+new ADR-019, and not an ADR-010 amendment — the same call ADR-018's <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+Alternative B reasoned through and the #07/#08/#09/#10 amendments
+applied.
+
+### The placement decision (R-01 (a), (c))
+
+**Single location: a new `## Project adoption triggers` section in
+`.claude/skills/verification-layer/SKILL.md`, immediately after the
+existing `## Configuration` section and before `## When to invoke`.**
+Not split; not in `verification.yml.example`; not in the `protocol.md`
+files. Rationale, against the three candidates the Spec surfaced
+(Key-interaction 2, 3, 6):
+
+- **Why SKILL.md, not `verification.yml.example`.** AC-6 (Spec line 62)
+  requires a fork maintainer to encounter the guidance "without reading
+  a file that is not already part of the adoption step." The adoption
+  step is CLAUDE.md `## Development Workflow` step 3, which already
+  routes the maintainer to *the verification-layer Skill*
+  (`.claude/skills/verification-layer/SKILL.md`) and to
+  `.claude/verification.yml` — **not** to `verification.yml.example`.
+  `verification.yml.example` is, by its own line 2–8 header,
+  "DOCUMENTATION REFERENCE ONLY … never read by the verification
+  layer"; it is a *field reference*, not an adoption-step file. Placing
+  decision guidance only there would require the maintainer to discover
+  a non-adoption-step file (AC-6 fail) and would also tend to drift
+  from the active `.claude/verification.yml` (two annotated copies). The
+  active `.claude/verification.yml` is constraint-locked by AC-5 and the
+  task ("Do NOT touch `.claude/verification.yml`"), so the guidance
+  cannot live in the active config either. SKILL.md is the one file the
+  adoption step already mandates that is *also* writable here.
+- **Why a new section adjacent to `## Configuration`, not folded into
+  it.** SKILL.md `## Configuration` (lines 126–146) answers "what does
+  each knob default to and why is the default asymmetric." #11 answers
+  the *adjacent but distinct* question "for what kind of project is
+  paying the doubled cost worth flipping the knob." Placing
+  `## Project adoption triggers` *between* `## Configuration` (the knob)
+  and `## When to invoke` (the per-change runtime trigger) puts the
+  three questions in their natural reading order — *what is the
+  default → should my project change it → once changed, when does the
+  Critic fire* — so the maintainer reads adoption guidance at exactly
+  the point of the config decision, with zero extra file lookups
+  (AC-6 satisfied by adjacency, not by a cross-reference).
+- **Why not the `protocol.md` files.** `implementation/protocol.md` and
+  `design/protocol.md` `## When to invoke` answer the *per-change*
+  question ("for this specific change, does the Critic spawn?") after a
+  project has already opted in. AC-3/AC-4 (Spec lines 56, 58) require
+  the project-adoption guidance to be *unambiguously distinct* from and
+  *non-duplicating* of those sections. Co-locating #11's guidance in
+  the same files as the per-change triggers is the exact R-02 scope-creep
+  risk; keeping it in SKILL.md (one level up, where the domain navigator
+  and shared invariants live) structurally separates the two questions
+  by file, not just by wording. The new section directs the reader
+  *onward* to the `protocol.md` `## When to invoke` sections for the
+  subsequent per-change question (Spec Key-interaction 1) without
+  restating their content.
+
+This placement is **self-contained in one location** (R-01 (c): not
+split). The only cross-references it adds are *outbound pointers* ("for
+the per-change trigger once enabled, see
+`implementation/protocol.md` / `design/protocol.md` `## When to
+invoke`"), satisfying Spec Key-interaction 1 without duplication
+(AC-4).
+
+### Downstream implementer tasks (performed in this same session — for #11 the two-session decision-then-implementation split used by #03/ADR-016 · #05/ADR-017 · #06/ADR-018 · #07/ADR-014-amendment · #08/ADR-014-amendment · #09/ADR-014-amendment · #10/ADR-014-amendment was deliberately collapsed: #11's implementation is a single prose-only SKILL.md section, fully enumerated below and verifiable against the Spec's eight ACs, requiring no separate review cycle; the task list is retained verbatim for traceability and as the precedent shape for milestones whose implementation *is* deferred)
+
+The implementer step (Spec step 5) is mechanical and verifiable
+against the Spec's eight ACs:
+
+- `.claude/skills/verification-layer/SKILL.md` — **add one new
+  `## Project adoption triggers` section, positioned immediately after
+  the existing `## Configuration` section (ends line 146) and
+  immediately before `## When to invoke` (line 148).** The section must
+  contain, as prose (no detector/CI/enforcement language anywhere in
+  it — AC-7, AC-8):
+  1. A one-sentence framing distinguishing the *project-adoption*
+     question ("should this project enable the domain at all?") from
+     the *per-change* question owned by the `protocol.md` `## When to
+     invoke` sections ("for this change, does the Critic spawn?") —
+     satisfies AC-3.
+  2. An `### implementation` subsection naming **at least three**
+     concrete project-characteristic triggers for `implementation.enabled:
+     true` (Spec AC-1 / Goal line 18 examples to draw from, not copy
+     verbatim: non-trivial custom algorithms; small team with limited
+     reviewer diversity; partial test-oracle ownership by the
+     Generator). Framed as "signals that increase the value of opting
+     in," additive not gating (Spec R-03 mitigation, line 108) — none
+     of them a per-change "do I spawn now?" trigger (AC-1).
+  3. A `### design` subsection naming **at least three** concrete
+     project-characteristic triggers for `design.enabled: true` (Spec
+     AC-2 / Goal line 19 examples: high ADR cadence; long architectural
+     reversibility horizon; downstream consumers in multiple
+     independent teams). Same additive framing; none a per-change
+     trigger (AC-2). The two trigger sets must be visibly distinct and
+     not conflated (Spec User-story row 2).
+  4. A closing one-line *outbound pointer*: once a domain is enabled,
+     the per-change runtime trigger lives in that domain's
+     `protocol.md` `## When to invoke` — **link, do not restate**
+     (satisfies AC-4 / Spec Key-interaction 1; restating would fail
+     AC-4).
+  5. No reference to `.claude/verification.yml` active values changing;
+     the section is documentation only (consistent with AC-5, which a
+     reviewer verifies against the untouched active config).
+- **No `.claude/verification.yml` edit** (task constraint; Spec AC-5,
+  Out of scope line 112). The active config's `implementation.enabled:
+  false` / `design.enabled: false` stay verbatim.
+- **No `.claude/verification.yml.example` edit.** Placement is
+  single-location in SKILL.md (placement decision above); editing the
+  example file too would create the split R-01 (c) rejects and a
+  second annotated copy that drifts. (If a future maintainer wants a
+  one-line "see SKILL.md `## Project adoption triggers`" pointer in the
+  example's `implementation:`/`design:` comment blocks, that is an
+  optional, separate, non-#11 nicety — explicitly **not** an #11
+  deliverable, to keep the placement single-source.)
+- **No `protocol.md` edits.** The per-change `## When to invoke` and
+  `## Configuration` blocks in `implementation/protocol.md` and
+  `design/protocol.md` are correct and out of scope (Spec Non-goals
+  line 30, Out of scope line 115). #11 points *to* them; it does not
+  modify them.
+- **No CI workflow and no script** (Spec Non-goals line 26, Out of
+  scope line 113). #11 is documentation/convention; a configuration-audit
+  detector is explicitly forbidden as an #11 consequence and is not a
+  deferred-optional either (unlike #09/#10, the Spec forbids it
+  outright, not "deferred").
+- **No agent-prompt edits.** No `product-manager.md`, `architect.md`,
+  `orchestrator.md`, `implementer.md`, or Critic-agent prose changes.
+  SKILL.md is the single source; the orchestrator/product-manager read
+  it as policy context (Spec Target-users row 3 / User-story row 4) via
+  the existing `## Development Workflow` step 3 route, which already
+  names the verification-layer Skill.
+- **No Roadmap row change.** Row #11's `Design source` cell stays
+  `spec:`-only — this is an ADR-014 amendment, ADR-014 has no milestone
+  row of its own, so no `adr:` link is added to row #11 (Milestone →
+  ADR is 0:1; identical to the #07, #08, #09, and #10 amendments' row
+  reasoning). `product-manager` flips the row glyph `◐→☑` after the
+  step-6 quality gate per the #07 transition matrix; `architect` adds
+  no `adr:` link here. (Per ADR-014 write-ownership the `architect`
+  *would* add an `adr:` link only if a *new* ADR were authored; an
+  amendment to ADR-014, which owns no row, adds none — the #07–#10
+  precedent.)
+- The Japanese counterpart of this ADR
+  (`014-roadmap-index-single-entry-point.ja.md`) receives the mirrored
+  amendment **in this same session** (architect-owned ADR JA-sibling
+  parity for an ADR this task edits; see the report). The Japanese
+  counterpart of CLAUDE.md (if present) and the JA Spec sibling
+  (`specs/11-…ja.md`) remain `technical-writer` tasks, **not** part of
+  this change. Because the EN↔JA mirror lands in the same session, the
+  #06 bilingual-parity detector (`check-bilingual-parity.sh`) sees a
+  matched heading tree on the ADR-014 pair at commit time — no
+  transient FAIL is introduced by this amendment (distinct from the
+  #07–#10 amendments, which deferred the JA mirror to `technical-writer`
+  and accepted a transient FAIL; the task constraint here requires
+  same-session ADR JA parity).
+
+### MECE / no-detector / no-new-partition statement (Spec R-01 (d), AC-7, AC-8)
+
+This placement introduces **no new CI detector** and **no new MECE
+partition inconsistent with this file's §(d) table at line 1800**. #11
+*populates* the `documentation/convention` slot the §(d) table already
+reserved and classified for it (line 1800 row; line 1808 owner
+sentence) before #11's Spec existed; it adds no row to that table, no
+fourth detector to the #04/#05/#06 detector-family contract partition,
+and no new keying. The boundary among #11 (verification-domain
+project-adoption guidance, SKILL.md prose), the per-change runtime
+triggers (`implementation/protocol.md` / `design/protocol.md`
+`## When to invoke`), #04 (`check-dangling-refs.sh` path resolution),
+and #05 (`check-roadmap-drift.sh` Roadmap-structural consistency)
+remains unambiguous to a future milestone author: a *project-level
+"should I enable this domain?"* question is #11's SKILL.md section; a
+*per-change "does the Critic spawn now?"* question is the protocol
+files'; a *broken prose path* is #04's; a *Roadmap-index/glyph defect*
+is #05's. No two-owner ambiguity is created.
+
+### Counter-proposal
+
+The serious counter-position is **author a new ADR-019 rather than <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+amend ADR-014** — recorded here per the
+ADR-012 / ADR-014 / ADR-015 / ADR-016 / ADR-017 / ADR-018 convention of
+taking the rejected alternative seriously, not as a strawman. The
+argument: #11 is the first verification-layer *adoption-guidance*
+milestone; it introduces a reader-facing decision-framework concept
+("project-characteristic triggers" as distinct from per-change
+triggers) that did not previously exist in the Skill; a dedicated
+ADR-019 would give that concept a single citable home and a clean <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+Counter-proposal slot of its own, rather than nesting it as the seventh
+amendment in an already-long ADR-014.
+
+**Why the counter was not adopted:**
+
+- The decisive issue is the **ADR-018 triad is not met**. ADR-015,
+  ADR-017, and ADR-018 each self-classified as new-ADR-worthy *because*
+  each shipped a new detector + new MECE boundary + new keying. #11
+  ships **none** of the three (clauses above, with Spec line
+  evidence): the Spec *forbids* a detector (line 26, 113), adds *no*
+  partition (the §(d) table already names #11), and introduces *no*
+  keying (prose only). The ECC precedent's own concrete signal is
+  absent; a new ADR would contradict the discriminator the Spec's R-01
+  instructs the architect to apply.
+- A "first adoption-guidance milestone" novelty argument proves too
+  much: by it, #07 (first status-ownership), #08 (first Analyze
+  row-guard), #09 (first filename pin), and #10 (first directory pin)
+  would each also have warranted a new ADR. All four were ADR-014
+  amendments precisely because novelty-of-topic is not the
+  discriminator — *new structural mechanism* is, and all four (like
+  #11) clarified a consequence of a boundary ADR-014 already owned.
+  Consistency with the immediately-preceding four sibling decisions
+  outweighs the citable-home convenience.
+- The "single citable home" benefit is delivered without a new ADR:
+  this amendment *is* the citable home, co-located with the §(d) MECE
+  table that names #11 — keeping the table and the decision that
+  populates its slot in one file is *better* bookkeeping than splitting
+  them, the same locality argument ADR-018 used for its three-way
+  contract partition.
+
+**Trigger conditions for re-evaluating this counter-proposal (i.e.
+when ADR-019 would become warranted):** <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+
+- A future milestone adds a **CI detector** that audits or enforces
+  which verification domains a fork has enabled (the precise thing
+  #11's Spec forbids) — that detector + its MECE boundary + its keying
+  would meet the triad and warrant its own ADR (not an ADR-014
+  amendment, and not retroactively reclassifying #11).
+- The project-adoption guidance is found to require a **new structural
+  convention** beyond prose — e.g. a machine-readable
+  capability-to-domain mapping the agents parse at Analyze time —
+  introducing a mechanism and a keying rule the triad would then
+  satisfy.
+- The §(d) MECE table is restructured such that #11's
+  `documentation/convention` slot no longer exists or is redrawn,
+  removing the pre-reserved boundary this amendment populates — at
+  which point #11's home would be reconsidered with the partition.
+
+The counter-proposal stays in this amendment as the historical record
+of the decision's most serious objection, per the
+ADR-012 / ADR-014 / ADR-015 / ADR-016 / ADR-017 / ADR-018 convention.
+
+The original Status line (`Accepted — 2026-05-15`) is unchanged; this
+amendment records a placement decision that populates a slot ADR-014's
+own §(d) MECE table pre-reserved for #11 and does not reopen the
+Decision (nor ADR-010's, which it leaves verbatim).
