@@ -213,6 +213,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   for traceability. Roadmap row #05 remains `◐ in-progress`. Bilingual
   `.md` and `.ja.md` for both `specs/05-roadmap-drift-detection-ci.md`
   and ADR-017.
+- **Milestone #09 — design only; implementation deferred.**
+  Spec `specs/09-spec-filename-convention.md` (Approved) defines the
+  Spec filename convention: the canonical form `specs/NN-slug.md` where
+  `NN` is the Roadmap row number zero-padded to a two-digit minimum
+  (`1→01`; rows >=100 written without extra padding) and `slug` is the
+  kebab-case slug already fixed in the row's reserved `spec:` path. The
+  JA sibling form is `specs/NN-slug.ja.md` (heading-tree parity owned
+  by #06/ADR-018). `specs/NN-progress.md` (ADR-016 cross-session state
+  files) are excluded — `progress` is a reserved suffix under ADR-016's
+  lifecycle, not governed by this convention. All eight existing Spec
+  files (`specs/01-*.md` through `specs/08-*.md`) already conform,
+  confirming this is a convention-statement milestone, not a bulk-rename.
+  The structural decision (ADR-014 amendment vs. new ADR-019,
+  documentation placement, edit scope, Skill necessity, MECE boundary
+  against #04/#05/#10/ADR-014-reservation-rule/ADR-016) was decided this
+  session by the architect as ADR-014's `## Amendment — 2026-05-17 (spec
+  filename convention)` — a consequence-clarification of ADR-014's
+  existing Spec-reservation Decision (the reserved `spec:` path is
+  `specs/NN-slug.md`; this amendment names that form normative), not a
+  new ADR-019 (the counter-proposal is permanently recorded in the
+  amendment per the ADR-012/ADR-014/ADR-015/ADR-016/ADR-017/ADR-018
+  convention). Key resolutions: (a) convention placement = CLAUDE.md
+  `## Roadmap` Rules block, one added bullet after the existing
+  reservation-rule guidance, zero extra file reads; (c) CLAUDE.md
+  Rules-block-only edit, claude-md-authoring Skill NOT required (single
+  bullet, routine-edit carve-out); (d) MECE boundary on contract type
+  (#04 reference resolution, #05 index consistency, #10 directory pin,
+  #09 filename form, ADR-014 reservation rule, ADR-016 progress-file
+  lifecycle). No new ADR, no CI workflow, no agent-prompt edits, no
+  renames — all deferred to a future implementation session. Roadmap row
+  #09 moves from `☐ todo` to `◐ in-progress`. Bilingual `.md` and
+  `.ja.md` (EN amendment + JA mirror land in the same commit to keep
+  `check-bilingual-parity.sh` green).
 - **Milestone #08 — design only; implementation deferred.**
   Spec `specs/08-orchestrator-row-guard.md` (Approved) defines the
   Orchestrator Analyze row-guard: three named pre-dispatch guard

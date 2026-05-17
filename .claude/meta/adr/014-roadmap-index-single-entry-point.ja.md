@@ -775,3 +775,367 @@ ADR-012 / ADR-014 / ADR-015 / ADR-016 / ADR-017 / ADR-018 の慣例に従い、
 元のステータス行 (`Accepted — 2026-05-15`) は変更しない; 本 amendment は
 すでに認可された Analyze ステップメカニズムのランタイム前提条件明確化を追記する
 ものであり、決定を再開するものではない。
+
+## Amendment — 2026-05-17 (spec filename convention)
+
+本 amendment は、この ADR 自身の 2026-05-16 **Spec 予約ルール** amendment が
+すでに *使用している* が *名前付きルールとして明記していない* ファイル名規約を
+規範化する。その amendment は予約済みリンクのパスを決定論的な形式
+`specs/NN-slug.md` として固定した (「決定論的パス `specs/NN-slug.md` を使用し、
+`NN` は安定した行番号」); 現在までに作成された 8 つの Spec ファイル
+(`specs/01-*.md` … `specs/08-*.md`) はすべて適合している。
+`specs/09-spec-filename-convention.md` (Roadmap row #09) が権威的なスコープであり、
+規約がカバーしなければならない内容 (正規形式、最小 2 桁ゼロパディング、100+ 拡張
+ルール、`specs/NN-slug.ja.md` 兄弟、`specs/NN-progress.md` 除外) を記述し、
+構造的な *どのように* を `architect` に委ねている (リスク R-01 (a)-(d)、R-02、R-03)。
+本 amendment はその決定を記録する。これは **ADR-014 の既存の決定の帰結明確化**
+であり ── 具体的には、すでに承認された 2026-05-16 Spec 予約 amendment の帰結明確化で
+あり、その予約パスが *まさに* `specs/NN-slug.md` である ── 新しい構造的決定ではない。
+新しいディテクター、CI ワークフロー、コントラクト境界、キーイングルール、またはメカニズムは
+導入しない: 規約は ADR-014 がすでに義務付けているパス方式のファイル名コンポーネントに
+名前を付けるものであり、`specs/NN-progress.md` 例外は ADR-016 の既存のライフサイクルの
+再記述であって新しいルールではない。
+
+### The (b) decision — ADR-014 amendment, not new ADR-019, by the ADR-018 Alternative-B discriminator <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal; it is intentionally never created (see Counter-proposal below) -->
+
+Spec の R-01 (b) は `architect` に明示的な選択肢 「ADR-014 amendment か新しい
+ADR-019 か」を渡しており、ADR-018 の Alternative-B 識別基準を逐語的に適用するよう <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+指示している: *#09 は新しいディテクター + 新しい MECE コントラクト境界 + 新しい
+キーイング/メカニズムを導入するか (⇒ 新しい ADR)、それとも既存 ADR のすでに認可
+された決定の帰結明確化/拡張か (⇒ amendment)?* 条項ごとに誠実に適用する:
+
+- **新しいディテクター? No.** Spec の Non-goals と Out of scope は CI ファイル名
+  形式ディテクターを *明示的に禁じている* (「機械的にファイル名準拠を検証する新しい
+  CI ディテクターの追加。… #09 はドキュメント/規約記述マイルストーン; CI 強制は
+  任意の帰結であり、このマイルストーンの成果物ではない」; 「CI ファイル名形式
+  チェックの追加 ── architect に延期された構造的決定」)。ADR-017 と ADR-018 は
+  それぞれが新しいスクリプト + 新しいワークフロー (`check-roadmap-drift.sh` /
+  `check-bilingual-parity.sh`) を導入したからこそ新 ADR 相当と自己分類した。
+  #09 はスクリプトもワークフローも **ゼロ** 導入する。ADR-017/ADR-018 で支配的
+  だった構造的な半分がここには不在 ── ディテクターなしの #07 amendment、
+  CI ワークフローを Non-goals が禁じた #08 amendment と同一。
+- **新しい MECE コントラクト境界? 新しいパーティションなし。** 境界の *記述*
+  は必要 (Spec Goal 5、受け入れ基準、R-02) だが、#04/#05/#06 のディテクター
+  ファミリーコントラクトパーティションに 4 番目のディテクターを追加しない。
+  #09 がそのパーティションの*外側*に完全に位置することを記述する: #09 は
+  ADR-014 の予約ルールがすでに生成する *予約された `spec:` パスのファイル名*
+  に関するドキュメント/規約記述であり、*隣接ディレクトリマイルストーン #10*
+  に対してのものである。これは ADR-014 の予約ルールの帰結がどこに位置するかの
+  スコープ限定であり、ADR-017 の不在宣言や ADR-018 の規約存在のような新しい
+  キーイングルールではない。
+- **新しいキーイング/メカニズム? No.** 免除キーイングルール、許可リスト対パターン
+  選択、解析戦略、新しいファイル成果物はない。`specs/NN-slug.md` は 2026-05-16
+  Spec 予約 amendment がすべての予約された `spec:` リンクに義務付けている
+  決定論的パスであり; #09 はそのすでに使用されている形式をファイルについても
+  規範的と名付ける。`specs/NN-progress.md` 除外は ADR-016 の確立済み
+  progress-file ライフサイクル (セッション境界で作成、`◐→☑`/`◐→✗` 反転で削除)
+  の *帰結* であり、本 amendment が導入する新しいメカニズムではない。
+- **既存の決定の帰結明確化? Yes、決定的に。** ADR-014 の 2026-05-16 Spec 予約
+  amendment はすでに不変の行番号をキーとした予約パス方式として逐語的に
+  `specs/NN-slug.md` を使用している。#09 の規約は、その既に認可されたパスの
+  ファイル名コンポーネントの、名前付き規範ルールとしての記述である。これは
+  ADR-014 §帰結 → ネガティブが事前にフラグした暫定慣行を形式化した
+  2026-05-17 ステータス遷移 amendment (#07)、ADR-014 の Analyze 参照が検証
+  しなければならない内容を強化した 2026-05-17 Analyze 行ガード amendment (#08)
+  と構造的に同一 ── いずれも ADR-014 amendment で解決し、ADR-019 ではない。 <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+
+**兄弟対称性の議論は詳細に見ると逆転する** (同じ罠を #07 と #08 の amendment が
+特定した): 「#05/#06 → ADR-017/ADR-018; したがって #09 → 対称性のために ADR-019」 <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+── しかし #05/#06 自身の *識別基準* を #09 に適用すると **amendment** になる。なぜなら
+3 つの構造的条項 (新しいディテクター、新しいパーティション、新しいキーイング/メカニズム)
+がすべて不在だからである。ADR-016 が別の ADR である理由は *新しいメカニズム*
+(独自の書き込みオーナーシップ / ライフサイクル / 削除トリガーコントラクトを持つ新しい
+ファイル成果物) を導入したからであり; #09 は新しい成果物も新しいメカニズムも導入しない
+── ADR-014 自身の予約 amendment がすでに定義する成果物 (`specs/NN-slug.md`) の
+ファイル名形式に名前を付け、ADR-016 のメカニズムに完全に委ねることで
+`specs/NN-progress.md` を明示的に除外する。**決定: ADR-014 amendment。ADR-019 は <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+作成しない。** Roadmap row #09 は `spec:` のみのまま維持される (マイルストーン → <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+ADR は 0:1; Roadmap メカニズム ADR への amendment は #09 固有の ADR ではない ──
+ADR-014 にはそれ自身のマイルストーン行がないため、row #09 から ADR-014 へ `adr:`
+リンクを追加することは存在しないマイルストーン→ADR マッピングを主張することになる
+── #07 と #08 の amendment の行推論と同一)。
+
+### The normative filename convention
+
+規約は 2026-05-16 Spec 予約 amendment がすでに義務付けている `specs/NN-slug.md`
+パスのファイル名コンポーネントに名前を付ける。新しいパス方式は追加しない;
+既存のものを名前付きルールとして記述する:
+
+| ルール | 記述 | 明確化する出典 |
+|---|---|---|
+| 正規 Spec ファイル名 | Spec ファイルは `specs/NN-slug.md` であり、`NN` は **最小 2 桁** にゼロパディングされた Roadmap 行番号、`slug` は行の予約済み `spec:` パスに **すでに固定されたケバブケース slug** である (オーサリング時に曖昧さなし ── `product-manager` は Roadmap 行から slug をコピーし、再導出しない)。 | ADR-014 2026-05-16 Spec 予約 amendment (予約パスはまさにこの形式)。 |
+| 100+ 拡張 | 最小 2 桁は一桁行のみをパディングする (`1→01`); すでに複数桁の行は追加パディングなしで記述する (`100`、`101`、…)。行番号規約 (番号は再使用/再番号付けしない) と安定する。 | ADR-014 §決定「行番号は安定しており再使用しない」。 |
+| JA 兄弟ファイル名 | 日本語兄弟は `specs/NN-slug.ja.md` ── 同一 `NN`、同一 `slug`、`.md` の前に `.ja` を挿入。EN プライマリとの見出しツリーパリティは **#06 / ADR-018 が所有**; 本規約は兄弟の *ファイル名形式* のみを記述し、パリティチェックを再定義または拡張しない。 | ADR-018 (パリティチェックがコンテンツパリティを所有; 本規約が兄弟名を所有)。 |
+| `specs/NN-progress.md` 除外 | `specs/NN-progress.md` は `specs/` ディレクトリと `NN` プレフィックスを共有するが、**Spec ファイルではなく**、`NN-slug.md` 要件から**除外**される。`progress` は ADR-016 のライフサイクル下の予約サフィックス (◐ の間セッション/コンパクション境界で作成、`◐→☑`/`◐→✗` 反転で削除); その命名とライフサイクルは ADR-016 によって完全に統治され、本規約によらない。 | ADR-016 §書き込みオーナーシップ / §退役 (例外は ADR-016 の再記述であり、新しいルールではない)。 |
+
+本規約は **既存のすべての Spec ファイルと遡及的に整合** し
+(`specs/01-*.md` … `specs/08-*.md` のすべてが適合)、これが一括リネームではなく
+規約 *記述* amendment であることを確認する ── ステータス遷移 amendment (#07) が
+「すべての歴史的な成果物と遡及的に整合しており、動作変更ではない」として
+確立したプロパティと全く同じである。
+
+### (a) Documentation placement — the CLAUDE.md `## Roadmap` Rules block, one added bullet, zero extra file reads
+
+規約は CLAUDE.md の **`## Roadmap` Rules ブロック** に 1 つの追加箇条書きとして
+記載される ── spec-template の `## How to use this template` ブロックではなく、
+新しい CI スクリプトでもなく、エージェントプロンプトに複製もしない。根拠、
+Spec の R-01 (a) 「追加ファイル読み取りなしに Spec オーサリングステップで出会う」
+基準に対して:
+
+- **`product-manager` はすでに Spec を作成するために CLAUDE.md の
+  `## Roadmap` セクションを読む。** 2026-05-16 Spec 予約 amendment はその
+  Rules ブロックに存在し、`product-manager` の ADR-014 書き込みオーナーシップ
+  (行 + 予約 `spec:` リンクの作成/更新) はすでにそこで行使される。ファイル名
+  規約は *同じ* 予約ルールの名前付き完成形 ── `product-manager` は所有する行から
+  予約済み `specs/NN-slug.md` パスを読み、そのパスでファイルを作成する。予約
+  ルールの 1 箇条書き下に規約を記述することで、`product-manager` が Spec を
+  作成する正確な瞬間に出会い、**追加ファイル読み取りゼロ** ── R-01 (a) 基準が
+  構造的に満たされる。spec-template の `## How to use this template` ブロックは
+  *著者がテンプレートを開いた場合のみ* 読まれ、これは 1 つの追加ファイル読み取りで
+  あり保証されない (経験豊富なエージェントがテンプレートをスキップしても規約は
+  成立しなければならない) ── したがってテンプレートは単一ソースとして不適切。
+- **これは意図的に #08 の配置ではなく #07 の配置を反映する。なぜならコントラクト
+  はインデックスメカニズムであり、エージェントランタイム動作ではないからである。**
+  #07 (Roadmap セル書き込みオーナーシップルール) は Rules ブロックに記載;
+  #08 (orchestrator ランタイム dispatch 前提条件) は orchestrator.md Workflow
+  step 1 に記載。#09 は Roadmap メカニズム自体のプロパティ (予約された `spec:`
+  パスのファイル名が *何であるか*)、Rules ブロックが統治するコントラクトクラスの
+  まさにそれ ── 予約ルール、行/リンク書き込みオーナーシップ、グリフセット、
+  #07 遷移マトリックスをすでに記述している。ファイル名規約は既存の「Spec 予約
+  ルール」/ 「`spec:` パスは行作成時に予約される」箇条書きの自然な完成形であり、
+  新しい場所の新しいコンセプトではない。配置はコントラクトオーナーに従う、
+  まさに #08 amendment が推論したとおり (「グリフオーナーシップ → Rules ブロック
+  (#07); Analyze dispatch 前提条件 → Analyze ステップ (#08)」)。
+- **CLAUDE.md 行予算ガイダンスをすでに免除されているセクションに記載することで
+  尊重する。** `## Roadmap` セクションは認可された行予算例外 (本 ADR の
+  2026-05-16 行予算 amendment、CLAUDE.md の `## CLAUDE.md authoring guidance`
+  で再記述)。すでに免除されているセクションへの 1 つの追加箇条書きは他の
+  予算を消費しない ── #07 amendment の配置根拠と同一。非免除セクションへの
+  散文追加 (例: 新しい `## Spec filename convention` 見出し) は予算を膨張させ、
+  再構成 (下記判断 (c)) に踏み込む。
+
+正確な 1 箇条書きの文言は下記の `implementer` に渡される; MECE 境界 (次節) は
+*その箇条書きに* 再記述され、将来のマイルストーン著者がディレクトリ問題を #09 に、
+ファイル名問題を #10 にルーティングしないようにする。
+
+### (c) Edit scope + claude-md-authoring Skill judgement
+
+- **CLAUDE.md への編集が必要 ── `## Roadmap` Rules ブロックのみ。**
+  既存の予約ルールガイダンスの後に 1 箇条書きを追加。他の CLAUDE.md セクションは
+  変更しない。
+- **`product-manager.md` への編集は不要。** 規約は `product-manager` が
+  ADR-014 下ですでに所有する予約済み `spec:` パスのファイル名に名前を付ける
+  (行 + `spec:` リンク書き込みオーナーシップ) で、#07 の `☐→◐` ピックアップ
+  遷移ですでに作成する。予約パスでファイルを *作成する* ことは既存の書き込み
+  オーナーシップ; 規約はそのパスの *形式* を `product-manager` がすでに読む
+  Rules ブロックで明示し、新しいプロンプト義務ではない。これは #07 amendment が
+  「エージェントプロンプトの編集は不要」と結論づけるために使用した推論と同一
+  (マトリックスはすでに所有されている行書き込みを Rules ブロックで明示し、
+  プロンプトではない) で、`product-manager.md` に対する #08 amendment が使用した
+  推論でもある (「`product-manager` の受信動作は既存の ADR-014 行+Spec 書き込み
+  オーナーシップと #07 の `☐→◐` トリガーですでにカバーされている」)。
+- **spec-template への編集は不要。** テンプレートの `## References` はすでに
+  `Roadmap row: #NN` バックリンク例を持つ (ADR-014 の元のダウンストリームタスク)。
+  ファイル名は Rules ブロック箇条書きが記述する予約ルールの *ファイルが作成される
+  場所* のプロパティ; テンプレートの *コンテンツ* は影響を受けない。テンプレートに
+  ファイル名ノートを追加すると同じルールのソースが 2 つになる (Rules ブロック箇条書き
+  *かつ* テンプレート行)、ADR-014 が除去しようとした「どの文書が権威的か」という
+  再発見問題をまさに再導入する。単一ソース: Rules ブロック。
+- **claude-md-authoring Skill: #09 CLAUDE.md 編集に不要。** 延期された CLAUDE.md
+  編集は **既存の `## Roadmap` Rules リストへの 1 箇条書きの追加** ── CLAUDE.md
+  の `## CLAUDE.md authoring guidance` セクションの明示的なカーブアウトによる
+  「ルーティン的な小さな編集 (… 単一の箇条書き …)」(「Routine small edits
+  (typo, single bullet, version bump) do not need the Skill」)。「重要な再構成」
+  ではない (セクションの追加/移動/分割なし、見出し変更なし、不変条件の変更なし)。
+  **判断: claude-md-authoring Skill は #09 実装編集に不要** ── #07 amendment が
+  その単一箇条書き Rules ブロック編集について記録した同一判断と同一推論。(実装者が
+  代わりに CLAUDE.md に `##` レベルの「Spec filename convention」セクションや
+  テーブルを追加することを選択した場合は再構成に該当し Skill が適用される ──
+  ここの設計はルーティン編集カーブアウトの範囲内に留まるよう意図的に単一箇条書き
+  であり、まさに #07 がそうだったとおり。)
+
+### (d) MECE boundary statement against #04 / #05 / #10 / ADR-014-reservation-rule / ADR-016-progress-files (R-02)
+
+境界は **各オーナーが所有するもの** で引かれており、将来のマイルストーン著者が
+ファイル名の懸念をディレクトリピンや、パス解決ディテクターや、progress-file
+ライフサイクルに誤ってルーティングできないよう、ここと実装者の箇条書きに再記述する:
+
+| オーナー | 所有する問い | トリガーポイント |
+|---|---|---|
+| #04 `check-dangling-refs.sh` | 文書散文中のパス/参照は実際のファイル/ADR に **解決するか**? | コミット時 (CI) |
+| #05 `check-roadmap-drift.sh` | **双方向 Roadmap インデックスコントラクト** は成立しており、すべてのステータスグリフは **整形式か**? | コミット時 (CI) |
+| #10 (Spec/ADR ディレクトリピン) | Spec/ADR ファイルは **どのディレクトリ** に存在するか (`specs/`、`.claude/meta/adr/`)? | ドキュメント/規約 (#10 のスコープに CI なし) |
+| #09 (本 amendment) | `specs/` 内の Spec ファイルの **ファイル名形式は何か** (`NN-slug.md`、最小 2 桁、JA 兄弟形式)? | ドキュメント/規約 (CI なし; CI は明示的に延期された任意の帰結であり、#09 ではない) |
+| ADR-014 予約ルール | すべての行が行作成時に予約済み `spec:` リンクを持つ *こと*、不変の行番号をキーとして。 | 行作成時 (プロセス) |
+| ADR-016 progress ファイル | `specs/NN-progress.md` の *ライフサイクル* (境界で作成、反転で削除)。`progress` はその予約サフィックス; **#09 の `NN-slug.md` ルールから除外**。 | セッション/コンパクション境界 (プロセス) |
+
+懸念はちょうど 1 つのオーナーにマッピングされる: *壊れた散文パス* は #04 (コミット時
+解決); *不正なグリフまたは壊れた双方向 ADR リンク* は #05 (コミット時整合性);
+*Spec がどのディレクトリに存在するか* は #10; *ディレクトリ内での Spec ファイルの名前が
+何か* は #09; *予約リンクがそもそも存在すること* は ADR-014 予約ルール;
+*`specs/NN-progress.md` がどのように生まれ退役するか* は ADR-016。完全な正規パス
+`specs/NN-slug.md` は #10 のディレクトリスコープと #09 のファイル名スコープの
+**合成** であり: どちらも他方を包含せず、ディレクトリに不確かな将来の著者は #10 を
+読み、ファイル名に不確かな著者は #09 を読む。`specs/NN-progress.md` の縫い目は
+明示的: #09 のディレクトリと `NN` プレフィックスを共有するがその命名とライフサイクルは
+ADR-016 の完全な管轄 ── #09 は意図的にそれを統治しない、まさに #08 amendment の
+MECE テーブルが #05 (確認しない) と #08 (異なるトリガーで確認する) の間の
+予約済みだがファイル未作成の `spec:` 縫い目を引いたとおり。
+
+### Composability with ADR-014's reservation rule, ADR-016, and #06/ADR-018 (no gap)
+
+- **ADR-014 2026-05-16 Spec 予約 amendment。** #09 はその amendment がすでに
+  義務付ける `specs/NN-slug.md` 予約パスのファイル名コンポーネントに名前を付ける。
+  2 つはギャップなく合成可能: 予約 amendment は *行作成時から予約済み `spec:`
+  リンクが `specs/NN-slug.md` の形式で存在する* と言い; #09 は *ピックアップ時に
+  作成されるファイルはすでに予約されているその名前を正確に使用する* と言う。
+  #09 は 2 番目のパス方式を追加しない; 既存のものを規範的と記述する。
+- **ADR-016 (`specs/NN-progress.md`)。** #09 は progress ファイルを ADR-016 の
+  ライフサイクルに完全に委ねることで除外する。ADR-016 §書き込みオーナーシップ/
+  §退役は `specs/NN-progress.md` の唯一の権威のままであり; #09 は書き込みも
+  ライフサイクルルールも追加せず、`progress` が `NN-slug.md` 要件の外の予約
+  サフィックスであるという名前付き記述のみ ── ADR-016 に対して読み取り専用で
+  あり、まさに #08 amendment の G3 が ADR-016 の書き込みオーナーシップに対して
+  読み取り専用だったとおり。
+- **#06 / ADR-018 (bilingual parity)。** #09 は JA 兄弟の *ファイル名形式*
+  (`specs/NN-slug.ja.md`) を記述; ADR-018 は JA ファイルの *見出しツリー/
+  全角括弧コンテンツパリティ* を所有する。準拠した bilingual Spec には両方が
+  成立しなければならない: #09 が兄弟名を統治し、#06 がその構造を統治する。
+  重複なし ── 命名上の欠陥は #09、見出し順序の欠陥は #06。
+
+### Downstream implementer tasks (recorded for traceability, not performed by this amendment — implementation is a future session, per the #03/ADR-016 · #05/ADR-017 · #06/ADR-018 · #07/ADR-014-amendment · #08/ADR-014-amendment two-session decision-then-implementation split)
+
+- `.claude/CLAUDE.md` の `## Roadmap` **Rules** ブロック ── 既存の予約ルール
+  ガイダンス (「**Spec 予約ルール:**」段落 / 「`spec:` パスは行作成時に予約される」
+  Rules 箇条書き) の後に 1 箇条書きを追加。形式: *「Spec filename convention:
+  a Spec file is `specs/NN-slug.md` where `NN` is the row number
+  zero-padded to a two-digit minimum (`1→01`; rows ≥100 written without
+  extra padding) and `slug` is the kebab-case slug already fixed in the
+  row's reserved `spec:` path (copy it from the row, do not re-derive).
+  The JA sibling is `specs/NN-slug.ja.md` (same `NN`/`slug`, `.ja`
+  before `.md`); its heading-tree parity is owned by #06.
+  `specs/NN-progress.md` is excluded — `progress` is ADR-016's reserved
+  suffix, governed by ADR-016's lifecycle, not by this convention. #10
+  pins the directory; #09 pins the filename — MECE."* 単一箇条書き、
+  サブ見出しなし、テーブルなし ── ルーティン編集カーブアウトの範囲内
+  (claude-md-authoring Skill 呼び出し不要; 上記判断 (c))。
+- **エージェントプロンプトの編集なし** (上記判断 (c))。実装者は
+  `product-manager.md`、`orchestrator.md`、`architect.md`、`implementer.md`
+  にファイル名規約の散文を追加してはならない; Rules ブロックが単一ソース。
+  `product-manager` の予約パスでのオーサリング動作は既存の ADR-014 行+`spec:`
+  書き込みオーナーシップと #07 の `☐→◐` ピックアップトリガーですでにカバーされている。
+- **spec-template の編集なし** (上記判断 (c))。テンプレートの `## References`
+  `Roadmap row: #NN` 例は影響を受けない; ファイル名は Rules ブロック箇条書きが
+  記述する予約パスのプロパティであり、テンプレートコンテンツではない。テンプレートに
+  ノートを追加すると同じルールのソースが 2 つになる。
+- **CI ワークフローとスクリプトなし** (Spec Non-goals / Out of scope:
+  「#09 はドキュメント/規約記述マイルストーン; CI 強制は任意の帰結であり、
+  成果物ではない」; 「CI ファイル名形式チェックの追加 ── architect に延期された
+  構造的決定」)。将来の機械的ファイル名形式チェックは可能性ある後のマイルストーンで
+  あり、**#09 ではない**。それは下記の反対案トリガー条件下で再評価される ──
+  (d) MECE テーブルに従い #04/#05 のコミット時チェックとは異なる。
+- **リネームなし。** 既存の 8 つの Spec ファイルはすべて適合; #09 は
+  規約記述であり一括リネームではない (Spec Non-goals)。
+- **Roadmap 行の変更なし。** Row #09 の `Design source` セルは `spec:` のみの
+  ままとする ── これは ADR-014 amendment であり、ADR-014 はそれ自身の
+  マイルストーン行を持たないため、row #09 に `adr:` リンクは追加しない
+  (マイルストーン → ADR は 0:1; #07 と #08 amendment の行推論と同一)。
+- 本 ADR の日本語版
+  (`014-roadmap-index-single-entry-point.ja.md`) はミラーされた amendment を
+  受け取る必要がある ── `technical-writer` タスクであり、本変更の対象ではない。
+  **本 amendment は ADR-014 に一時的な EN/JA 見出し不一致を作り出す (EN は
+  1 つの `##` レベル見出しとその `###` サブ見出しを獲得し; JA は本変更前に
+  26 見出しで同等だった) ── `technical-writer` のミラーが反映されるまで
+  #06 の bilingual-parity detector (`check-bilingual-parity.sh`) は ADR-014 で
+  FAIL する。これは期待されるキューに入った `technical-writer` タスクであり、
+  この EN amendment を省略する理由ではない**、まさに 2026-05-17 の
+  ステータス遷移 (#07) と Analyze 行ガード (#08) の amendment が行ったとおり。
+
+### Counter-proposal
+
+深刻な反対案は **新しい ADR-019 ── Spec ファイル名規約を ADR-014 amendment <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+ではなくスタンドアロン ADR として形式化する** である。
+ADR-012 / ADR-014 / ADR-015 / ADR-016 / ADR-017 / ADR-018 の慣例に従い、
+却下された代替案を藁人形としてではなく真剣に記録する。議論:
+
+1. Spec は `architect` に明示的な (b) 選択肢 (「ADR-014 amendment か新しい
+   ADR-019 か」) を渡しており、構造的に並行した兄弟マイルストーン #05 と #06 は <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+   どちらも延期された構造的質問の Spec を *新しい* ADR (017、018) で解決しており、
+   amendment ではない。プロセスの対称性は #09 → ADR-019 を示唆する。 <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+2. 将来のすべてのマイルストーン著者とすべてのフォークが遵守しなければならない
+   名前付きファイル名規約はファーストクラスの引用可能なコントラクトであり; 長い
+   ADR-014 トレイルの 5 番目の amendment として埋め込むことは、読者が
+   「Spec ファイル名 ADR」として引用できる専用 ADR-019 より発見しやすさが劣る。 <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+   隣接マイルストーン #10 (ディレクトリピン) もそれ自体が ADR になる可能性がある;
+   ファイル名ルールとディレクトリルールの対称性は両方が同じ形状の ADR であるべきと
+   主張する。
+3. ADR-019 はそれ自身の Roadmap バックリンク (`Roadmap row: #09`) を持ち、 <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+   row は `adr:` リンクを獲得する ── #05/#06 が行使する同じ双方向コントラクトを
+   #09 に与え、その兄弟と同じ成果物形状になる。
+
+**反対案が採用されなかった理由:**
+
+- ADR-017 と ADR-018 は特定の、明記された識別基準に基づいて新 ADR に値すると
+  自己分類した: それぞれが **新しいディテクター + 新しい MECE コントラクト境界 +
+  新しい免除キーイングルール** を導入した (ADR-017 Alternative B; ADR-018
+  Alternative B)。#09 はそれらを **いずれも** 導入しない ── Spec の Non-goals と
+  Out of scope は CI ファイル名形式ディテクターを明示的に禁じている
+  (「#09 はドキュメント/規約記述マイルストーン; CI 強制は任意の帰結であり、
+  成果物ではない」); MECE 記述はディテクターファミリー分割の外部に #09 を置く
+  スコープ限定であり、その分割内の 4 番目のパーティションではない; そして
+  免除キーイングも、新しいファイル成果物も、新しいメカニズムも存在しない。
+  ADR-014 の Spec 予約 amendment が確立した予約パス (`specs/NN-slug.md`) の
+  ファイル名コンポーネントに名前を付ける ── ADR-014 §帰結 → ネガティブが
+  事前フラグした正確なギャップを閉じる。兄弟対称性の議論は詳細に見ると逆転する:
+  #05/#06 自身の識別基準を #09 に適用すると「amendment」になる、なぜなら
+  #05/#06 にとって支配的だった構造的な半分が #09 には不在だからである。これは
+  ADR-014 の 2026-05-16 行予算 amendment が自身の ADR-015 を拒否した際に
+  使用した推論と全く同じであり、ADR-018 の 2026-05-17 amendment が新しい番号
+  なしにすでに決定されたオーナーシップルールを精緻化するために使用した推論でも
+  あり、2026-05-17 のステータス遷移 (#07) amendment が ADR-019 を拒否するために <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+  使用した推論でもあり、2026-05-17 の Analyze 行ガード (#08) amendment が
+  ADR-019 を拒否するために使用した推論でもある。 <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+- ADR-016 の類比は詳細に見ると崩れる。ADR-016 が別の ADR である理由は、
+  **新しいメカニズム** を導入したからである ── 独自の書き込みオーナーシップ、
+  ライフサイクル、削除トリガーコントラクトを持つ新しいファイル成果物
+  (`specs/NN-progress.md`)。#09 は **新しい成果物もメカニズムも導入しない**;
+  ADR-014 の Spec 予約 amendment がすでに定義する成果物 (`specs/NN-slug.md`) の
+  ファイル名形式に名前を付け、ADR-016 のメカニズムに完全に委ねることで
+  `specs/NN-progress.md` を明示的に除外するだけである。
+- 発見しやすさは ADR-014 amendment の方が *良い*、悪くない: 「Spec ファイルの
+  ファイル名はどのような形式か」を読者が探す正規の場所は、Spec 予約ルールを
+  定義し、すべての行に決定論的な予約パスを要求し、すでに `product-manager` に
+  行+`spec:` 書き込みオーナーシップを割り当てている ADR である。別個の ADR-019 は <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+  ファイル名コントラクトを 2 つの ADR に *分断* する ── `product-manager` は
+  ファイル名規約の全体を知るために ADR-014 *と* ADR-019 の両方を読む必要があり、 <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+  ADR-014 が除去しようとした「どの文書が権威的か」という再発見の問題をまさに
+  再導入する。
+- 双方向バックリンクの議論は無意味: ADR-014 はそれ自身のマイルストーン行を
+  持たないため、ADR-014 への amendment は正しく `Roadmap row:` 行を持たず
+  #05 ドリフトコントラクトをトリガーしない。バックリンクを作成するためだけに
+  新しい ADR-019 を強制することは、真の構造的決定を反映するのではなく <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+  双方向成果物を製造することになる ── #07 と #08 の amendment による同じ異論の
+  解決と同一。 <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+
+**この反対案を再評価するトリガー条件:**
+
+- 将来のマイルストーンが規約の *機械的な CI 強制* を genuinely 追加する場合
+  (ファイル名が `NN-slug.md` 形式に適合するかどうかを静的に検証する新しい
+  ディテクター) ── それは新しいディテクター + 新しい境界 + 新しいキーイングであり、
+  ADR-017/ADR-018 識別基準の構造的な半分に当たり、独自の ADR を持つに値し、
+  本 amendment の規約をその継承されたベースラインとする。Spec はこれを
+  「#09 ではなく将来の可能性あるマイルストーン」と明示的にフラグしている。
+- 隣接マイルストーン #10 (ディレクトリピン) が新しい ADR として解決される場合、
+  #09 と #10 の形状対称性は両方を ADR にすることを支持する可能性がある ──
+  ただし #10 の構造的内容が独自の ADR を正当化する場合のみ (識別基準が
+  #09 に適用されるのと同じように #10 にも適用される)。
+- 「Spec ファイル名 ADR」の発見しやすさが実際に問題になる場合 ──
+  ADR-014 トレイルが長くなりすぎて著者が規約を見つけられなくなった場合に、
+  専用 ADR-019 が正当化される可能性がある。 <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+
+反対案は ADR-012 / ADR-014 / ADR-015 / ADR-016 / ADR-017 / ADR-018 の慣例に従い、
+決定の最も深刻な異論の歴史的記録として本 amendment に残る。
+
+元のステータス行 (`Accepted — 2026-05-15`) は変更しない; 本 amendment は
+ADR-014 の既存の Spec 予約ルール決定のファイル名コンポーネント帰結明確化を
+追記するものであり、決定を再開するものではない。

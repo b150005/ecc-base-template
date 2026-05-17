@@ -1032,6 +1032,440 @@ The counter-proposal stays in this amendment as the historical record
 of the decision's most serious objection, per the
 ADR-012 / ADR-014 / ADR-015 / ADR-016 / ADR-017 / ADR-018 convention.
 
+## Amendment — 2026-05-17 (spec filename convention)
+
+This amendment makes normative the filename convention this ADR's
+2026-05-16 **Spec reservation rule** amendment already *uses* but never
+*states as a named rule*. That amendment fixed the reserved-link path
+as the deterministic form `specs/NN-slug.md` ("using the deterministic
+path `specs/NN-slug.md` where `NN` is the stable row number"); all
+eight Spec files authored to date (`specs/01-*.md` … `specs/08-*.md`)
+already conform. `specs/09-spec-filename-convention.md` (Roadmap row
+#09) is the authoritative scope; it states *what* the convention must
+cover (canonical form, two-digit-minimum zero-padding, the 100+
+extension rule, the `specs/NN-slug.ja.md` sibling, the
+`specs/NN-progress.md` exclusion) and defers the structural *how* to
+`architect` (its Risk R-01 (a)–(d), R-02, R-03). This amendment records
+that decision. It is a **consequence-clarification of ADR-014's
+existing Decision** — specifically of the already-accepted 2026-05-16
+Spec-reservation amendment, whose reserved path *is* `specs/NN-slug.md`
+— not a new structural decision. No new detector, CI workflow, contract
+boundary, keying rule, or mechanism is introduced: the convention names
+the filename component of a path scheme ADR-014 already mandates, and
+the `specs/NN-progress.md` carve-out is a restatement of ADR-016's
+existing lifecycle, not a new rule.
+
+### The (b) decision — ADR-014 amendment, not new ADR-019, by the ADR-018 Alternative-B discriminator <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal; it is intentionally never created (see Counter-proposal below) -->
+
+The Spec's R-01 (b) hands `architect` the explicit choice "ADR-014
+amendment or a new ADR-019" and instructs the architect to apply <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+ADR-018's Alternative-B discriminator verbatim: *does #09 introduce a
+NEW detector + a NEW MECE contract boundary + a NEW keying/mechanism
+(⇒ new ADR), or is it a consequence-clarification / extension of an
+existing ADR's already-sanctioned Decision (⇒ amendment)?* Applied
+honestly, clause by clause:
+
+- **New detector? No.** The Spec's Non-goals and Out of scope
+  *explicitly forbid* a CI filename-format detector ("Adding a new CI
+  detector that mechanically checks filename conformance. … #09 is a
+  documentation/convention-statement milestone; CI enforcement is an
+  optional consequence, not a deliverable of this milestone";
+  "Adding a CI filename-format check — a structural decision deferred
+  to the architect"). ADR-017 and ADR-018 each self-classified as
+  new-ADR-worthy *because* each introduced a new script + new workflow
+  (`check-roadmap-drift.sh` / `check-bilingual-parity.sh`). #09
+  introduces **zero** scripts and **zero** workflows. The structural
+  half that dominated for ADR-017/ADR-018 is absent here — identical to
+  the #07 amendment (no detector) and the #08 amendment (Non-goals
+  forbid a CI workflow).
+- **New MECE contract boundary? No new partition.** A boundary
+  *statement* is required (Spec Goal 5, Acceptance criterion, R-02),
+  but it does **not** add a fourth detector to the #04/#05/#06
+  detector-family contract partition. It states that #09 sits *outside*
+  that partition entirely: #09 is a documentation/convention statement
+  about the *filename of the reserved `spec:` path* ADR-014's
+  reservation rule already produces, and against the *adjacent
+  directory milestone #10*. This is a scope-delineation of where an
+  ADR-014 reservation-rule consequence lives, not a new keying rule
+  like ADR-017's absence-of-claim or ADR-018's convention-presence.
+- **New keying / mechanism? No.** There is no exemption-keying rule, no
+  allowlist-vs-pattern choice, no parsing strategy, no new file
+  artifact. `specs/NN-slug.md` is *already* the deterministic path the
+  2026-05-16 Spec-reservation amendment mandates for every reserved
+  `spec:` link; #09 names that already-used form normative for the
+  files too. The `specs/NN-progress.md` exclusion is a *consequence* of
+  ADR-016's already-established progress-file lifecycle
+  (created at session boundary, deleted at `◐→☑`/`◐→✗`), not a new
+  mechanism this amendment introduces.
+- **Consequence-clarification of an existing Decision? Yes,
+  decisively.** ADR-014's 2026-05-16 Spec-reservation amendment already
+  uses `specs/NN-slug.md` verbatim as the reserved-path scheme keyed to
+  the immutable row number. The #09 convention is the statement, as a
+  named normative rule, of the filename component of that
+  already-sanctioned path. This is the identical structural shape as
+  the 2026-05-17 status-transition amendment (#07), which formalized an
+  interim practice ADR-014 §Consequences → Negative pre-flagged, and
+  the 2026-05-17 Analyze row-guard amendment (#08), which strengthened
+  what ADR-014's Analyze read must verify — both resolved by ADR-014
+  amendment, not by ADR-019. <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+
+**The sibling-symmetry argument inverts on inspection** (the same trap
+the #07 and #08 amendments identified): "#05/#06 → ADR-017/ADR-018;
+therefore #09 → ADR-019 for symmetry" — but applying #05/#06's *own <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+stated discriminator* to #09 yields **amendment**, because all three
+structural clauses (new detector, new partition, new keying/mechanism)
+are absent. ADR-016 is a separate ADR because it introduced a *new
+mechanism* (a new file artifact with its own write-ownership /
+lifecycle / deletion-trigger contract); #09 introduces no new artifact
+and no new mechanism — it names the filename form of an artifact
+(`specs/NN-slug.md`) ADR-014's own reservation amendment already
+defines, and explicitly *excludes* `specs/NN-progress.md` by deferring
+entirely to ADR-016's mechanism. **Decision: ADR-014 amendment. No
+ADR-019 is created.** Roadmap row #09 stays `spec:`-only (Milestone → <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+ADR is 0:1; an amendment to the Roadmap-mechanism ADR is not #09's
+*own* ADR — ADR-014 has no milestone row of its own, so adding an
+`adr:` link from row #09 to ADR-014 would assert a milestone→ADR
+mapping that does not exist — identical reasoning to the #07 and #08
+amendments).
+
+### The normative filename convention
+
+The convention names the filename component of the `specs/NN-slug.md`
+path the 2026-05-16 Spec-reservation amendment already mandates. It
+adds no new path scheme; it states the existing one as a named rule:
+
+| Rule | Statement | Source it clarifies |
+|---|---|---|
+| Canonical Spec filename | A Spec file is `specs/NN-slug.md`, where `NN` is the Roadmap row number zero-padded to a **minimum of two digits** and `slug` is the kebab-case slug **already fixed in the row's reserved `spec:` path** (so there is no authoring-time ambiguity — `product-manager` copies the slug from the Roadmap row, it does not re-derive it). | ADR-014 2026-05-16 Spec-reservation amendment (the reserved path *is* this form). |
+| 100+ extension | The two-digit minimum pads single-digit rows only (`1→01`); rows already multi-digit are written without extra padding (`100`, `101`, …). Stable with the row-number convention (numbers never reused/renumbered). | ADR-014 §Decision "row number is stable and never reused." |
+| JA sibling filename | The Japanese sibling is `specs/NN-slug.ja.md` — same `NN`, same `slug`, `.ja` inserted before `.md`. Its heading-tree parity with the EN primary is **owned by #06 / ADR-018**; this convention states only the *filename form* of the sibling, it does not redefine or extend the parity check. | ADR-018 (parity check owns content parity; this convention owns the sibling's name). |
+| `specs/NN-progress.md` exclusion | `specs/NN-progress.md` shares the `specs/` directory and the `NN` prefix but is **not** a Spec file and is **excluded** from the `NN-slug.md` requirement. `progress` is a reserved suffix under ADR-016's lifecycle (created at the session/compaction boundary while `◐`, deleted at the `◐→☑`/`◐→✗` flip); its naming and lifecycle are governed entirely by ADR-016, never by this convention. | ADR-016 §write-ownership / §retirement (the carve-out is a restatement of ADR-016, not a new rule). |
+
+The convention is **retroactively consistent with every existing Spec
+file** (`specs/01-*.md` … `specs/08-*.md` all conform), confirming this
+is a convention-*statement* amendment, not a bulk-rename — exactly the
+"retroactively consistent with every historical [artifact], not a
+behavior change" property the #07 amendment established for the
+status-transition matrix.
+
+### (a) Documentation placement — the CLAUDE.md `## Roadmap` Rules block, one added bullet, zero extra file reads
+
+The convention lives in the **CLAUDE.md `## Roadmap` Rules block** as
+one added bullet — **not** in the spec-template's `## How to use this
+template` block, **not** in a new CI script, **not** duplicated into
+agent prompts. Rationale, against the Spec's R-01 (a) "encountered at
+the Spec-authoring step without an additional file read" criterion:
+
+- **`product-manager` already reads the CLAUDE.md `## Roadmap` section
+  to author a Spec.** The 2026-05-16 Spec-reservation amendment lives
+  in that exact Rules block, and `product-manager`'s ADR-014
+  write-ownership (create/update the row + reserved `spec:` link) is
+  already exercised there. The filename convention is the named
+  completion of the *same* reservation rule — `product-manager` reads
+  the reserved `specs/NN-slug.md` path from the row it owns and authors
+  the file at that path. Stating the convention one bullet below the
+  reservation rule means `product-manager` encounters it at the precise
+  moment it authors the Spec, with **zero additional file reads** — the
+  R-01 (a) criterion is met by construction. The spec-template's
+  `## How to use this template` block is read *only if the author opens
+  the template*, which is one extra file read and is not guaranteed
+  (the convention must hold even when an experienced agent skips the
+  template) — so the template is the wrong single source.
+- **This deliberately mirrors #07's placement, not #08's, because the
+  contract is index-mechanism, not agent-runtime-behavior.** #07 (a
+  Roadmap-cell write-ownership rule) went in the Rules block; #08 (an
+  orchestrator runtime dispatch precondition) went in orchestrator.md
+  Workflow step 1. #09 is a property of the Roadmap mechanism itself
+  (what the reserved `spec:` path's filename *is*), exactly the
+  contract class the Rules block governs — it already states the
+  reservation rule, the row/link write-ownership, the glyph set, and
+  the #07 transition matrix. The filename convention is the natural
+  completion of the existing "Spec reservation rule" / "`spec:` paths
+  are reserved at row-creation" bullet, not a new concept in a new
+  place. Placement follows the contract owner, exactly as the #08
+  amendment reasoned ("glyph-ownership → Rules block (#07);
+  Analyze-dispatch precondition → the Analyze step (#08)").
+- **It respects the CLAUDE.md line-budget guidance by living in the
+  one already-exempt section.** The `## Roadmap` section is the
+  sanctioned line-budget exception (this ADR's 2026-05-16 line-budget
+  amendment, restated in CLAUDE.md's `## CLAUDE.md authoring
+  guidance`). One added bullet to an already-exempt section costs no
+  budget elsewhere — identical to the #07 amendment's placement
+  rationale. Adding prose to a non-exempt section (e.g. a new
+  `## Spec filename convention` heading) would bloat the budget and
+  cross into restructuring (judgement (c) below).
+
+The exact one-bullet wording is handed to `implementer` below; the
+MECE boundary (next section) is restated *in that bullet* so a future
+milestone author does not route a directory question to #09 or a
+filename question to #10.
+
+### (c) Edit scope + claude-md-authoring Skill judgement
+
+- **CLAUDE.md requires editing — the `## Roadmap` Rules block only.**
+  One bullet appended after the existing reservation-rule guidance. No
+  other CLAUDE.md section changes.
+- **`product-manager.md` does NOT require editing.** The convention
+  names the filename of the reserved `spec:` path `product-manager`
+  already owns under ADR-014 (row + `spec:` link write-ownership) and
+  already authors at the #07 `☐→◐` pickup transition. Authoring the
+  file *at the reserved path* is the existing write-ownership; the
+  convention makes the *form* of that path explicit in the Rules block
+  `product-manager` already reads, not a new prompt obligation. This is
+  the identical reasoning the #07 amendment used to conclude "no agent
+  prompt requires editing" (the matrix made an already-owned row write
+  explicit in the Rules block, not in the prompt) and the #08
+  amendment used for `product-manager.md` ("`product-manager`'s receipt
+  behavior is already covered by its ADR-014 row+Spec write-ownership
+  and the #07 `☐→◐` trigger").
+- **The spec-template does NOT require editing.** The template's
+  `## References` already carries a `Roadmap row: #NN` back-link
+  example (ADR-014's original downstream task). The filename is a
+  property of *where the file is created*, governed by the Roadmap
+  reservation rule the Rules-block bullet states; the template's
+  *content* is unaffected. Adding a filename note to the template would
+  create a second source for the same rule (a Rules-block bullet *and*
+  a template line), reintroducing exactly the "which document is
+  authoritative" rediscovery ADR-014 exists to remove. Single source:
+  the Rules block.
+- **claude-md-authoring Skill: NOT required for the #09 CLAUDE.md
+  edit.** The deferred CLAUDE.md edit is **one bullet appended to the
+  existing `## Roadmap` Rules list** — a "routine small edit (…
+  single bullet …)" by the explicit carve-out in CLAUDE.md's
+  `## CLAUDE.md authoring guidance` section ("Routine small edits
+  (typo, single bullet, version bump) do not need the Skill"). It is
+  **not** "significant restructuring" (no section added/moved/split, no
+  heading change, no invariant touched). **Judgement: the
+  claude-md-authoring Skill is NOT required for the #09 implementation
+  edit** — the identical judgement and the identical reasoning the #07
+  amendment recorded for its single-bullet Rules-block edit. (If the
+  implementer instead chooses to add a `##`-level "Spec filename
+  convention" section or a table to CLAUDE.md, that *would* cross into
+  restructuring and the Skill would then apply — the design here is
+  deliberately a single bullet precisely to stay under the routine-edit
+  carve-out, exactly as #07 was.)
+
+### (d) MECE boundary statement against #04 / #05 / #10 / ADR-014-reservation-rule / ADR-016-progress-files (R-02)
+
+The boundary is drawn on **what each owns**, restated here and in the
+implementer's bullet so a future milestone author cannot mis-route a
+filename concern to a directory pin, a path-resolution detector, or a
+progress-file lifecycle:
+
+| Owner | Owns the question | Trigger point |
+|---|---|---|
+| #04 `check-dangling-refs.sh` | Does a path/reference in document prose **resolve** to a real file/ADR? | commit time (CI) |
+| #05 `check-roadmap-drift.sh` | Does the **bidirectional Roadmap-index contract** hold and is every Status glyph **well-formed**? | commit time (CI) |
+| #10 (Spec/ADR directory pin) | **Which directory** do Spec/ADR files live in (`specs/`, `.claude/meta/adr/`)? | documentation/convention (no CI in #10's own scope) |
+| #09 (this amendment) | **What is the filename form** of a Spec file inside `specs/` (`NN-slug.md`, two-digit-min, JA sibling form)? | documentation/convention (no CI; CI is an explicitly-deferred optional consequence, not #09) |
+| ADR-014 reservation rule | *That* every row carries a reserved `spec:` link at row-creation, keyed to the immutable row number. | row-creation (process) |
+| ADR-016 progress files | The `specs/NN-progress.md` *lifecycle* (create at boundary, delete at flip). `progress` is its reserved suffix; **excluded** from #09's `NN-slug.md` rule. | session/compaction boundary (process) |
+
+A concern maps to exactly one owner: a *broken prose path* is #04's
+(commit-time resolution); a *malformed glyph or broken bidirectional
+ADR-link* is #05's (commit-time consistency); *which directory a Spec
+lives in* is #10's; *what a Spec file is named inside that directory*
+is #09's; *that a reserved link exists at all* is the ADR-014
+reservation rule's; *how `specs/NN-progress.md` is born and retired* is
+ADR-016's. The full canonical path `specs/NN-slug.md` is the
+**composition** of #10's directory scope and #09's filename scope:
+neither subsumes the other, and a future author uncertain about
+directory reads #10 while one uncertain about filename reads #09. The
+`specs/NN-progress.md` seam is explicit: it shares #09's directory and
+`NN` prefix but its naming and lifecycle are ADR-016's entirely — #09
+deliberately does not govern it, exactly as the #08 amendment's MECE
+table drew the reserved-but-absent-`spec:` seam between #05 (does not
+look) and #08 (does look, at a different trigger).
+
+### Composability with ADR-014's reservation rule, ADR-016, and #06/ADR-018 (no gap)
+
+- **ADR-014 2026-05-16 Spec-reservation amendment.** #09 names the
+  filename component of the `specs/NN-slug.md` reserved path that
+  amendment already mandates. The two are composable with no gap: the
+  reservation amendment says *a reserved `spec:` link of form
+  `specs/NN-slug.md` is present from row-creation*; #09 says *the file
+  authored at pickup uses exactly that already-reserved name*. #09 adds
+  no second path scheme; it states the existing one as normative.
+- **ADR-016 (`specs/NN-progress.md`).** #09 excludes progress files by
+  deferring entirely to ADR-016's lifecycle. ADR-016
+  §write-ownership/§retirement remains the sole authority for
+  `specs/NN-progress.md`; #09 adds no write, no lifecycle rule, only a
+  named statement that `progress` is a reserved suffix outside the
+  `NN-slug.md` requirement — read-only with respect to ADR-016, exactly
+  as the #08 amendment's G3 was read-only with respect to ADR-016's
+  write-ownership.
+- **#06 / ADR-018 (bilingual parity).** #09 states the JA sibling's
+  *filename form* (`specs/NN-slug.ja.md`); ADR-018 owns the JA file's
+  *heading-tree/full-width-paren content parity*. Both must hold for a
+  conformant bilingual Spec: #09 governs the sibling's name, #06
+  governs its structure. No overlap — a naming defect is #09's, a
+  heading-order defect is #06's.
+
+### Downstream implementer tasks (recorded for traceability, not performed by this amendment — implementation is a future session, per the #03/ADR-016 · #05/ADR-017 · #06/ADR-018 · #07/ADR-014-amendment · #08/ADR-014-amendment two-session decision-then-implementation split)
+
+- `.claude/CLAUDE.md` `## Roadmap` **Rules** block — append one bullet
+  after the existing reservation-rule guidance (the "**Spec
+  reservation rule:**" paragraph / the "`spec:` paths are reserved at
+  row-creation" Rules bullet), of the form: *"Spec filename convention:
+  a Spec file is `specs/NN-slug.md` where `NN` is the row number
+  zero-padded to a two-digit minimum (`1→01`; rows ≥100 written without
+  extra padding) and `slug` is the kebab-case slug already fixed in the
+  row's reserved `spec:` path (copy it from the row, do not re-derive).
+  The JA sibling is `specs/NN-slug.ja.md` (same `NN`/`slug`, `.ja`
+  before `.md`); its heading-tree parity is owned by #06.
+  `specs/NN-progress.md` is excluded — `progress` is ADR-016's reserved
+  suffix, governed by ADR-016's lifecycle, not by this convention. #10
+  pins the directory; #09 pins the filename — MECE."* Single bullet, no
+  sub-heading, no table — stays within the routine-edit carve-out (no
+  claude-md-authoring Skill invocation required; judgement (c) above).
+- **No agent-prompt edits** (judgement (c) above). The implementer must
+  **not** add filename-convention prose to `product-manager.md`,
+  `orchestrator.md`, `architect.md`, or `implementer.md`; the Rules
+  block is the single source. `product-manager`'s authoring-at-the-
+  reserved-path behavior is already covered by its ADR-014 row+`spec:`
+  write-ownership and the #07 `☐→◐` pickup trigger.
+- **No spec-template edit** (judgement (c) above). The template's
+  `## References` `Roadmap row: #NN` example is unaffected; the
+  filename is a property of the reserved path the Rules-block bullet
+  states, not of template content. Adding a template note would create
+  a second source for the same rule.
+- **No CI workflow and no script** (Spec Non-goals / Out of scope:
+  "#09 is a documentation/convention-statement milestone; CI
+  enforcement is an optional consequence, not a deliverable"; "Adding a
+  CI filename-format check — a structural decision deferred to the
+  architect"). A future mechanical filename-format check is a possible
+  later milestone, **not** #09, and would be re-evaluated under the
+  Counter-proposal trigger conditions below — distinct from #04/#05's
+  commit-time checks per the (d) MECE table.
+- **No renames.** All eight existing Spec files conform; #09 is a
+  convention-statement, not a bulk-rename (Spec Non-goals).
+- **No Roadmap row change.** Row #09's `Design source` cell stays
+  `spec:`-only — this is an ADR-014 amendment, ADR-014 has no milestone
+  row of its own, so no `adr:` link is added to row #09 (Milestone →
+  ADR is 0:1; identical to the #07 and #08 amendments' row reasoning).
+- The Japanese counterpart of this ADR
+  (`014-roadmap-index-single-entry-point.ja.md`) must receive the
+  mirrored amendment, and the Japanese counterpart of CLAUDE.md (if
+  present) the mirrored Rules-block bullet — a `technical-writer`
+  task, **not** part of this change. **This amendment creates a
+  transient EN/JA heading mismatch on ADR-014 (EN gains one `##`-level
+  heading plus its `###` sub-headings; JA was in heading parity before
+  this change) until `technical-writer` mirrors it; the #06
+  bilingual-parity detector (`check-bilingual-parity.sh`, now shipped)
+  will FAIL on ADR-014 until the mirror lands. This is the expected,
+  queued `technical-writer` task — not a reason to omit this EN
+  amendment**, exactly as the 2026-05-17 status-transition (#07) and
+  Analyze row-guard (#08) amendments did.
+
+### Counter-proposal
+
+The serious counter-position is **new ADR-019 — formalize the spec <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+filename convention as a standalone ADR rather than an ADR-014
+amendment**. It is recorded here per the
+ADR-012 / ADR-014 / ADR-015 / ADR-016 / ADR-017 / ADR-018 convention of
+taking a rejected alternative seriously rather than as a strawman. The
+argument:
+
+1. The Spec hands `architect` an explicit (b) choice ("ADR-014
+   amendment or a new ADR-019") and structurally parallel sibling <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+   milestones #05 and #06 both resolved their deferred-structural-
+   question Specs with *new* ADRs (017, 018), not amendments. Symmetry
+   of process argues #09 → ADR-019. <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+2. A named filename convention that every future milestone author and
+   every fork must honor is a first-class, citable contract; burying it
+   as the fifth amendment in a long ADR-014 trail makes it less
+   discoverable than a dedicated ADR-019 a reader can cite as "the <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+   Spec-filename ADR." Milestone #10 (the adjacent directory pin) may
+   itself become an ADR; symmetry between the filename rule and the
+   directory rule argues both should be ADRs of the same shape.
+3. ADR-019 would carry its own Roadmap back-link (`Roadmap row: #09`) <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+   and the row would gain an `adr:` link — the same bidirectional
+   contract #05/#06 exercise — giving #09 the same artifact shape as
+   its siblings.
+
+**Why the counter was not adopted:**
+
+- ADR-017 and ADR-018 self-classified as new-ADR-worthy on a specific,
+  stated discriminator: each introduced a **new detector + a new MECE
+  contract boundary + a new exemption-keying rule** (ADR-017
+  Alternative B; ADR-018 Alternative B). #09 introduces **none** of
+  those — the Spec's Non-goals and Out of scope *explicitly forbid* a
+  new CI detector or script; the MECE statement is a scope-delineation
+  placing #09 *outside* the detector-family partition and against the
+  adjacent #10 directory pin, not a fourth partition within it; and
+  there is no exemption keying, no allowlist-vs-pattern choice, no new
+  file artifact, no new mechanism. #09 names the filename component of
+  the `specs/NN-slug.md` reserved path ADR-014's *own* 2026-05-16
+  Spec-reservation amendment already mandates. The sibling-symmetry
+  argument inverts on inspection: applying #05/#06's own stated
+  discriminator to #09 yields "amendment," because the structural half
+  that dominated for #05/#06 is absent for #09. This is the identical
+  reasoning ADR-014's 2026-05-16 line-budget amendment used to refuse
+  its own ADR-015, ADR-018's 2026-05-17 amendment used to refine an
+  already-decided rule without a new number, and the 2026-05-17
+  status-transition (#07) and Analyze row-guard (#08) amendments used
+  to refuse ADR-019. <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+- The ADR-016 analogy fails on inspection. ADR-016 is a separate ADR
+  because it introduced a **new mechanism** — a new file artifact
+  (`specs/NN-progress.md`) with its own write-ownership, lifecycle, and
+  deletion-trigger contract. #09 introduces **no new artifact and no
+  new mechanism**; it names the filename form of an artifact
+  (`specs/NN-slug.md`) ADR-014's reservation amendment already defines,
+  and *defers entirely to ADR-016* for the one adjacent artifact
+  (`specs/NN-progress.md`) it explicitly excludes. A convention over an
+  existing path scheme is a consequence-clarification of that scheme's
+  owning Decision, not a new mechanism.
+- Discoverability is *better*, not worse, as an ADR-014 amendment: the
+  canonical place a reader looks for "what is the reserved `spec:`
+  path's filename" is the ADR that defined the Roadmap, the
+  reservation rule, and the `specs/NN-slug.md` path scheme itself. A
+  separate ADR-019 would *fragment* the reservation-rule contract <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+  across two ADRs — a reader would have to read ADR-014 (the
+  reservation rule) *and* ADR-019 (the filename form of the reserved <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+  path) to know the full path contract, reintroducing exactly the
+  "which document is authoritative" rediscovery ADR-014 exists to
+  remove. The #10 symmetry argument does not force ADR-019: whether <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+  #10's directory pin warrants its own ADR is #10's *own* discriminator
+  application at its pickup, decided on #10's structural facts, not
+  inherited from #09 — the two milestones are MECE precisely so each is
+  classified on its own merits.
+- The bidirectional-back-link argument is moot: ADR-014 has no
+  milestone row of its own, so an amendment to it correctly carries
+  *no* `Roadmap row:` line and triggers no #05 drift contract. Forcing
+  a new ADR-019 purely to manufacture a back-link creates the <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+  bidirectional artifact rather than reflecting a genuine structural
+  decision — identical to the #07 and #08 amendments' resolution of
+  the same objection.
+
+**Trigger conditions for re-evaluating this counter-proposal:**
+
+- A future milestone genuinely adds a *mechanical CI enforcement* of
+  the filename convention (a new detector that statically verifies
+  every `specs/*.md` matches `NN-slug.md`, the JA sibling form, and the
+  `progress` exclusion) — that would be a new detector + new boundary +
+  new keying, the ADR-017/ADR-018 discriminator's structural half, and
+  would warrant its own ADR with this amendment's convention as its
+  inherited normative baseline. The Spec explicitly flags the CI check
+  as "an optional consequence, not a deliverable of this milestone."
+- The filename convention is found to require divergent forms per
+  project type (e.g. forks that drop the bilingual `.ja.md` sibling, or
+  adopt a different number-prefix width), such that a single convention
+  in ADR-014 can no longer express it — at which point a dedicated ADR
+  with per-profile filename rules may be warranted.
+- The `specs/NN-slug.md` path scheme itself is restructured (e.g. the
+  reservation rule is replaced, or `specs/` is renamed by #10 in a way
+  that changes the filename grammar, not only the directory) — a
+  genuine change to the underlying mechanism, which would reopen the
+  owning Decision rather than extend it by amendment.
+
+The counter-proposal stays in this amendment as the historical record
+of the decision's most serious objection, per the
+ADR-012 / ADR-014 / ADR-015 / ADR-016 / ADR-017 / ADR-018 convention.
+
+The original Status line (`Accepted — 2026-05-15`) is unchanged; this
+amendment appends a convention-statement of an already-sanctioned path
+scheme and does not reopen the Decision.
+
 The original Status line (`Accepted — 2026-05-15`) is unchanged; this
 amendment appends a runtime-precondition clarification of an
 already-sanctioned Analyze-step mechanism and does not reopen the

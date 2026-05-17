@@ -138,7 +138,7 @@ Single entry point mapping each milestone to its authoritative design source. Ea
 | 06 | EN/JA bilingual parity detector | ☑ done | spec: `specs/06-bilingual-parity-detector.md`<br>adr: `.claude/meta/adr/018-bilingual-parity-detector.md` |
 | 07 | Roadmap status-transition ownership assignment | ☑ done | spec: `specs/07-roadmap-status-transitions.md` |
 | 08 | Orchestrator Analyze row-guard | ☑ done | spec: `specs/08-orchestrator-row-guard.md` |
-| 09 | Spec filename convention alignment (`NN-slug.md`) | ☐ todo | spec: `specs/09-spec-filename-convention.md` |
+| 09 | Spec filename convention alignment (`NN-slug.md`) | ◐ in-progress | spec: `specs/09-spec-filename-convention.md` |
 | 10 | Spec/ADR directory location pin in CLAUDE.md | ☐ todo | spec: `specs/10-spec-adr-directory-pinning.md` |
 | 11 | Opt-in trigger guidance for implementation/design verification domains | ☐ todo | spec: `specs/11-verification-domain-opt-in-guidance.md` |
 | 12 | CI coverage gate (80% hard check) | ☐ todo | spec: `specs/12-coverage-ci-gate.md` |
