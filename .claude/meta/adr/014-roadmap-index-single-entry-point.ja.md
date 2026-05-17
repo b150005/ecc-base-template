@@ -426,3 +426,352 @@ ADR-012 / ADR-014 / ADR-015 / ADR-016 / ADR-017 / ADR-018 の慣例に従い、�
 反対案は ADR-012 / ADR-014 / ADR-015 / ADR-016 / ADR-017 / ADR-018 の慣例に従い、決定の最も深刻な異論の歴史的記録として本 amendment に残る。
 
 元のステータス行 (`Accepted — 2026-05-15`) は変更しない; 本 amendment はすでに認可されたメカニズムのオーナーシップ形式化を追記するものであり、決定を再開するものではない。
+
+## Amendment — 2026-05-17 (orchestrator Analyze row-guard)
+
+本 amendment は、この ADR 自身の §帰結 → ネガティブが逐語的に明記した
+「インデックス↔実態のドリフト。Spec や ADR が Roadmap 行を更新せずに作成される
+可能性があり、インデックスが古くなる。本 ADR では自動的な強制手段はない…
+それまでは、成果物生成者によるオーナーシップが唯一の安全策であり、エージェント
+プロンプトへの遵守に依存する。」というギャップを閉じる。
+`specs/08-orchestrator-row-guard.md` (Roadmap row #08) が権威的なスコープであり、
+構造的な *どのように* を `architect` に委ねている (リスク R-01 (a)–(d)、R-02、R-03)。
+本 amendment はその決定を記録する。これは **ADR-014 の既存の決定の帰結明確化** であり、
+新しい構造的決定ではない: §決定はすでに orchestrator の Analyze 手順を Roadmap 参照
+とし (「orchestrator の Analyze 手順がリポジトリスキャンではなくテーブル参照になる」)、
+orchestrator に読み取り専用の Roadmap コントラクトを割り当てている
+(「`orchestrator` は読むだけ」)。#08 はその参照が *dispatch 前に何を検証しなければ
+ならないか* を強化する。新しいディテクター、CI ワークフロー、コントラクト境界、
+キーイングルール、またはメカニズムは導入しない ── ガードは ADR-014 の既存の
+Analyze ステップエントリポイントと ADR-016 の既存の `specs/NN-progress.md`
+コントラクトをそのまま再利用する。
+
+### The (b) decision — ADR-014 amendment, not new ADR-019, by the ADR-018 Alternative-B discriminator <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal; it is intentionally never created (see Counter-proposal below) -->
+
+Spec の R-01 (b) は `architect` に「ADR-014 amendment か新しい ADR-019 か」という <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+明示的な選択肢を渡し、ADR-018 の Alternative-B 識別基準を逐語的に適用するよう
+指示する: *#08 は新しいディテクター + 新しい MECE コントラクト境界 + 新しいキーイング/
+メカニズムを導入するか (⇒ 新しい ADR)、それとも既存 ADR のすでに認可された決定の
+帰結明確化/拡張か (⇒ amendment)?* 正直に条項ごとに適用すると: <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+
+- **新しいディテクター? いいえ。** Spec の Non-goals と Out of scope は CI ワークフロー
+  を明示的に禁じている (「新しい CI ワークフローファイルの追加。#08 は静的分析の追加
+  ではなく、ランタイム orchestrator の動作変更である」; 「ガードを CI で機械的に強制
+  すること (将来のマイルストーンとして可能性はあるが、#08 ではない)」)。ADR-017 と
+  ADR-018 はそれぞれ新しいスクリプト + 新しいワークフロー (`check-roadmap-drift.sh` /
+  `check-bilingual-parity.sh`) を導入したがゆえに新 ADR に値すると自己分類した。#08 は
+  スクリプト **ゼロ**、ワークフロー **ゼロ** である。ADR-017/ADR-018 にとって支配的だった
+  構造的な半分が ここには存在しない。
+- **新しい MECE コントラクト境界? 新たな分割なし。** 境界の *記述* は必要だが
+  (Spec Goal 4、R-03)、#04/#05/#06 ディテクターファミリーのコントラクト分割に 4 番目の
+  ディテクターを追加するわけではない。#08 はその分割の *外部* に位置することを記述する:
+  #04/#05 はコミット時の静的チェックであり、#08 はランタイムの orchestrator 動作である。
+  これは ADR-014 の Analyze ステップ義務がどこに存在するかのスコープ限定であり、
+  ADR-017 の absence-of-claim や ADR-018 の convention-presence のような新しいキーイング
+  ルールではない。
+- **新しいキーイング/メカニズム? いいえ。** 免除キーイングルールも、allowlist と
+  pattern の選択も、パース戦略も、新しいファイル成果物もない。3 つのガード条件は、
+  ADR-014 (エントリポイント不変条件; orchestrator 読み取り専用) と ADR-016
+  (`specs/NN-progress.md` 書き込みオーナーシップ) がすでに確立した不変条件の
+  *帰結* である。
+- **既存の決定の帰結明確化? はい、決定的に。** ADR-014 §帰結 → ネガティブは
+  正確なギャップを逐語的に名指ししている (上記引用)。#08 ガードは ADR-014 の
+  エントリポイント不変条件が満たされない場合に dispatch を拒否する orchestrator の
+  ランタイム義務である。これは 2026-05-17 のステータス遷移 amendment (#07) と同一の
+  構造的形状であり、#07 は別の ADR-014 §帰結 → ネガティブのギャップを ADR-019 ではなく <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+  amendment で閉じた。 <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+
+**兄弟対称性の議論は詳細に見ると逆転する** (#07 amendment が同じトラップを指摘した):
+「#05/#06 → ADR-017/ADR-018; したがって対称性から #08 → ADR-019; そして ADR-016 は <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+ADR-014 と合成するが別の ADR である」 ── しかし #05/#06 自身の識別基準を #08 に
+適用すると **amendment** になる、なぜなら 3 つの構造的条項がすべて不在だからである。
+ADR-016 が別の ADR である理由は、*新しいメカニズム* を導入したから ── 独自の <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+書き込みオーナーシップ/ライフサイクル/削除トリガーコントラクトを持つ新しいファイル成果物
+(`specs/NN-progress.md`); #08 は新しい成果物もメカニズムも導入しない ── 既に存在する
+2 つのメカニズムの *使用* を制約するだけである。**決定: ADR-014 amendment。ADR-019 は <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+作成しない。** Roadmap row #08 は `spec:` のみのまま維持される (マイルストーン → ADR は <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+0:1; Roadmap メカニズム ADR への amendment は #08 固有の ADR ではない ── ADR-014 には
+それ自身のマイルストーン行がないため、row #08 から ADR-014 へ `adr:` リンクを追加
+することは存在しないマイルストーン→ADR マッピングを主張することになる ── #07 amendment
+と同一の推論)。
+
+### The Analyze pre-dispatch guard (three named conditions, three routing outcomes)
+
+ADR-014 の §決定は Analyze ステップを Roadmap 参照とする。本 amendment は、
+orchestrator がマイルストーン作業のためにサブエージェントを dispatch する *前に*
+その参照が満たさなければならない個別の前提条件に名前を付ける。各条件にはちょうど
+1 つのルーティング結果があり、いずれも Roadmap を自動変更しない (orchestrator は
+ADR-014 §決定に従い読み取り専用のまま):
+
+| # | ガード条件 | 未満時のルーティング結果 |
+|---|---|---|
+| G1 | 受け付けたタスクに対応する Roadmap 行が存在する。 | 不足している行をユーザーに伝え、行の作成 (および着手時の #07 `☐→◐` 遷移で Spec を作成) を `product-manager` にルーティングする; orchestrator はサブエージェントを dispatch せず、行を自分で挿入しない (ADR-014: orchestrator は行を書かない)。新しく作成された行で Analyze を再実行する。 |
+| G2 | 次のアクションが `implementer` または `test-runner` への dispatch となる **場合に限り**、行の `spec:` ファイルがディスク上に存在する (以下の R-02 解決を参照)。 | `product-manager` に Spec を作成してからその dispatch を行うようルーティングする。*プロダクト計画またはアーキテクチャ* が次のアクションである `☐` 行の予約済みだがファイル未作成の `spec:` は ADR-014 予約ルールの有効な中間状態であり、ガードをトリガーしない。`spec:` が存在しない `◐` 行は不完全な着手であり: 実装 dispatch の前に欠けている Spec を作成するよう `product-manager` にルーティングする。 |
+| G3 | `◐ in-progress` 行に対して `specs/NN-progress.md` が存在する。 | 存在しない場合、**progress レコードが存在しないことを明示的に表明し**、`git log` から状態を再導出する; いずれのワークフロー手順も暗黙に仮定しない。これは orchestrator.md Workflow step 1 がすでに持つフォールバックを、埋め込まれた散文ではなく名前付きの可視ガード条件として形式化する。orchestrator は progress ファイルに対して読み取り専用のまま (ADR-016 書き込みオーナーシップは変更なし)。 |
+
+G1–G3 がすべて満たされた場合、orchestrator は変更なく Feasibility 評価
+(Workflow step 2) と既存の dispatch フローに進む ── ガードは dispatch 前の
+ゲートを追加するものであり、満たされたパスを変更するものではない。
+
+**(R-02) ☐ 行の dispatch 粒度サブ決定 ── 単純なヒューリスティックに解決。**
+Spec の R-02 は architect に選択肢を渡す: G2 に意図した下流エージェント
+(「`implementer`/`test-runner` に dispatch しようとしている」) を内省させるか、
+それとも「行が `☐` で Spec がない場合は、意図した下流エージェントに関わらず
+まず `product-manager` にルーティングする」というより単純なヒューリスティックに
+集約するか。**決定: より単純なヒューリスティックを採用する。** 根拠:
+(1) *安全* である ── `product-manager` が Spec を作成して `☐→◐` (の #07 遷移) を
+行うことは、`☐` 行が着手時にいずれにせよ行うべきことそのものであり、そこに
+まずルーティングすることで誤った結果は生じない; (2) ガード評価時の下流エージェント
+内省を不要とし、ガードを (KISS に従い) まだ決まっていない dispatch 対象への
+分岐ではなく平坦な前提条件チェックとする; (3) 過少発動が起きない ── ガードが
+存在する目的である障害 (「Spec がディスクにない状態で `implementer` が dispatch
+される」) は、`☐`+Spec 未作成の行が *あらゆる* dispatch の前に `product-manager`
+にルーティングされれば構造的に不可能である。したがって G2 行は次のように読む:
+*Spec ファイルが存在しない `☐` 行はまず `product-manager` にルーティングし;
+Spec ファイルが存在しない `◐` 行は不完全な着手であり同様に `product-manager`
+にルーティングする; Spec がディスク上に存在する `☐` 行は通常どおり進む。*
+ガード時に下流エージェントのテストは行わない。(Spec の「次のアクションが
+プロダクト計画またはアーキテクチャである `☐` 行はこのガードをトリガーしない」
+という括弧書きはそのまま効果を持つ: そのような行を `product-manager` にルーティング
+することが *まさにその次のアクション* ── ヒューリスティックと Spec のカーブアウトは
+収束しており、矛盾しない。)
+
+### (a) Documentation placement — orchestrator.md Workflow step 1, as a named guard, zero extra file reads
+
+ガード条件は **`.claude/agents/orchestrator.md` Workflow step 1 (Analyze)** の
+中に、名前付きの個別の dispatch 前チェックとして記載される ── CLAUDE.md の
+Roadmap Rules 箇条書きではなく、新しい CI スクリプトでもなく、エージェント
+プロンプト全体に複製するのでもない。Spec の R-01 (a) 「Analyze ステップで
+追加のファイル読み取りをゼロにする」という基準に照らした根拠:
+
+- **orchestrator はすでに Analyze ステップを実行するために orchestrator.md を
+  読んでいる。** Workflow step 1 は orchestrator が Roadmap 行と (◐ 行に対して)
+  progress ファイルを読む *場所* である。そのステップ内にガードを名付けることで、
+  orchestrator は参照を行う正確な瞬間に G1–G3 と出会い、**追加ファイル読み取り
+  ゼロ** ── R-01 (a) の基準が構造的に満たされる。CLAUDE.md の Rules 箇条書きも
+  ゼロの追加読み取りとなる (CLAUDE.md は常に読まれる) が、ガードは
+  *orchestrator のランタイム動作* であり Roadmap メカニズムのプロパティではない;
+  Rules ブロックは *Roadmap セルを誰が書けるか* を統治し (#07 のホーム)、#08 は
+  *orchestrator が dispatch 前に何を検証しなければならないか* を統治する。
+  配置はコントラクトオーナーに従う: グリフオーナーシップ → Rules ブロック (#07);
+  Analyze dispatch 前提条件 → Analyze ステップ (#08)。
+- **CLAUDE.md 行予算ガイダンスを尊重する最もタイトな配置。** orchestrator.md は
+  行予算の制約を受けない; CLAUDE.md は受ける (本 ADR の 2026-05-16 行予算
+  amendment)。#08 を orchestrator.md に置くことで CLAUDE.md 予算をゼロ消費する。
+  これは #07 の配置決定と意図的に異なる: #07 は Roadmap セル書き込みオーナーシップ
+  に関する単一の Rules ブロック箇条書き (インデックスメカニズム、性質上 Rules
+  ブロック) であり; #08 は orchestrator dispatch 動作に関する複数条件のランタイム
+  ガード (エージェント動作、性質上エージェントプロンプト) である。コントラクトが
+  異なり、正しいホームも異なる ── 不整合ではない。
+- **インデックス整合かつ単一ソース。** ガードは Workflow step 1 の既存の
+  progress-file フォールバック散文の自然な完成形である (G3 はその散文を名前付き
+  条件に昇格させる)。G1/G2 は同じステップの既存の「対象マイルストーン行を特定し
+  リンクされた設計ソースのみを開く」という文を、行と (実装 dispatch の場合) Spec が
+  実際に存在するという前提条件で拡張する。1 つのソース、すでにその動作を所有する
+  ステップの中にある。
+
+### (c) orchestrator.md edit scope + claude-md-authoring Skill judgement
+
+- **orchestrator.md への直接編集が必要 ── Analyze ステップ (Workflow step 1)
+  のみ。** orchestrator.md の他のセクションは変更しない; 他のエージェントプロンプトも
+  変更しない (`product-manager.md`、`architect.md`、`implementer.md`、
+  `test-runner.md` は変更なし ── ガードは `product-manager` にルーティングするが、
+  `product-manager` の既存の ADR-014 行+Spec 書き込みオーナーシップと #07 の
+  `☐→◐` トリガーが受信時に行うべき内容をすでにカバーしている; 新しいプロンプト
+  行は必要ない)。
+- **claude-md-authoring Skill: orchestrator.md 編集には不要。** Skill のスコープ
+  (CLAUDE.md の `## CLAUDE.md authoring guidance` と ADR-007 より) は
+  `CLAUDE.md` / `README.md` / `.claude/agents/*.md` の「作成または重大な再構成」
+  である。orchestrator.md は `.claude/agents/*.md` ファイルなので *ファイルスコープ内*
+  だが、#08 の編集は **重大な再構成ではない**: 既存の Workflow ステップの既存の
+  散文を名前付きガードで拡張する (新しいトップレベルセクションなし、見出しツリー
+  変更なし、不変条件への変更なし、ロール追加なし)。「ルーティン的な小さな編集」の
+  カーブアウトに近い。**判断: claude-md-authoring Skill は #08 実装編集に不要。**
+  (実装者が orchestrator.md に新しい `##` レベルセクションを追加したり Workflow
+  リストを再構成することを選択した場合は再構成に該当し Skill が適用される ──
+  ここの設計はルーティン編集カーブアウトの範囲内に留まるよう意図的に
+  インステップの名前付きガード拡張である。注記: ADR-014 の既存の参照にはすでに
+  「`.claude/agents/orchestrator.md` — Analyze 手順に『まず Roadmap 行を参照する』
+  指示が追加される (ダウンストリームタスク)」と記載されている ── #08 ガードは
+  同じ Analyze ステップのコントラクトを同じステップで、同じダウンストリームタスクの
+  規律によって強化するものである。)
+- **CLAUDE.md 編集なし。** #07 (Roadmap Rules ブロック箇条書き) と異なり、
+  #08 は CLAUDE.md に何も追加しない。ガードはエージェント動作であり、Roadmap
+  メカニズムルールではない。CLAUDE.md の既存の Development Workflow と
+  `specs/NN-progress.md` 段落はすでに orchestrator.md Workflow step 1 を
+  Analyze の権威として指し示している; CLAUDE.md への変更は不要である。
+
+### (d) MECE boundary statement against #04 / #05 / #07 (R-03)
+
+境界は **トリガーポイント + コントラクト** で引かれており、将来のマイルストーン
+作成者がランタイムの懸念を静的ディテクターに誤ってルーティングしたり、
+その逆が起きたりしないよう、ここで改めて記述する:
+
+| マイルストーン | 所有する問い | トリガーポイント |
+|---|---|---|
+| #04 `check-dangling-refs.sh` | 文書散文中のパス/参照は実際のファイル/ADR に **解決するか**? | コミット時 (CI) |
+| #05 `check-roadmap-drift.sh` | **双方向 Roadmap インデックスコントラクト** は成立しており、すべてのステータスグリフは **整形式か**? | コミット時 (CI) |
+| #07 (ADR-014 2026-05-17 matrix) | ステータスグリフを **誰が** かつ **いつ** 変更できるか? | プロセス/ドキュメント (CI なし) |
+| #08 (本 amendment) | orchestrator の **Analyze 前提条件は dispatch 前に満たされているか** (行が存在する; 実装 dispatch に対して Spec がディスク上にある; `◐` の progress ファイルが存在するか明示的に不在か)? | **ランタイム** (orchestrator 動作、CI なし) |
+
+欠陥はちょうど 1 つのオーナーにマッピングされる: *壊れた散文パス* は #04
+(コミット時解決); *一貫したポインターだが Roadmap コントラクトの不整合または
+不正なグリフ* は #05 (コミット時整合性); *グリフを誰がいつ変更できるか* という
+問いは #07 (プロセスオーナーシップ); *orchestrator が行の不在/予約済みだがファイル
+未作成の Spec/明示されない progress ファイルの欠如に対して dispatch しようとしている*
+は #08 (ランタイム前提条件)。**(R-03 隣接性、明示):** #05 の Non-goals はすでに
+予約済みの `spec:` リンクがディスク上のファイルとして解決するかどうかの検証を
+明示的に除外している ── ADR-017 §1 は「主張が存在するときの整合性を検証し、
+普遍性は検証しない」とキーイングしており、`☐` 行の予約済み `spec:` は
+設計上有効な不在である。その同じ予約済みだがファイル未作成の `spec:` は
+*ランタイム時、orchestrator が実装を dispatch しようとするときのみ* 欠陥となる
+── それが #08 のコントラクトであり #05 のコントラクトではない。#05 は「Roadmap は
+構造的に有効か?」をコミット時に問い; #08 は「Analyze 前提条件は満たされているか?」
+をランタイムに問う。予約ルールのカーブアウトが縫い目である: #05 は意図的に
+確認せず、#08 は意図的に確認する ── 異なるトリガーポイント、異なるコントラクトで。
+2 つのオーナーによる曖昧さは存在しない。
+
+### Composability with ADR-016 and #07 (no ownership gap)
+
+- **ADR-016 (`specs/NN-progress.md`)。** G3 は `◐` 行の progress ファイルが
+  存在しない場合の orchestrator の名前付き動作を形式化する。ADR-016 §書き込みオーナー
+  シップは作成/更新/削除を `product-manager`/`implementer` に予約している;
+  orchestrator は読み取りのみ。G3 の「明示的に表明しフォールバックする」は
+  読み取り専用であり ADR-016 と整合している ── 書き込みを追加せず、従来の散文で
+  暗示されていたものを名前付きの可視診断として追加するだけである。
+- **#07 (ステータス遷移マトリックス)。** G1/G2 が行の作成または Spec の作成のために
+  `product-manager` にルーティングする場合、そのオーサリングアクションは
+  `product-manager` がすでに所有する #07 の `☐→◐` 遷移そのものである。#08 は
+  着手をトリガーする orchestrator 側の前提条件を提供し; #07 は着手オーナーシップ
+  そのものを所有する。2 つはギャップなく合成可能である: #08 は「orchestrator は
+  Spec がディスク上にあるまで実装を dispatch してはならない」と言い; #07 は
+  「`product-manager` がその Spec を作成することと同時に `☐→◐` を変更する」と言う。
+  同じ境界の 2 つの補完的な側面。
+
+### Downstream implementer tasks (recorded for traceability, not performed by this amendment — implementation is a future session, per the #03/ADR-016 · #05/ADR-017 · #06/ADR-018 · #07/ADR-014-amendment two-session decision-then-implementation split)
+
+- `.claude/agents/orchestrator.md` **Workflow step 1 (Analyze)** ──
+  既存のステップ散文を、上記のとおり 3 つの条件 G1–G3 とそのルーティング結果を
+  持つ名前付き dispatch 前ガードで拡張する。**単純な R-02 ヒューリスティック**
+  を使用する (Spec ファイルが存在しない `☐` または `◐` 行は `product-manager` に
+  まずルーティングし; ガードで下流エージェント内省は行わない)。G3 は *名前付きの
+  可視* 条件として表現し、現在のインフォーマルな「progress レコードが存在しない
+  場合は明示的に表明し、`git log` から状態を再導出する」という文を吸収・置換する
+  (複製しない ── 名前付きガードに昇格させる)。**インステップ拡張** に留める:
+  新しい `##` レベルセクションなし、Workflow リストの再構成なし ── ルーティン編集
+  カーブアウトの範囲内に留め、claude-md-authoring Skill がトリガーされないようにする
+  (上記の判断 (c))。
+- **他のエージェントプロンプトの編集なし。** 実装者は `product-manager.md`、
+  `architect.md`、`implementer.md`、`test-runner.md` にガード散文を追加しては
+  ならない; orchestrator.md Workflow step 1 が唯一のソースである。`product-manager`
+  の受信動作は既存の ADR-014 行+Spec 書き込みオーナーシップと #07 の `☐→◐`
+  トリガーですでにカバーされている。
+- **CLAUDE.md 編集なし** (判断 (c)): #08 はエージェント動作であり、Roadmap
+  メカニズムルールではない; CLAUDE.md の Development Workflow と
+  `specs/NN-progress.md` 段落はすでに orchestrator.md Workflow step 1 を指し示している。
+- **CI ワークフローとスクリプトなし** (Spec Non-goals / Out of scope:
+  「#08 は静的分析の追加ではなくランタイム orchestrator の動作変更である」;
+  機械的な CI 強制は明示的に延期された将来の可能性あるマイルストーンであり、
+  #08 ではない ── (d) の MECE テーブルに従い #04/#05 のコミット時チェックとは
+  異なる)。
+- **Roadmap 行の変更なし。** Row #08 の `Design source` セルは `spec:` のみの
+  ままとする ── これは ADR-014 amendment であり、ADR-014 はそれ自身の
+  マイルストーン行を持たないため、row #08 に `adr:` リンクは追加しない
+  (マイルストーン → ADR は 0:1; #07 amendment の row #07 の推論と同一)。
+- 本 ADR の日本語版
+  (`014-roadmap-index-single-entry-point.ja.md`) はミラーされた amendment を
+  受け取る必要がある ── `technical-writer` タスクであり、本変更の対象ではない。
+  **本 amendment は ADR-014 に一時的な EN/JA 見出し不一致を作り出す (EN は
+  1 つの `##` レベル見出しとその `###` サブ見出しを獲得し; JA は本変更前に
+  18 見出しで同等だった) ── `technical-writer` のミラーが反映されるまで
+  #06 の bilingual-parity detector (`check-bilingual-parity.sh`) は ADR-014 で
+  FAIL する。これは期待されるキューに入った `technical-writer` タスクであり、
+  この EN amendment を省略する理由ではない**、まさに 2026-05-17 の
+  ステータス遷移 amendment が行ったとおり。
+
+### Counter-proposal
+
+深刻な反対案は **新しい ADR-019 ── Analyze dispatch 前ガードを ADR-014 amendment <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+ではなくスタンドアロン ADR として形式化する** である。
+ADR-012 / ADR-014 / ADR-015 / ADR-016 / ADR-017 / ADR-018 の慣例に従い、
+却下された代替案を藁人形としてではなく真剣に記録する。議論:
+
+1. Spec は `architect` に明示的な (c) 選択肢 (「ADR-014 amendment か新しい
+   ADR-019 か」) を渡しており、構造的に並行した兄弟マイルストーン #05 と #06 は <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+   どちらも延期された構造的質問の Spec を *新しい* ADR (017、018) で解決しており、
+   amendment ではない。プロセスの対称性は #08 → ADR-019 を示唆する。 <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+2. 4 つのエージェントロール (orchestrator、product-manager、implementer、テンプレート
+   メンテナー) がランタイムで遵守しなければならない 3 条件 3 ルーティング結果を
+   持つ名前付き dispatch 前ガードはファーストクラスの引用可能な動作コントラクトである
+   ── ADR-016 のように、ADR-014 と合成するが別の ADR である。長い ADR-014 トレイルの
+   4 番目の amendment として埋め込むことは、読者が「Analyze ガード ADR」として
+   引用できる専用 ADR-019 より発見しやすさが劣る。 <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+3. ADR-019 はそれ自身の Roadmap バックリンク (`Roadmap row: #08`) を持ち、 <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+   row は `adr:` リンクを獲得する ── #05/#06 が行使する同じ双方向コントラクトを
+   #08 に与え、その兄弟と同じ成果物形状になる。
+
+**反対案が採用されなかった理由:**
+
+- ADR-017 と ADR-018 は特定の、明記された識別基準に基づいて新 ADR に値すると
+  自己分類した: それぞれが **新しいディテクター + 新しい MECE コントラクト境界 +
+  新しい免除キーイングルール** を導入した (ADR-017 Alternative B; ADR-018
+  Alternative B)。#08 はそれらをいずれも導入しない ── Spec の Non-goals と
+  Out of scope は新しい CI ワークフローやスクリプトを明示的に禁じている
+  (「#08 は静的分析の追加ではなくランタイム orchestrator の動作変更である」);
+  MECE 記述はディテクターファミリー分割の外部に #08 を置くスコープ限定であり、
+  その分割内の 4 番目のパーティションではない; そして免除キーイングも、新しい
+  ファイル成果物も、新しいメカニズムも存在しない。orchestrator の Analyze 参照
+  (ADR-014 §決定) が dispatch 前に検証しなければならない内容を強化する ──
+  ADR-014 §帰結 → ネガティブが事前にフラグした正確なギャップを閉じる。
+  兄弟対称性の議論は詳細に見ると逆転する: #05/#06 自身の識別基準を #08 に
+  適用すると「amendment」になる、なぜなら #05/#06 にとって支配的だった構造的な
+  半分が #08 には不在だからである。これは ADR-014 の 2026-05-16 行予算 amendment
+  が自身の ADR-015 を拒否した際に使用したのと全く同じ推論であり、ADR-018 の
+  2026-05-17 amendment が新しい番号なしにすでに決定されたオーナーシップルールを
+  精緻化するために使用した推論でもあり、2026-05-17 のステータス遷移 (#07) amendment
+  が ADR-019 を拒否するために使用した推論でもある。 <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+- ADR-016 の類比は詳細に見ると崩れる。ADR-016 が別の ADR である理由は、**新しい
+  メカニズム** を導入したからである ── 独自の書き込みオーナーシップ、ライフサイクル、
+  削除トリガーコントラクトを持つ新しいファイル成果物 (`specs/NN-progress.md`)。
+  #08 は **新しい成果物もメカニズムも導入しない**; ADR-014 (Roadmap 行) と
+  ADR-016 (progress ファイル) がすでに定義する 2 つの成果物の *使用* を制約する
+  だけである。既存のメカニズムに対するガードは、それらのメカニズムの所有する決定の
+  帰結明確化であり、新しいメカニズムではない。
+- 発見しやすさは ADR-014 amendment の方が *良い*、悪くない: 「orchestrator は
+  Roadmap について dispatch 前に何を検証しなければならないか」を読者が探す正規の
+  場所は、Roadmap を定義し、Analyze ステップを Roadmap 参照とし、すでに orchestrator
+  に読み取り専用 Roadmap コントラクトを割り当てている ADR である。別個の ADR-019 は <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+  Analyze ステップのコントラクトを 2 つの ADR に *分断* する ── orchestrator は
+  Analyze 義務の全体を知るために ADR-014 *と* ADR-019 の両方を読む必要があり、 <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+  ADR-014 が除去しようとした「どの文書が権威的か」という再発見の問題をまさに
+  再導入する。
+- 双方向バックリンクの議論は無意味: ADR-014 はそれ自身のマイルストーン行を
+  持たないため、ADR-014 への amendment は正しく `Roadmap row:` 行を持たず
+  #05 ドリフトコントラクトをトリガーしない。バックリンクを作成するためだけに
+  新しい ADR-019 を強制することは、真の構造的決定を反映するのではなく <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+  双方向成果物を製造することになる ── #07 amendment による同じ異論の解決と同一。 <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+
+**この反対案を再評価するトリガー条件:**
+
+- 将来のマイルストーンがガードの *機械的な CI 強制* を genuinely 追加する場合
+  (orchestrator が G1–G3 を遵守したこと、または dispatch されたマイルストーンが
+  ディスク上に Spec を持っていたことを静的に検証する新しいディテクター) ──
+  それは新しいディテクター + 新しい境界 + 新しいキーイングであり、ADR-017/ADR-018
+  識別基準の構造的な半分に当たり、独自の ADR を持つに値し、本 amendment の
+  ガードをその継承されたベースラインとする。Spec はこれを「#08 ではなく将来の
+  可能性あるマイルストーン」と明示的にフラグしている。
+- ガードがプロジェクトタイプごとに異なる動作を必要とすることが判明した場合
+  (例: `product-manager` を削除するフォークが異なるルーティング対象を必要とする)、
+  単一のガードが ADR-014 で表現できなくなった時点で、プロファイル別ガードバリアント
+  を持つ専用 ADR が適切になる可能性がある。
+- orchestrator の Analyze ステップではない *別の* エージェントに対する新しい
+  常時参照ランタイムコントラクトが追加される場合 (ADR-014 の決定の帰結ではなく
+  それと合成する、ADR-016 のような genuinely 新しいメカニズム) ── 独自の ADR に
+  値する。
+
+反対案は ADR-012 / ADR-014 / ADR-015 / ADR-016 / ADR-017 / ADR-018 の慣例に従い、
+決定の最も深刻な異論の歴史的記録として本 amendment に残る。
+
+元のステータス行 (`Accepted — 2026-05-15`) は変更しない; 本 amendment は
+すでに認可された Analyze ステップメカニズムのランタイム前提条件明確化を追記する
+ものであり、決定を再開するものではない。

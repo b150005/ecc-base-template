@@ -213,6 +213,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   for traceability. Roadmap row #05 remains `◐ in-progress`. Bilingual
   `.md` and `.ja.md` for both `specs/05-roadmap-drift-detection-ci.md`
   and ADR-017.
+- **Milestone #08 — design only; implementation deferred.**
+  Spec `specs/08-orchestrator-row-guard.md` (Approved) defines the
+  Orchestrator Analyze row-guard: three named pre-dispatch guard
+  conditions (G1 — a Roadmap row exists for the incoming task; G2 —
+  the row's `spec:` file exists on disk when the next action would
+  dispatch to `implementer` or `test-runner`; G3 — for a `◐
+  in-progress` row, `specs/NN-progress.md` is present or its absence
+  is stated explicitly) with three named routing outcomes, all
+  MECE-bounded against #04 (commit-time reference resolution), #05
+  (commit-time Roadmap consistency), and #07 (process glyph
+  write-ownership) on trigger point + contract. The structural
+  decision (ADR-014 amendment vs. new ADR-019, documentation
+  placement, orchestrator.md edit scope, Skill necessity, MECE
+  boundary) was decided this session by the architect as ADR-014's
+  `## Amendment — 2026-05-17 (orchestrator Analyze row-guard)` — a
+  consequence-clarification of ADR-014's existing Decision (the
+  Roadmap-single-entry-point invariant the orchestrator's Analyze
+  step depends on), not a new ADR-019 (the counter-proposal is
+  permanently recorded in the amendment per the
+  ADR-012/ADR-014/ADR-015/ADR-016/ADR-017/ADR-018 convention).
+  Key resolutions: (a) guard placement = orchestrator.md Workflow
+  step 1 (Analyze) as a named in-step guard, zero extra file reads;
+  (c) orchestrator.md Workflow-step-1-only edit, claude-md-authoring
+  Skill NOT required (in-step extension, not restructuring); (d)
+  MECE boundary on trigger point (#04/#05 commit-time vs. #07
+  process vs. #08 runtime); R-02 resolved to the simpler heuristic
+  (a ☐ or ◐ row with an absent `spec:` file routes to
+  `product-manager` first, no downstream-agent introspection at the
+  guard). No new ADR, no CI workflow, no agent-prompt edits — all
+  deferred to a future implementation session. Roadmap row #08 moves
+  from `☐ todo` to `◐ in-progress`. Bilingual `.md` and `.ja.md`.
 - **Milestone #07 — design only; implementation deferred.**
   Spec `specs/07-roadmap-status-transitions.md` (Approved) defines
   Roadmap status-transition ownership assignment: explicit named-role

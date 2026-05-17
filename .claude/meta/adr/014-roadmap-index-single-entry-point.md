@@ -631,3 +631,408 @@ ADR-012 / ADR-014 / ADR-015 / ADR-016 / ADR-017 / ADR-018 convention.
 The original Status line (`Accepted — 2026-05-15`) is unchanged; this
 amendment appends an ownership formalization of an already-sanctioned
 mechanism and does not reopen the Decision.
+
+## Amendment — 2026-05-17 (orchestrator Analyze row-guard)
+
+This amendment closes the gap this ADR's own §Consequences → Negative
+flagged verbatim: "Index↔reality drift. A Spec or ADR can be created
+without the Roadmap row being updated, leaving the index stale. There
+is no automated enforcement in this ADR … Until then,
+ownership-by-artifact-producer is the only guard, and it depends on
+agent prompt compliance." `specs/08-orchestrator-row-guard.md` (Roadmap
+row #08) is the authoritative scope; it defers the structural *how* to
+`architect` (its Risk R-01 (a)–(d), R-02, R-03). This amendment records
+that decision. It is a **consequence-clarification of ADR-014's
+existing Decision**, not a new structural decision: the §Decision
+already makes the orchestrator's Analyze step a Roadmap read
+("The orchestrator's Analyze step becomes a table read instead of a
+repo scan") and already assigns the orchestrator a read-only Roadmap
+contract ("`orchestrator` only reads the Roadmap"). #08 strengthens
+*what that read must verify before the orchestrator dispatches work*.
+No new detector, CI workflow, contract boundary, keying rule, or
+mechanism is introduced — the guard reuses ADR-014's existing
+Analyze-step entry point and ADR-016's existing `specs/NN-progress.md`
+contract unchanged.
+
+### The (b) decision — ADR-014 amendment, not new ADR-019, by the ADR-018 Alternative-B discriminator <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal; it is intentionally never created (see Counter-proposal below) -->
+
+The Spec's R-01 (b) hands `architect` the explicit choice "ADR-014
+amendment or a new ADR-019" and instructs the architect to apply <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+ADR-018's Alternative-B discriminator verbatim: *does #08 introduce a
+NEW detector + a NEW MECE contract boundary + a NEW keying/mechanism
+(⇒ new ADR), or is it a consequence-clarification / extension of an
+existing ADR's already-sanctioned Decision (⇒ amendment)?* Applied
+honestly, clause by clause:
+
+- **New detector? No.** The Spec's Non-goals and Out of scope
+  *explicitly forbid* a CI workflow ("Adding a new CI workflow file.
+  #08 is a runtime orchestrator behavior change, not a static analysis
+  addition"; "Enforcing the guard mechanically in CI (a possible
+  future milestone, not #08)"). ADR-017 and ADR-018 each
+  self-classified as new-ADR-worthy *because* each introduced a new
+  script + new workflow (`check-roadmap-drift.sh` /
+  `check-bilingual-parity.sh`). #08 introduces **zero** scripts and
+  **zero** workflows. The structural half that dominated for
+  ADR-017/ADR-018 is absent here.
+- **New MECE contract boundary? No new partition.** A boundary
+  *statement* is required (Spec Goal 4, R-03), but it does **not** add
+  a fourth detector to the #04/#05/#06 detector-family contract
+  partition. It states that #08 sits *outside* that partition
+  entirely: #04/#05 are commit-time static checks; #08 is a runtime
+  orchestrator behavior. This is a scope-delineation of where
+  ADR-014's Analyze-step obligation lives, not a new keying rule like
+  ADR-017's absence-of-claim or ADR-018's convention-presence.
+- **New keying / mechanism? No.** There is no exemption-keying rule,
+  no allowlist-vs-pattern choice, no parsing strategy, no new file
+  artifact. The three guard conditions are *consequences* of
+  invariants ADR-014 (the entry-point invariant; orchestrator
+  read-only) and ADR-016 (the `specs/NN-progress.md` write-ownership)
+  already established.
+- **Consequence-clarification of an existing Decision? Yes,
+  decisively.** ADR-014 §Consequences → Negative names the exact gap
+  verbatim (quoted above). The #08 guard is the orchestrator's runtime
+  obligation to refuse dispatch when ADR-014's entry-point invariant
+  is unmet. This is the identical structural shape as the 2026-05-17
+  status-transition amendment (#07), which closed a different
+  ADR-014 §Consequences → Negative gap by amendment, not by ADR-019. <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+
+**The sibling-symmetry argument inverts on inspection** (the same trap
+the #07 amendment identified): "#05/#06 → ADR-017/ADR-018; therefore
+#08 → ADR-019 for symmetry; and ADR-016 is a separate ADR though it <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+composes with ADR-014" — but applying #05/#06's *own stated
+discriminator* to #08 yields **amendment**, because all three
+structural clauses are absent. ADR-016 is a separate ADR because it
+introduced a *new mechanism* (a new file artifact with its own
+write-ownership / lifecycle / deletion-trigger contract); #08
+introduces no new artifact and no new mechanism — it constrains the
+*use* of two existing ones. **Decision: ADR-014 amendment. No
+ADR-019 is created.** Roadmap row #08 stays `spec:`-only (Milestone → <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+ADR is 0:1; an amendment to the Roadmap-mechanism ADR is not #08's
+*own* ADR — ADR-014 has no milestone row of its own, so adding an
+`adr:` link from row #08 to ADR-014 would assert a milestone→ADR
+mapping that does not exist — identical reasoning to the #07
+amendment).
+
+### The Analyze pre-dispatch guard (three named conditions, three routing outcomes)
+
+ADR-014's §Decision makes the Analyze step a Roadmap read. This
+amendment names the discrete preconditions that read must satisfy
+*before the orchestrator dispatches any sub-agent for milestone work*.
+Each condition has exactly one routing outcome; none auto-mutates the
+Roadmap (the orchestrator stays read-only per ADR-014 §Decision):
+
+| # | Guard condition | Routing outcome when unmet |
+|---|---|---|
+| G1 | A Roadmap row exists for the incoming task. | Surface the missing row to the user and route to `product-manager` to create the row (and author the Spec at pickup per the #07 `☐→◐` transition); the orchestrator does **not** dispatch any sub-agent and does **not** insert a row itself (ADR-014: orchestrator never writes rows). Re-run Analyze on the newly created row. |
+| G2 | The row's `spec:` file exists on disk **whenever the next action would dispatch to `implementer` or `test-runner`** (R-02 resolution below). | Route to `product-manager` to author the Spec before that dispatch. A reserved-but-absent `spec:` on a `☐` row whose next action is *product planning or architecture* is the ADR-014 reservation rule's valid intermediate state and does **not** trip the guard. A `◐` row whose `spec:` is absent is an incomplete pickup: route to `product-manager` to author the missing Spec before any implementation dispatch. |
+| G3 | For a `◐ in-progress` row, `specs/NN-progress.md` is present. | If absent, **state explicitly that no progress record exists** and fall back to re-deriving state from `git log`; do not assume any workflow step silently. This formalizes — as a named, visible guard condition rather than embedded prose — the fallback orchestrator.md Workflow step 1 already carries. The orchestrator remains read-only on the progress file (ADR-016 write-ownership unchanged). |
+
+When G1–G3 are all satisfied the orchestrator proceeds to Assess
+Feasibility (Workflow step 2) and the existing dispatch flow unchanged
+— the guard adds a pre-dispatch gate, it does not alter any satisfied
+path.
+
+**(R-02) ☐-row dispatch-granularity sub-decision — resolved to the
+simpler heuristic.** The Spec's R-02 hands the architect a choice: make
+G2 introspect the intended downstream agent ("about to dispatch to
+`implementer`/`test-runner`"), or collapse to the simpler heuristic
+"if the row is `☐` and the Spec is absent, route to `product-manager`
+first, regardless of intended downstream agent." **Decision: adopt the
+simpler heuristic.** Rationale: (1) it is *safe* — `product-manager`
+authoring the Spec and flipping `☐→◐` (the #07 transition) is exactly
+what a `☐` row owes at pickup anyway, so routing there first never
+produces a wrong outcome; (2) it removes downstream-agent introspection
+from guard-evaluation time, keeping the guard a flat precondition check
+(KISS) rather than a branch on a not-yet-decided dispatch target; (3)
+it cannot under-fire — the failure mode the guard exists to prevent
+("`implementer` dispatched without a Spec on disk") is structurally
+impossible once any `☐`+absent-Spec row routes to `product-manager`
+before *any* dispatch. The G2 row above is therefore read as: *a `☐`
+row with an absent `spec:` file routes to `product-manager` first; a
+`◐` row with an absent `spec:` file is an incomplete pickup and also
+routes to `product-manager`; a `☐` row whose Spec already exists on
+disk proceeds normally.* No downstream-agent test is evaluated at the
+guard. (The Spec's parenthetical "a `☐` row whose next action is
+product planning or architecture does not trigger this guard" is
+preserved in effect: routing such a row to `product-manager` *is* its
+next action — the heuristic and the Spec's carve-out converge, they do
+not conflict.)
+
+### (a) Documentation placement — orchestrator.md Workflow step 1, as a named guard, zero extra file reads
+
+The guard conditions live in **`.claude/agents/orchestrator.md`
+Workflow step 1 (Analyze)** as a named, discrete pre-dispatch check —
+**not** in a CLAUDE.md Roadmap Rules bullet, **not** in a new CI
+script, **not** duplicated across agent prompts. Rationale, against the
+Spec's R-01 (a) "zero additional file reads at the Analyze step"
+criterion:
+
+- **The orchestrator already reads orchestrator.md to execute the
+  Analyze step.** Workflow step 1 is *where* the orchestrator reads the
+  Roadmap row and (for `◐` rows) the progress file. Naming the guard
+  inside that exact step means the orchestrator encounters G1–G3 at the
+  precise moment it performs the read, with **zero additional file
+  reads** — the R-01 (a) criterion is met by construction. A CLAUDE.md
+  Rules bullet would also be zero-extra-read (CLAUDE.md is always
+  read), but the guard is *orchestrator runtime behavior*, not a
+  Roadmap-mechanism property; the Rules block governs *who may write a
+  Roadmap cell* (the #07 home), whereas #08 governs *what the
+  orchestrator must verify before it dispatches*. Placement follows the
+  contract owner: glyph-ownership → Rules block (#07); Analyze-dispatch
+  precondition → the Analyze step (#08).
+- **It is the tightest placement respecting the CLAUDE.md line-budget
+  guidance.** orchestrator.md is not line-budget-constrained; CLAUDE.md
+  is (this ADR's 2026-05-16 line-budget amendment). Putting #08 in
+  orchestrator.md spends zero CLAUDE.md budget. This deliberately
+  *differs* from #07's placement decision: #07 was a single Rules-block
+  bullet about Roadmap-cell write-ownership (index-mechanism, Rules
+  block by nature); #08 is a multi-condition runtime guard about
+  orchestrator dispatch behavior (agent-behavior, agent-prompt by
+  nature). Different contracts, different correct homes — not an
+  inconsistency.
+- **It is index-consistent and single-source.** The guard is the
+  natural completion of Workflow step 1's existing progress-file
+  fallback prose (G3 *is* that prose, promoted to a named condition).
+  G1/G2 extend the same step's existing "locate the target milestone
+  row and open only its linked design source" sentence with the
+  precondition that the row and (for implementation dispatch) the Spec
+  must actually exist. One source, in the step that already owns the
+  behavior.
+
+### (c) orchestrator.md edit scope + claude-md-authoring Skill judgement
+
+- **orchestrator.md requires direct editing — the Analyze step
+  (Workflow step 1) only.** No other section of orchestrator.md
+  changes; no other agent prompt changes (`product-manager.md`,
+  `architect.md`, `implementer.md`, `test-runner.md` are untouched —
+  the guard *routes to* `product-manager`, but `product-manager`'s
+  existing ADR-014 row+Spec write-ownership and the #07 `☐→◐` trigger
+  already cover what it must do on receipt; no new prompt line is owed
+  there).
+- **claude-md-authoring Skill: NOT required for the orchestrator.md
+  edit.** The Skill's scope (per CLAUDE.md `## CLAUDE.md authoring
+  guidance` and ADR-007) is "creating or significantly restructuring"
+  `CLAUDE.md` / `README.md` / `.claude/agents/*.md`. orchestrator.md is
+  a `.claude/agents/*.md` file, so it is *in the file scope*, but the
+  #08 edit is **not significant restructuring**: it extends one
+  existing Workflow step's existing prose with a named guard
+  (no new top-level section, no heading-tree change, no invariant
+  touched, no role added). It is closer to the "routine small edit"
+  carve-out than to "significant restructuring." **Judgement: the
+  claude-md-authoring Skill is NOT required for the #08 implementation
+  edit.** (If the implementer instead chooses to add a new `##`-level
+  section to orchestrator.md or restructure the Workflow list, that
+  *would* cross into restructuring and the Skill would then apply — the
+  design here is deliberately an in-step named-guard extension to stay
+  under the routine-edit threshold. Note also: ADR-014's existing
+  References already say "`.claude/agents/orchestrator.md` — Analyze
+  step gains a 'read the Roadmap row first' instruction (downstream
+  task)" — the #08 guard is the same Analyze-step contract being
+  tightened, in the same step, by the same downstream-task discipline.)
+- **No CLAUDE.md edit.** Unlike #07 (a Roadmap Rules-block bullet),
+  #08 adds nothing to CLAUDE.md. The guard is agent-behavior, not a
+  Roadmap-mechanism rule. CLAUDE.md's existing Development Workflow and
+  the `specs/NN-progress.md` paragraph already point at orchestrator.md
+  Workflow step 1 as the Analyze authority; no CLAUDE.md change is
+  owed.
+
+### (d) MECE boundary statement against #04 / #05 / #07 (R-03)
+
+The boundary is drawn on **trigger point + contract**, restated here
+so a future milestone author cannot mis-route a runtime concern to a
+static detector or vice versa:
+
+| Milestone | Owns the question | Trigger point |
+|---|---|---|
+| #04 `check-dangling-refs.sh` | Does a path/reference in document prose **resolve** to a real file/ADR? | commit time (CI) |
+| #05 `check-roadmap-drift.sh` | Does the **bidirectional Roadmap-index contract** hold and is every Status glyph **well-formed**? | commit time (CI) |
+| #07 (ADR-014 2026-05-17 matrix) | **Who** may flip a Status glyph and **when**? | process/documentation (no CI) |
+| #08 (this amendment) | Are the orchestrator's **Analyze preconditions met before it dispatches** (row exists; Spec on disk for an implementation dispatch; `◐` progress file present-or-explicitly-absent)? | **runtime** (orchestrator behavior, no CI) |
+
+A defect maps to exactly one owner: a *broken prose path* is #04's
+(commit-time resolution); a *consistent-pointer-but-inconsistent-
+Roadmap-contract or malformed glyph* is #05's (commit-time
+consistency); a *who/when may a glyph change* question is #07's
+(process ownership); a *the orchestrator is about to dispatch against a
+missing row / reserved-but-absent Spec / unstated missing progress
+file* is #08's (runtime precondition). **(R-03 adjacency, explicit):**
+#05's Non-goals already exclude checking whether a reserved `spec:`
+link resolves to a file on disk — ADR-017 §1 keys "consistency when a
+claim is present, never universality," and a reserved `spec:` for a
+`☐` row is valid-by-design absent. That same reserved-but-absent
+`spec:` *becomes* a defect **only at runtime, only when the
+orchestrator is about to dispatch implementation** — which is #08's
+contract, not #05's. #05 asks "is the Roadmap structurally valid?" at
+commit time; #08 asks "are the Analyze preconditions met?" at runtime.
+The reservation-rule carve-out is the seam: #05 deliberately does not
+look, #08 deliberately does — at a different trigger point, for a
+different contract. No two-owner ambiguity exists.
+
+### Composability with ADR-016 and #07 (no ownership gap)
+
+- **ADR-016 (`specs/NN-progress.md`).** G3 formalizes the orchestrator's
+  named behavior when a `◐` row's progress file is absent. ADR-016
+  §write-ownership reserves create/update/delete to
+  `product-manager`/`implementer`; the orchestrator only reads. G3's
+  "state explicitly and fall back to `git log`" is read-only and
+  consistent with ADR-016 unchanged — it adds no write, only a named
+  visible diagnostic where prose previously implied one.
+- **#07 (status-transition matrix).** When G1/G2 route to
+  `product-manager` to create a row or author a Spec, that authoring
+  action *is* the #07 `☐→◐` transition `product-manager` already owns.
+  #08 supplies the orchestrator-side precondition that *triggers* the
+  pickup; #07 owns the pickup ownership itself. The two are composable
+  with no gap: #08 says "the orchestrator must not dispatch
+  implementation until a Spec is on disk"; #07 says
+  "`product-manager` flips `☐→◐` atomically with authoring that Spec."
+  Same boundary, two complementary sides.
+
+### Downstream implementer tasks (recorded for traceability, not performed by this amendment — implementation is a future session, per the #03/ADR-016 · #05/ADR-017 · #06/ADR-018 · #07/ADR-014-amendment two-session decision-then-implementation split)
+
+- `.claude/agents/orchestrator.md` **Workflow step 1 (Analyze)** —
+  extend the existing step prose with a named pre-dispatch guard
+  carrying the three conditions G1–G3 and their routing outcomes
+  exactly as tabulated above, using the **simpler R-02 heuristic** (a
+  `☐` or `◐` row with an absent `spec:` file routes to
+  `product-manager` first; no downstream-agent introspection at the
+  guard). G3 must be phrased as a *named, visible* condition, absorbing
+  and replacing the current informal "If that file is absent, state
+  explicitly that no progress record exists and fall back to
+  re-deriving state from `git log`" sentence (do not duplicate it —
+  promote it into the named guard). Keep it an **in-step extension**:
+  no new `##`-level section, no Workflow-list restructuring — stay
+  under the routine-edit threshold so the claude-md-authoring Skill is
+  not triggered (judgement (c) above).
+- **No other agent-prompt edits.** The implementer must **not** add
+  guard prose to `product-manager.md`, `architect.md`,
+  `implementer.md`, or `test-runner.md`; orchestrator.md Workflow step
+  1 is the single source. `product-manager`'s receipt behavior is
+  already covered by its ADR-014 row+Spec write-ownership and the #07
+  `☐→◐` trigger.
+- **No CLAUDE.md edit** (judgement (c)): #08 is agent-behavior, not a
+  Roadmap-mechanism rule; CLAUDE.md's Development Workflow and
+  `specs/NN-progress.md` paragraph already point at orchestrator.md
+  Workflow step 1.
+- **No CI workflow and no script** (Spec Non-goals / Out of scope:
+  "#08 is a runtime orchestrator behavior change, not a static analysis
+  addition"; mechanical CI enforcement is an explicitly-deferred
+  possible future milestone, not #08 — distinct from #04/#05's
+  commit-time checks per the (d) MECE table).
+- **No Roadmap row change.** Row #08's `Design source` cell stays
+  `spec:`-only — this is an ADR-014 amendment, ADR-014 has no milestone
+  row of its own, so no `adr:` link is added to row #08 (Milestone →
+  ADR is 0:1; identical to the #07 amendment's row-#07 reasoning).
+- The Japanese counterpart of this ADR
+  (`014-roadmap-index-single-entry-point.ja.md`) must receive the
+  mirrored amendment — a `technical-writer` task, **not** part of this
+  change. **This amendment creates a transient EN/JA heading mismatch
+  on ADR-014 (EN gains one `##`-level heading plus its `###`
+  sub-headings; JA is at 18 headings, in parity before this change)
+  until `technical-writer` mirrors it; the #06 bilingual-parity
+  detector (`check-bilingual-parity.sh`, when shipped) will FAIL on
+  ADR-014 until the mirror lands. This is the expected, queued
+  `technical-writer` task — not a reason to omit this EN amendment**,
+  exactly as the 2026-05-17 status-transition amendment did.
+
+### Counter-proposal
+
+The serious counter-position is **new ADR-019 — formalize the <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+Analyze pre-dispatch guard as a standalone ADR rather than an ADR-014
+amendment**. It is recorded here per the
+ADR-012 / ADR-014 / ADR-015 / ADR-016 / ADR-017 / ADR-018 convention of
+taking a rejected alternative seriously rather than as a strawman. The
+argument:
+
+1. The Spec hands `architect` an explicit (c) choice ("ADR-014
+   amendment or a new ADR-019") and structurally parallel sibling <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+   milestones #05 and #06 both resolved their deferred-structural-
+   question Specs with *new* ADRs (017, 018). Symmetry of process
+   argues #08 → ADR-019. <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+2. A named pre-dispatch guard with three conditions and three routing
+   outcomes that four agent roles (orchestrator, product-manager,
+   implementer, template maintainer) must honor at runtime is a
+   first-class, citable behavioral contract — arguably like ADR-016,
+   which is a separate ADR even though it composes with ADR-014.
+   Burying it as the fourth amendment in a long ADR-014 trail makes it
+   less discoverable than a dedicated ADR-019 a reader can cite as <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+   "the Analyze-guard ADR."
+3. ADR-019 would carry its own Roadmap back-link (`Roadmap row: #08`) <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+   and the row would gain an `adr:` link — the same bidirectional
+   contract #05/#06 exercise — giving #08 the same artifact shape as
+   its siblings.
+
+**Why the counter was not adopted:**
+
+- ADR-017 and ADR-018 self-classified as new-ADR-worthy on a specific,
+  stated discriminator: each introduced a **new detector + a new MECE
+  contract boundary + a new exemption-keying rule** (ADR-017
+  Alternative B; ADR-018 Alternative B). #08 introduces **none** of
+  those — the Spec's Non-goals and Out of scope *explicitly forbid* a
+  new CI workflow or script ("#08 is a runtime orchestrator behavior
+  change, not a static analysis addition"); the MECE statement is a
+  scope-delineation placing #08 *outside* the detector-family
+  partition, not a fourth partition within it; and there is no
+  exemption keying, no new file artifact, no new mechanism. It
+  strengthens what the orchestrator's Analyze read (ADR-014 §Decision)
+  must verify before dispatch — closing the *exact* gap ADR-014
+  §Consequences → Negative pre-flagged. The sibling-symmetry argument
+  inverts on inspection: applying #05/#06's own stated discriminator to
+  #08 yields "amendment," because the structural half that dominated
+  for #05/#06 is absent for #08. This is the identical reasoning
+  ADR-014's 2026-05-16 line-budget amendment used to refuse its own
+  ADR-015, ADR-018's 2026-05-17 amendment used to refine an
+  already-decided rule without a new number, and the 2026-05-17
+  status-transition (#07) amendment used to refuse ADR-019. <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+- The ADR-016 analogy fails on inspection. ADR-016 is a separate ADR
+  because it introduced a **new mechanism** — a new file artifact
+  (`specs/NN-progress.md`) with its own write-ownership, lifecycle, and
+  deletion-trigger contract. #08 introduces **no new artifact and no
+  new mechanism**; it constrains the *use* of two artifacts ADR-014
+  (the Roadmap row) and ADR-016 (the progress file) already define. A
+  guard over existing mechanisms is a consequence-clarification of
+  those mechanisms' owning Decisions, not a new mechanism.
+- Discoverability is *better*, not worse, as an ADR-014 amendment: the
+  canonical place a reader looks for "what must the orchestrator verify
+  about the Roadmap before it dispatches" is the ADR that defined the
+  Roadmap, made the Analyze step a Roadmap read, and already assigns
+  the orchestrator its read-only Roadmap contract. A separate ADR-019 <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+  would *fragment* the Analyze-step contract across two ADRs — the
+  orchestrator would have to read ADR-014 *and* ADR-019 to know its <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+  full Analyze obligation, reintroducing exactly the "which document is
+  authoritative" rediscovery ADR-014 exists to remove.
+- The bidirectional-back-link argument is moot: ADR-014 has no
+  milestone row of its own, so an amendment to it correctly carries
+  *no* `Roadmap row:` line and triggers no #05 drift contract. Forcing
+  a new ADR-019 purely to manufacture a back-link creates the <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+  bidirectional artifact rather than reflecting a genuine structural
+  decision — identical to the #07 amendment's resolution of the same
+  objection.
+
+**Trigger conditions for re-evaluating this counter-proposal:**
+
+- A future milestone genuinely adds a *mechanical CI enforcement* of
+  the guard (a new detector that statically verifies the orchestrator
+  honored G1–G3, or that a dispatched milestone had a Spec on disk) —
+  that would be a new detector + new boundary + new keying, the
+  ADR-017/ADR-018 discriminator's structural half, and would warrant
+  its own ADR with this amendment's guard as its inherited baseline.
+  The Spec explicitly flags this as "a possible future milestone, not
+  #08."
+- The guard is found to require divergent behavior per project type
+  (e.g. forks that drop `product-manager` need a different routing
+  target), such that a single guard in ADR-014 can no longer express
+  it — at which point a dedicated ADR with per-profile guard variants
+  may be warranted.
+- A new always-read runtime contract for a *different* agent (not the
+  orchestrator's Analyze step) is added that composes with but is not a
+  consequence of ADR-014's Decision — a genuinely new mechanism like
+  ADR-016, which would warrant its own ADR.
+
+The counter-proposal stays in this amendment as the historical record
+of the decision's most serious objection, per the
+ADR-012 / ADR-014 / ADR-015 / ADR-016 / ADR-017 / ADR-018 convention.
+
+The original Status line (`Accepted — 2026-05-15`) is unchanged; this
+amendment appends a runtime-precondition clarification of an
+already-sanctioned Analyze-step mechanism and does not reopen the
+Decision.
