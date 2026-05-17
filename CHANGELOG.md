@@ -271,6 +271,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Milestone #06 — now IMPLEMENTED** (design landed previously
+  under Documentation; implementation completed this session per
+  ADR-018 §Consequences → Neutral downstream tasks, including a
+  2026-05-17 in-scope-granularity amendment). An always-on CI
+  detector enforcing three EN/JA bilingual parity dimensions. Four
+  artifacts:
+  - `.claude/meta/scripts/check-bilingual-parity.sh` — the
+    detector (`set -euo pipefail`, `pass`/`warn`/`fail_check`
+    accumulator, `GITHUB_STEP_SUMMARY` support, line-level
+    `<!-- ref-allow: -->` escape hatch reused unmodified from
+    #04/#05). Three checks: (1) **Presence parity** — an orphaned
+    `.ja.md` with no `.md` counterpart FAILs; a lone `.md` in an
+    otherwise-bilingual tree is a sanctioned EN-only complement
+    per ADR-018's 2026-05-17 per-file-pair-granularity amendment.
+    (2) **Heading-tree parity by (level, position) only** — text-
+    blind so correct translations never false-positive; fenced-code-
+    skip and `<!-- ref-allow: -->` reused unmodified from #04/#05.
+    (3) **Full-width-parenthesis scan** — U+FF08/U+FF09 in in-scope
+    `.ja.md` files per the Japanese typography rules.
+  - `.github/workflows/bilingual-parity-check.yml` — always-on
+    (no per-fork config; posture inherited from ADR-015's
+    subject-matter-presence rule naming #06), single
+    `bilingual-parity-check` job, `permissions: contents: read`,
+    `timeout-minutes: 5`. Modeled on `dangling-ref-check.yml`.
+  - `.claude/meta/scripts/test-check-bilingual-parity.sh` — TDD
+    suite (22 tests) covering all 11 Spec/06 acceptance criteria
+    plus edge cases. `check-dangling-refs.sh` and
+    `check-roadmap-drift.sh` each gain a reciprocal MECE-boundary
+    header note extending the two-way (#04↔#05) note to three-way
+    (#04/#05/#06), so the resolution / consistency / parity
+    partition is discoverable from all three scripts.
+  - ADR-018 gains a 2026-05-17 amendment refining in-scope
+    granularity to per-file-pair (not per-directory), so the
+    template is green-by-construction at fork time. ADR-018's
+    Japanese counterpart (`018-bilingual-parity-detector.ja.md`)
+    was authored this session. Two pre-existing bilingual-parity
+    defects corrected so green-by-construction holds:
+    `.claude/meta/references/learning-mode-explained.ja.md`
+    (EN/JA heading count restored 24↔24) and two ADR-018.ja.md
+    body lines reworded to reference forbidden full-width-paren
+    characters by codepoint only. Roadmap row #06 flips
+    `◐ in-progress` → `☑ done`.
 - **Milestone #05 — now IMPLEMENTED** (design landed previously
   under Documentation; implementation completed this session per
   ADR-017 §Consequences → Neutral downstream tasks). An always-on

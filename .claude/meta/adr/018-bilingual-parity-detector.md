@@ -578,3 +578,131 @@ ADR-012 / ADR-014 / ADR-015 / ADR-016 / ADR-017 convention.
   (`018-bilingual-parity-detector.ja.md`) is owned by
   `technical-writer`, not part of this change.
 - Roadmap row: #06
+
+## Amendment — 2026-05-17 (in-scope granularity — per-pair, not per-directory)
+
+This amendment resolves a load-bearing granularity ambiguity in how
+Decision 1 + Decision 2 are read. It does **not** reopen the decided
+architecture; it clarifies a consequence of the existing Decision so
+#06 ships green-by-construction, the same "amendment, not new ADR"
+call ADR-017's Alternative B reasoned through and ADR-014's two
+2026-05-16 amendments format. It changes **only** the Decision 1/2
+granularity; Decisions 3, 4, and 5 are untouched.
+
+**The contradiction.** Read at *directory* granularity — "every `.md`
+in any tree containing ≥1 `.ja.md` must be paired" — Decision 1 + 2
+makes the template's own repository RED on day one. Verified against
+the working tree: `specs/` carries `05-*.ja.md`/`06-*.ja.md` but
+`specs/01-*.md`…`04-*.md` have no `.ja.md`; `.claude/templates/` carries
+four `.ja.md` but `verification-review-template.md` and
+`workaround-template.md` do not; `.claude/meta/references/` (recursive)
+carries many `.ja.md` but `domain-taxonomy.md` and
+`upstream-workaround-tracking.md` do not. Directory-granularity ⇒ eight
+presence-parity FAILs on `main` at ship time. That directly violates
+the Spec's green-by-construction acceptance criterion ("Given the
+template repository's own artifacts at the time this milestone ships …
+then all checks pass") **and** this ADR's own Positive bullet that
+cites that criterion as satisfied, **and** Decision 1's own sentence
+"with today's repository the convention-presence rule selects the same
+trees the stopgap named — but it does so by reading the artifact … and
+stays green." The body asserted green-by-construction but never
+reconciled the unpaired EN files that already exist in those trees.
+This is a real gap, not a re-litigation.
+
+**Decision: in-scope is keyed per FILE-PAIR, not per directory.** An
+EN `.md` is in-scope *for presence-parity* iff its **own** co-located
+`<name>.ja.md` sibling exists. "In-scope" operationally means the
+*pair*, selected by the same co-located structural signal Decision 1
+already mandates (the presence of a `.ja.md`), read one filename-stem
+finer: not "some `.ja.md` somewhere in this tree" but "this file's own
+`.ja.md`." This is faithful to every decided principle: it is
+**convention-presence keying, not an enumerated allowlist** (Decision
+1; ADR-017 §4 — no filename is listed in the script; the predicate is
+computed per stem from the artifact at scan time); the EN-only state
+remains the **complement** of the in-scope rule, not a second rule
+(Decision 2); and it adds **zero new exemption concepts** (Decision 2;
+ADR-017's recorded Negative) — there is no per-file `<!-- en-only -->`
+hatch, because a lone `<name>.md` with no `<name>.ja.md` is simply not
+a pair and was never in scope, exactly as a whole EN-only tree is not.
+
+**Reconciliation with Decision 2's "this IS a failure" sentence
+(lines 146–157).** Decision 2 says a `.md` "in an in-scope tree … with
+no `.ja.md` of its own … **is** a presence-parity failure and **must**
+FAIL," reasoning that "a tree that has adopted the bilingual convention
+is asserting every member is paired." This amendment **refines what
+"in-scope" denotes** — the pair, not the directory — and with that
+refinement the sentence is *preserved verbatim in force*, not
+contradicted: the failing object in Decision 2 is "a `.md` … with no
+`.ja.md` **of its own**," and that is precisely the orphan predicate
+below (read in the EN→JA direction it is vacuous; read in the JA→EN
+direction it is the orphaned-`.ja.md` failure). Decision 2's own
+load-bearing line is "the carve-out is not a second rule, it is the
+*complement* of the in-scope rule." Per-directory keying makes that
+sentence false today (the complement would have to carve out eight
+real files inside in-scope trees, i.e. be a second rule). Per-pair
+keying makes it *true*: the complement is exactly "this stem has no
+`.ja.md`," a co-located signal, no allowlist. The directory-level
+gloss in Decision 2's prose ("a tree that has adopted the convention")
+was the unreconciled over-reach; the operative rule it states ("no
+`.ja.md` **of its own**" + complement-not-second-rule) is honored by
+per-pair keying and is what this amendment pins. A future reader must
+read Decision 2 with "in-scope tree" meaning "the set of stems that
+have opted into the pair," which is the only reading consistent with
+both Decision 2's complement sentence and the green-by-construction
+criterion.
+
+**The exact rule the implementer encodes (no further architecture
+needed).** Operating recursively over the convention-bearing trees
+(`.claude/meta/adr/`, `.claude/meta/references/`, `.claude/templates/`,
+`.claude/agents/`, `specs/` — and any future tree, with **no
+enumerated path allowlist in the script**: a tree participates purely
+by containing at least one `<name>.ja.md`, the unchanged Decision 1
+signal):
+
+- **Pair set.** For every file matching `*.ja.md`, derive its stem by
+  stripping the `.ja.md` suffix; the EN counterpart is `<stem>.md`.
+- **Orphan predicate (presence-parity, always FAIL, both readings).**
+  A `<stem>.ja.md` whose `<stem>.md` does **not** exist is an orphaned
+  JA file → FAIL naming the orphaned `.ja.md` (Spec AC: "a `.ja.md`
+  file in an in-scope tree has no corresponding `.md` counterpart →
+  fails naming the orphaned `.ja.md`"). This is the genuine
+  translation-of-nothing case and FAILs under any granularity.
+- **Presence-parity predicate.** Presence-parity = "no orphan
+  `.ja.md`." A lone `<stem>.md` with no `<stem>.ja.md` is **not**
+  evaluated — it is the sanctioned EN-only state (the complement),
+  identical in kind to a whole EN-only tree; it is *not* a presence
+  failure. There is **no** EN→JA "every `.md` must have a `.ja.md`"
+  scan; that scan is exactly the directory-granularity reading this
+  amendment removes.
+- **Heading + full-width-paren parity (unchanged, retains teeth).**
+  For **every pair that exists** (`<stem>.md` ∧ `<stem>.ja.md`),
+  Decision 3 applies unchanged: heading sequences compared by (level,
+  position), length mismatch or positional mismatch FAILs; and every
+  in-scope `<stem>.ja.md` is scanned for `（` U+FF08 / `）` U+FF09 and
+  FAILs with file + line. A genuine heading/paren drift on an existing
+  pair still FAILs — the detector keeps full teeth on opted-in pairs;
+  per-pair keying narrows *only* which files the presence dimension
+  demands a counterpart for, never what the heading/paren dimensions
+  check.
+
+**No allowlist confirmation.** The script enumerates **zero**
+filenames or paths as exempt. Every in-scope decision is computed at
+scan time from a co-located `.ja.md`'s presence (Decision 1's signal,
+read per stem). A future bilingual pair is auto-included the moment its
+`.ja.md` lands; a dropped pair auto-excludes when its `.ja.md` is
+removed — the pattern-keyed property Decision 1 and ADR-017 §4 require,
+now exact at stem granularity. The orphan direction always FAILs, so
+the detector cannot be silently defeated by deleting an EN file.
+
+**Scope of this amendment.** Decision 1 (convention-presence keying)
+and Decision 2 (carve-out is the complement) are *clarified* to operate
+at file-pair granularity. Decision 3 (level+position heading
+normalization, fenced-code skip, numbered-prefix non-special-casing),
+Decision 4 (single-pass scan, `<!-- ref-allow: -->` reused unmodified,
+standard detector skeleton), and Decision 5 (three-way MECE-by-contract
+against #04/#05) are **unchanged**. The original Status line
+(`Accepted — 2026-05-16`) is unchanged; this amendment appends a
+consequence-clarification and does not reopen the Decision. The
+Japanese counterpart receives the equivalent amendment in the same
+change (it is #06's own first test subject; EN/JA heading parity is
+preserved by appending exactly one `##`-level section to each).

@@ -61,6 +61,8 @@ Approved
 - **Given** フォークごとの設定変数や設定ファイルなしにワークフローファイルが存在する **when** 派生リポジトリの CI が実行される **then** 追加のセットアップなしにチェックが自動的に実行される (ADR-015 から継承した always-on デフォルト)。
 - **Given** `.md` とその `.ja.md` の間に見出しカウント不一致を導入する `main` への push または pull request **when** ワークフローが実行される **then** `bilingual-parity-check` という名前の CI ジョブが失敗し、サマリー出力にファイルペアと失敗したパリティ次元が示される。
 
+**注 (ADR-018 amendment — 2026-05-17):** AC#5 および AC#7 の「スコープ内ツリー」という表現は、ADR-018 (`.claude/meta/adr/018-bilingual-parity-detector.md`) の `## Amendment — 2026-05-17 (in-scope granularity — per-pair, not per-directory)` セクションによってファイルペア単位の粒度に権威ある形で精緻化されている。その精緻化の下では、対応する `<stem>.ja.md` を持たない単独の `<stem>.md` は認可された EN のみの補完ファイルであり、存在パリティの失敗とはならない。存在パリティが失敗するのは、対応する `<stem>.md` を持たない孤立した `<stem>.ja.md` (AC#6) の場合のみである。これが、慣例を持つツリーに EN のみの `.md` ファイルが存在するにもかかわらず、テンプレートが green-by-construction (AC#9) である理由である: それらのファイルは認可された EN のみの補完ファイルであり、パリティ失敗ではない。AC#7 の ADR-018 への明示的な委任が AC#5 をスコープ付けており、amendment は歴史的な契約の上に重ねられた権威ある精緻化である。
+
 ## 主なインタラクション
 
 1. `implementer` が `.claude/meta/scripts/check-dangling-refs.sh` と `.claude/meta/scripts/check-roadmap-drift.sh` (#04/#05 から確立された再利用可能なパターン) の構造に従って `.claude/meta/scripts/check-bilingual-parity.sh` を作成する: `set -euo pipefail`、`git rev-parse` によるリポジトリルート解決、`pass`/`warn`/`fail_check` ヘルパー、`fail=0` アキュムレーター、`exit "$fail"`。スクリプトは 3 つのチェックを順番に実装する: (1) スコープ内ツリー全体の存在パリティスキャン、(2) 見つかった各 EN/JA ペアの見出しツリーパリティ、(3) スコープ内のすべての `.ja.md` の全角括弧スキャン。 <!-- ref-allow: .claude/meta/scripts/check-bilingual-parity.sh is the deliverable artifact this milestone authorizes; it does not exist yet at Spec authoring time -->

@@ -57,25 +57,28 @@
 #   open silently as ADRs are added and carries per-ADR maintenance cost.
 #
 # ─────────────────────────────────────────────────────────────────────────
-# MECE SCOPE BOUNDARY against check-dangling-refs.sh (#04), per ADR-017 §2:
+# MECE SCOPE BOUNDARY against check-dangling-refs.sh (#04) and
+# check-bilingual-parity.sh (#06), per ADR-017 §2 and ADR-018 §5:
 #
-#   The partition is drawn on CONTRACT, not file type (both checks scan the
-#   same files — CLAUDE.md and ADRs):
+#   The partition is drawn on CONTRACT, not file type (all three checks scan
+#   overlapping files — CLAUDE.md, ADRs, Specs, .ja.md pairs):
 #     - check-dangling-refs.sh (#04) owns RESOLUTION: does a pointer resolve
 #       to a real file/ADR? (ADR-NNN refs, .claude/-rooted paths, specs/ refs)
 #     - check-roadmap-drift.sh (#05, THIS SCRIPT) owns CONSISTENCY: does the
 #       bidirectional index contract hold in BOTH directions, and is every
 #       Status glyph well-formed?
+#     - check-bilingual-parity.sh (#06) owns PARITY: does the EN↔JA pair
+#       agree structurally (heading-tree, full-width-paren scan, presence)?
 #   A defect maps to exactly one owner: a *broken pointer* (target absent) is
 #   #04's; a *consistent-pointer-but-inconsistent-contract* defect (both
-#   files exist, back-link missing or glyph unsanctioned) is #05's. The
-#   single deliberate overlap (a Roadmap `adr:` link whose target is absent)
-#   is owned PRIMARILY by #04 for resolution; #05 ALSO fails it because an
+#   files exist, back-link missing or glyph unsanctioned) is #05's; a
+#   *structurally divergent EN/JA pair* (heading count/order mismatch, full-
+#   width paren in .ja.md, or orphaned .ja.md) is #06's. The single
+#   deliberate overlap (a Roadmap `adr:` link whose target is absent) is
+#   owned PRIMARILY by #04 for resolution; #05 ALSO fails it because an
 #   absent `adr:` target is by definition a broken bidirectional contract.
-#   check-dangling-refs.sh carries the reciprocal one-line note so the
-#   partition is discoverable from both sides (ADR-017 §2 downstream task);
-#   its note reads, verbatim: "Roadmap bidirectional-link and status-glyph
-#   consistency is owned by check-roadmap-drift.sh per ADR-017".
+#   check-dangling-refs.sh and check-bilingual-parity.sh carry reciprocal
+#   notes so the partition is discoverable from all three sides.
 #
 # ─────────────────────────────────────────────────────────────────────────
 # Parsing constraints (ADR-017 §4 — structural requirements, not the bash):

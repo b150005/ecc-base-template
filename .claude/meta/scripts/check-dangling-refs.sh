@@ -14,13 +14,18 @@
 # A link is validated by exactly one of these two checks, never both.
 # See ADR-015 for the full scope-boundary rationale.
 #
-# MECE boundary against check-roadmap-drift.sh (#05, ADR-017 §2): this
-# script owns reference RESOLUTION (does a pointer resolve to a real
-# file/ADR?). Roadmap bidirectional-link and status-glyph consistency is
-# owned by check-roadmap-drift.sh per ADR-017 — that is index CONSISTENCY,
-# a different contract on the same files. The single deliberate overlap (a
-# Roadmap `adr:` link whose target is absent) fails both checks by design:
-# a stronger signal, not a boundary violation (ADR-017 §2).
+# MECE boundary against check-roadmap-drift.sh (#05, ADR-017 §2) and
+# check-bilingual-parity.sh (#06, ADR-018 §5): this script owns reference
+# RESOLUTION (does a pointer resolve to a real file/ADR?). Roadmap
+# bidirectional-link and status-glyph consistency is owned by
+# check-roadmap-drift.sh — index CONSISTENCY, a different contract on the
+# same files. EN↔JA translation parity (heading-tree agreement, full-width-
+# paren scan, orphaned .ja.md) is owned by check-bilingual-parity.sh. A
+# .ja.md containing a broken ADR-NNN ref in heading text is #04's by
+# resolution; #06 does NOT validate reference resolution inside JA files.
+# The single deliberate overlap (a Roadmap `adr:` link whose target is
+# absent) fails both #04 and #05 by design: a stronger signal, not a
+# boundary violation (ADR-017 §2).
 #
 # ADR-014 Reservation-rule carve-out (KEYED TO ROADMAP Design-source COLUMN ONLY):
 #   ADR-014's Spec reservation rule makes a Roadmap `spec: specs/NN-slug.md`
