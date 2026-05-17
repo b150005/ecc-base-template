@@ -378,3 +378,256 @@ performed by this ADR):**
   of this change.
 
 The original Status line (`Accepted — 2026-05-15`) is unchanged.
+
+## Amendment — 2026-05-17 (status-transition ownership matrix)
+
+This amendment closes the gap this ADR's own §Consequences → Negative
+flagged verbatim: "a formal status-transition state machine is not part
+of this ADR. Until then, ownership-by-artifact-producer is the [interim]
+only guard." `specs/07-roadmap-status-transitions.md` (Roadmap row #07)
+is the authoritative scope; it defers the structural *how* to
+`architect` (its Risk R-01 (a)–(d)). This amendment records that
+decision. It is a **consequence-clarification of ADR-014's existing
+Decision**, not a new structural decision: the §Decision already
+assigns glyph ownership in interim form ("ownership-by-artifact-producer")
+and this ADR pre-declared the formalization as its own deferred
+follow-up. No new detector, boundary, keying, or mechanism is
+introduced. Per the ECC precedent this ADR's two 2026-05-16 amendments
+and ADR-018's 2026-05-17 amendment apply ("consequence-clarifications
+fold into amendments; new ADR numbers are reserved for new structural
+decisions" — ADR-015 §Context, ADR-017/ADR-018 Alternative B), this is
+an ADR-014 amendment, **not ADR-019**. No ADR-019 is created; Roadmap <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal; it is intentionally never created (see Counter-proposal below) -->
+row #07 stays `spec:`-only (Milestone → ADR is 0:1; an amendment to the
+Roadmap-mechanism ADR is not #07's *own* ADR — ADR-014 has no milestone
+row of its own, so adding an `adr:` link from row #07 to ADR-014 would
+assert a milestone→ADR mapping that does not exist).
+
+**Why this is not a state machine.** The Spec's Non-goals forbid
+"designing a general workflow-state-machine engine." This amendment
+assigns an *owner and a workflow-step trigger* to each of the four
+glyph transitions ADR-014's §Decision already sanctioned (`☐`/`◐`/`☑`/
+`✗`). It adds no new glyph, no new transition, and no new workflow
+step. It codifies the interim practice exercised verbatim by
+milestones #03, #05, and #06 (and by #07's own pickup this session) —
+a documentation/ownership formalization, retroactively consistent with
+every historical flip, not a behavior change.
+
+### The status-transition ownership matrix
+
+Exactly one owning role per transition, tied to a named
+`## Development Workflow` step or gate:
+
+| Transition | Owning role | Trigger / gate condition | ADR-014 / ADR-016 consistency |
+|---|---|---|---|
+| `☐ todo → ◐ in-progress` | `product-manager` | Atomic with authoring the Spec file `specs/NN-slug.md` at milestone pickup (Workflow step 2). The glyph must not remain `☐` once the Spec is on disk and work has begun. | Aligns with ADR-014's existing write-ownership (`product-manager` owns the row + `spec:` link) and the Spec reservation rule (file authored at the `◐` transition). |
+| `◐ in-progress → ☑ done` | `product-manager` | After the Workflow step 6 quality gate passes for the milestone (code-reviewer, linter, security-reviewer, performance-engineer all pass) and steps 7–9 (docs, release, commit) are complete. `product-manager` — the row's existing write-owner under ADR-014 — performs the flip; no other role may. | The same role that owns the row under ADR-014 owns the close-out flip. The flip-owner also deletes `specs/NN-progress.md` in the same change (ADR-016 §4 retirement), so the ADR-016 deletion trigger and the #07 flip owner are one role — no ownership gap. |
+| `◐ in-progress → ✗ dropped` | `product-manager`, on an `orchestrator`-confirmed drop decision | When the orchestrator (Workflow step 1 Analyze authority) determines the milestone is obsolete/infeasible, `product-manager` (the row write-owner) flips the glyph; the row stays in the table (history not rewritten). | Drop authority is split deliberately: `orchestrator` *decides* (it owns Analyze and is the only always-reading role), `product-manager` *writes* (ADR-014 reserves all row writes to `product-manager`/`architect`; `orchestrator` never writes rows). Same flip-owner deletes `specs/NN-progress.md` per ADR-016 §4. |
+| `☑ done → ✗ dropped` (revert) | `product-manager`, on an `orchestrator`-confirmed reversal decision | When a shipped milestone is later found infeasible/reverted, same split as `◐→✗`: `orchestrator` decides, `product-manager` writes. The row stays; ADR-014's "dropped rows stay / history is not rewritten" governs. | Identical authority split to `◐→✗`. No `specs/NN-progress.md` exists at `☑` (ADR-016 §4 deleted it at `◐→☑`), so no progress-file action. |
+
+**Resolving the "quality-gate close-out actor" ambiguity (Spec R-01
+(b)).** The interim practice phrased the `◐→☑` owner as a
+"quality-gate close-out actor," which the Spec flags as an
+unresolved name. This amendment resolves it to a **named role:
+`product-manager`**, not a compound responsibility. Rationale: ADR-014's
+write-ownership model already reserves *every* Roadmap row write to
+`product-manager` (row + `spec:`) or `architect` (`adr:`), with
+`orchestrator` read-only. The Status glyph is a row cell; a glyph flip
+is a row write. Assigning `◐→☑` to anyone other than the two
+sanctioned row-writers would contradict ADR-014's existing Decision.
+Between the two, `architect` writes only the `adr:` link; the row's
+lifecycle owner is `product-manager`. Therefore `product-manager` owns
+`◐→☑`, gated on the step-6 quality gate having passed (the gate is the
+*condition*; the *owner* is the row-writer). This keeps the glyph
+dimension consistent with — never contradictory to — ADR-014's
+link/row write-ownership, satisfying the Spec's compatibility
+acceptance criterion.
+
+**Composability with ADR-016 (Spec R-01, ADR-016 §4).** ADR-016
+defines `specs/NN-progress.md` deletion as triggered by "the `◐→☑` or
+`◐→✗` flip" and assigns the deletion to "the agent that flips the
+Roadmap glyph." This amendment names that agent (`product-manager` for
+both `◐→☑` and `◐→✗`), making the two rules composable with no gap:
+the role this amendment authorizes to flip is, by construction, the
+role ADR-016 §4 already binds the progress-file deletion to. ADR-016's
+downstream task list still names `implementer` as a possible deleter;
+that is reconciled by reading ADR-016 §4's controlling phrase ("the
+agent that flips the Roadmap glyph") as authoritative — whichever role
+this amendment assigns the flip to is the one ADR-016 binds the
+deletion to. Since this amendment assigns all `◐→{☑,✗}` flips to
+`product-manager`, `product-manager` owns the paired deletion.
+
+### Documentation placement (Spec R-01 (b))
+
+The formalized matrix lives in the **CLAUDE.md `## Roadmap` Rules
+block** as one added bullet, **not** in the Development Workflow
+section and **not** duplicated into agent prompts. Rationale:
+
+- The Rules block is **index-adjacent and compaction-durable**: it sits
+  directly under the Roadmap table every agent reads on every step
+  (Invariant 2), so `product-manager` encounters the glyph-ownership
+  rule at exactly the step it authors a Spec or closes a gate, with
+  **zero additional file reads** — the Spec's R-01 (b) acceptance
+  criterion.
+- It is the **tightest placement** respecting the CLAUDE.md
+  line-budget guidance: the Rules block is *inside* the Roadmap
+  section, which is already the sanctioned line-budget exception (this
+  ADR's 2026-05-16 line-budget amendment). One added bullet to an
+  already-exempt section costs no budget elsewhere; adding prose to
+  `## Development Workflow` would bloat a non-exempt section.
+- It is **index-consistent**: glyph ownership is a property of the
+  Roadmap mechanism (who may write the Status cell), which is exactly
+  what the Rules block governs (it already states the `Status =` glyph
+  set and the row/link write-ownership). The transition matrix is the
+  natural completion of the existing "Write-ownership:" bullet, not a
+  new concept in a new place.
+
+The exact one-bullet wording is handed to `implementer` below; the
+MECE boundary against milestone #05's glyph *well-formedness* check
+(ADR-017: #05 validates the glyph *value* is one of four sanctioned
+characters; #07 governs *who* may change it and *when* — distinct,
+non-overlapping, no CI automates #07) is stated in the Spec's R-03 and
+restated in the bullet so a future milestone author does not route a
+character check to #07 or an ownership question to #05.
+
+### Spec R-01 (c)(d) judgements recorded for the implementer
+
+- **(c) Amendment vs new ADR:** ADR-014 amendment (decided above). No
+  ADR-019. Row #07 Design-source cell is unchanged (`spec:`-only). <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+- **(d) claude-md-authoring Skill necessity:** the deferred CLAUDE.md
+  edit is **one bullet appended to the existing `## Roadmap` Rules
+  list** — a "routine small edit (… single bullet …)" by the explicit
+  carve-out in CLAUDE.md's `## CLAUDE.md authoring guidance` section
+  ("Routine small edits (typo, single bullet, version bump) do not
+  need the Skill"). It is **not** "significant restructuring" (no
+  section added/moved/split, no heading change, no invariant touched).
+  **Judgement: the claude-md-authoring Skill is NOT required** for the
+  #07 implementation edit. (If the implementer instead chooses to add
+  a sub-heading or a table, that *would* cross into restructuring and
+  the Skill would then apply — but the design here is deliberately a
+  single bullet precisely to stay under the routine-edit carve-out.)
+- **(d) Agent-prompt impact:** **no agent prompt requires editing.**
+  The matrix assigns transitions to roles whose Roadmap-write
+  contracts ADR-014 *already* established (`product-manager` owns row
+  writes; `orchestrator` reads/decides-at-Analyze; `architect` owns
+  `adr:` only). `product-manager` already owns row+`spec:` writes at
+  Spec authoring (ADR-014) — the `☐→◐` and `◐→{☑,✗}` flips are the
+  glyph facet of that same already-owned row write, made explicit in
+  the Rules block rather than in the prompt. `orchestrator`'s
+  drop-*decision* authority is its existing Analyze-step role (ADR-014:
+  "orchestrator only reads"; deciding a drop is an Analyze output, not
+  a row write). ADR-016 already added the `product-manager`/
+  `implementer` progress-file-deletion prompt lines; this amendment
+  only *names which role's flip* triggers them, which the Rules-block
+  bullet conveys without a prompt edit. Recording the rule in the
+  always-read Rules block (not in prompts) is the deliberate
+  minimal-surface choice, consistent with ADR-017/ADR-018 keeping their
+  changes out of agent prompts.
+
+### Downstream `implementer` tasks (recorded for traceability, not performed by this amendment — implementation is a future session, per the #03/ADR-016 · #05/ADR-017 · #06/ADR-018 two-session decision-then-implementation split)
+
+- `.claude/CLAUDE.md` `## Roadmap` **Rules** block — append one bullet
+  after the existing "Write-ownership:" bullet, of the form: *"Status
+  glyph transitions: `product-manager` flips `☐→◐` atomically with
+  authoring the Spec at pickup, and `◐→☑` after the step-6 quality
+  gate passes (deleting `specs/NN-progress.md` in the same change per
+  ADR-016); drops (`◐→✗`, `☑→✗`) are decided by `orchestrator` at
+  Analyze and written by `product-manager`, row retained (history not
+  rewritten). #05 checks glyph *value* well-formedness; #07 governs
+  *who* flips and *when* — no CI enforces #07."* Single bullet, no
+  sub-heading, no table — stays within the routine-edit carve-out (no
+  claude-md-authoring Skill invocation required).
+- **No agent-prompt edits** (judgement above). The implementer must
+  *not* add glyph-ownership prose to `product-manager.md`,
+  `orchestrator.md`, `architect.md`, or `implementer.md`; the Rules
+  block is the single source.
+- **No CI workflow** (Spec Non-goals; #07 is a process/documentation
+  assignment, not an automated check — distinct from #05's glyph
+  *value* check per ADR-017 and the Spec's R-03 MECE boundary).
+- The Japanese counterpart of this ADR
+  (`014-roadmap-index-single-entry-point.ja.md`) must receive the
+  mirrored amendment, and the Japanese counterpart of CLAUDE.md (if
+  present) the mirrored Rules-block bullet — a `technical-writer`
+  task, **not** part of this change. **This amendment creates a
+  transient EN/JA heading mismatch on ADR-014 until `technical-writer`
+  mirrors it; the #06 bilingual-parity detector
+  (`check-bilingual-parity.sh`) will FAIL on ADR-014 until the mirror
+  lands. This is the expected, queued `technical-writer` task — not a
+  reason to omit this EN amendment.**
+
+### Counter-proposal
+
+The serious counter-position is **new ADR-019 — formalize the <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+status-transition matrix as a standalone ADR rather than an ADR-014
+amendment**. It is recorded here per the
+ADR-012 / ADR-014 / ADR-015 / ADR-016 / ADR-017 / ADR-018 convention of
+taking a rejected alternative seriously rather than as a strawman. The
+argument:
+
+1. The Spec hands `architect` an explicit (c) choice ("ADR-014
+   amendment or a new ADR-019") and structurally parallel sibling <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+   milestones #05 and #06 both resolved their deferred-structural-
+   question Specs with *new* ADRs (017, 018), not amendments. Symmetry
+   of process argues #07 → ADR-019. <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+2. A named ownership matrix that four agent roles must honor is a
+   first-class, citable contract; burying it as the third amendment in
+   a long ADR-014 trail makes it less discoverable than a dedicated
+   ADR-019 a reader can cite as "the status-transition ADR." <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+3. ADR-019 would carry its own Roadmap back-link (`Roadmap row: #07`) <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+   and the row would gain an `adr:` link — the same bidirectional
+   contract #05/#06 exercise — giving #07 the same artifact shape as
+   its siblings.
+
+**Why the counter was not adopted:**
+
+- ADR-017 and ADR-018 self-classified as new-ADR-worthy on a specific,
+  stated discriminator: each introduced a **new detector + a new MECE
+  contract boundary + a new exemption-keying rule** (ADR-017
+  Alternative B; ADR-018 Alternative B). #07 introduces **none** of
+  those — no detector, no boundary, no keying, no mechanism, no new
+  glyph, no new workflow step. It assigns owners to transitions
+  ADR-014's §Decision *already sanctioned* and whose formalization
+  ADR-014 *itself pre-declared as its own deferred follow-up*
+  ("not part of this ADR … until then"). The sibling-symmetry argument
+  inverts on inspection: applying #05/#06's own stated discriminator to
+  #07 yields "amendment," because the structural half that dominated
+  for #05/#06 is absent for #07. This is the exact reasoning ADR-014's
+  2026-05-16 line-budget amendment used to refuse its own ADR-015
+  ("a clarification of a consequence of ADR-014's existing Decision …
+  not a new structural decision") and ADR-018's 2026-05-17 amendment
+  used to refine an already-decided ownership rule without a new
+  number.
+- Discoverability is *better*, not worse, as an ADR-014 amendment:
+  glyph ownership is a property of the Roadmap mechanism ADR-014 owns;
+  the canonical place a reader looks for "who may change a Roadmap
+  cell" is the ADR that defined the Roadmap and already assigns
+  row/link write-ownership. A separate ADR-019 would *fragment* the <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+  Roadmap-ownership contract across two ADRs — the orchestrator/
+  architect would have to read ADR-014 *and* ADR-019 to know the full <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+  write-ownership picture, reintroducing exactly the "which document is
+  authoritative" rediscovery ADR-014 exists to remove.
+- The bidirectional-back-link argument is moot: ADR-014 has no
+  milestone row of its own, so an amendment to it correctly carries
+  *no* `Roadmap row:` line and triggers no #05 drift contract. Forcing
+  a new ADR-019 purely to create a back-link manufactures the <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal, intentionally never created -->
+  bidirectional artifact rather than reflecting a genuine
+  structural decision.
+
+**Trigger conditions for re-evaluating this counter-proposal:**
+
+- A future milestone genuinely introduces a *workflow-state-machine
+  engine* (new transitions, new states, an automated enforcement
+  detector for *who* flipped a glyph) — that would be a new structural
+  decision (new mechanism + new boundary) and would warrant its own
+  ADR, with this amendment's matrix as its inherited baseline.
+- The status-transition rule is found to require divergent ownership
+  per project type (e.g. forks that drop `product-manager`), such that
+  a single matrix in ADR-014 can no longer express it — at which point
+  a dedicated ADR with per-profile matrices may be warranted.
+
+The counter-proposal stays in this amendment as the historical record
+of the decision's most serious objection, per the
+ADR-012 / ADR-014 / ADR-015 / ADR-016 / ADR-017 / ADR-018 convention.
+
+The original Status line (`Accepted — 2026-05-15`) is unchanged; this
+amendment appends an ownership formalization of an already-sanctioned
+mechanism and does not reopen the Decision.

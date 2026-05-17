@@ -213,6 +213,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   for traceability. Roadmap row #05 remains `◐ in-progress`. Bilingual
   `.md` and `.ja.md` for both `specs/05-roadmap-drift-detection-ci.md`
   and ADR-017.
+- **Milestone #07 — design only; implementation deferred.**
+  Spec `specs/07-roadmap-status-transitions.md` (Approved) defines
+  Roadmap status-transition ownership assignment: explicit named-role
+  ownership for each of the four glyph transitions (☐→◐, ◐→☑,
+  ◐→✗, ☑→✗) with gate conditions, compatibility with ADR-014's
+  row/link write-ownership, and composability with ADR-016's
+  progress-file deletion trigger. The structural decision
+  (ownership matrix, placement, agent-prompt impact, Skill
+  necessity) was decided this session by the architect as
+  ADR-014's `## Amendment — 2026-05-17 (status-transition ownership
+  matrix)` — a consequence-clarification of ADR-014's existing
+  Decision, not a new ADR-019 (the counter-proposal is permanently
+  recorded in the amendment per the ADR-012/ADR-014/ADR-015/ADR-016/
+  ADR-017/ADR-018 convention). Ownership matrix: `product-manager`
+  flips ☐→◐ atomically with Spec authoring; `product-manager`
+  flips ◐→☑ after the step-6 quality gate passes (deleting
+  `specs/NN-progress.md` in the same change per ADR-016); drops
+  (◐→✗ and ☑→✗) are decided by `orchestrator` at Analyze and
+  written by `product-manager`, row retained. No new ADR, no CI
+  workflow, no agent-prompt edits — all deferred to a future
+  implementation session. Roadmap row #07 moves from `☐ todo` to
+  `◐ in-progress`. Bilingual `.md` and `.ja.md`.
 - **Milestone #06 — design only; implementation deferred.**
   Spec `specs/06-bilingual-parity-detector.md` (Approved) defines the
   EN/JA bilingual parity detector — three parity dimensions (heading-tree
