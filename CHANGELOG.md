@@ -293,6 +293,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Milestone #07 — now IMPLEMENTED** (design landed previously under
+  Documentation as ADR-014's 2026-05-17 amendment; implementation
+  completed this session). A documentation-only change: one bullet
+  appended to the `## Roadmap` **Rules:** block in `CLAUDE.md`,
+  formalizing the status-transition ownership matrix. `product-manager`
+  flips ☐→◐ atomically with Spec authoring at milestone pickup;
+  `product-manager` flips ◐→☑ after the step-6 quality gate passes
+  (deleting `specs/NN-progress.md` in the same change per ADR-016);
+  drops (◐→✗, ☑→✗) are decided by `orchestrator` at Analyze and
+  written by `product-manager`, row retained (history not rewritten).
+  This is MECE with Milestone #05 (which governs glyph *value*
+  well-formedness) — #07 governs *who* flips and *when*. No new ADR,
+  no CI workflow, no agent-prompt edits. CLAUDE.md is EN-only; no
+  bilingual mirror needed. Roadmap row #07 flips ◐→☑ done.
+
 - **Milestone #06 — now IMPLEMENTED** (design landed previously
   under Documentation; implementation completed this session per
   ADR-018 §Consequences → Neutral downstream tasks, including a

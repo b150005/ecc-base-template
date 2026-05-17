@@ -136,7 +136,7 @@ Single entry point mapping each milestone to its authoritative design source. Ea
 | 04 | CI detector for dangling ADR/skill cross-references | ☑ done | spec: `specs/04-dangling-reference-detector.md`<br>adr: `.claude/meta/adr/015-dangling-reference-detector.md` |
 | 05 | Roadmap drift-detection CI | ☑ done | spec: `specs/05-roadmap-drift-detection-ci.md`<br>adr: `.claude/meta/adr/017-roadmap-drift-detector.md` |
 | 06 | EN/JA bilingual parity detector | ☑ done | spec: `specs/06-bilingual-parity-detector.md`<br>adr: `.claude/meta/adr/018-bilingual-parity-detector.md` |
-| 07 | Roadmap status-transition ownership assignment | ◐ in-progress | spec: `specs/07-roadmap-status-transitions.md` |
+| 07 | Roadmap status-transition ownership assignment | ☑ done | spec: `specs/07-roadmap-status-transitions.md` |
 | 08 | Orchestrator Analyze row-guard | ☐ todo | spec: `specs/08-orchestrator-row-guard.md` |
 | 09 | Spec filename convention alignment (`NN-slug.md`) | ☐ todo | spec: `specs/09-spec-filename-convention.md` |
 | 10 | Spec/ADR directory location pin in CLAUDE.md | ☐ todo | spec: `specs/10-spec-adr-directory-pinning.md` |
@@ -159,6 +159,7 @@ Single entry point mapping each milestone to its authoritative design source. Ea
 - Status = implementation state: ☐ todo / ◐ in-progress / ☑ done / ✗ dropped. Dropped rows stay (history not rewritten).
 - Index only — never duplicate acceptance criteria or rationale; the linked Spec/ADR is the source of truth.
 - Write-ownership: `product-manager` creates/updates the row + `spec:` link; `architect` adds the `adr:` link; `orchestrator` only reads.
+- Status glyph transitions: `product-manager` flips `☐→◐` atomically with authoring the Spec at pickup, and `◐→☑` after the step-6 quality gate passes (deleting `specs/NN-progress.md` in the same change per ADR-016); drops (`◐→✗`, `☑→✗`) are decided by `orchestrator` at Analyze and written by `product-manager`, row retained (history not rewritten). #05 checks glyph *value* well-formedness; #07 governs *who* flips and *when* — no CI enforces #07.
 - At 100+ milestones, split into `### Phase N` sub-tables under `## Roadmap`.
 
 ## Development Workflow
