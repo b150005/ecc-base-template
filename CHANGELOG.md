@@ -490,6 +490,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Milestone #13 — now IMPLEMENTED** (two-session split — design
+  landed under commit `92aaa0a` / ADR-020 `Proposed — 2026-05-18`;
+  implementation completed this session per ADR-020 §Consequences →
+  Neutral downstream tasks). Five artifacts: (1)
+  **`.claude/meta/scripts/check-ecc-delegation-consistency.sh`** —
+  new default-off detector validating `code-reviewer.md`'s nine-row
+  ECC delegation table for internal consistency (every
+  manifest→ECC-agent row references a name declared in the file's
+  own reviewer intro list), with zero operator-environment
+  introspection — reads only repository artifacts, consistent with
+  `code-reviewer.md` lines 84–87 forbidding unreliable runtime
+  introspection (Spec AC-5); green-by-construction on the
+  template's own `main` (Spec AC-3). (2)
+  **`.github/workflows/ecc-delegation-consistency-check.yml`** —
+  forkable default-off `workflow_call` workflow; single activation
+  switch `enabled: false` in `.github/ecc-delegation-tracker.yml`
+  (the `workaround-check.yml` / `coverage-gate.yml` single-switch
+  precedent, ADR-019 Decision 2 / ADR-006). (3)
+  **`.claude/meta/scripts/test-check-ecc-delegation-consistency.sh`**
+  — dedicated 10-test TDD suite, making the separated-run test suite
+  count five (alongside `test-check-dangling-refs.sh`,
+  `test-check-roadmap-drift.sh`, `test-check-bilingual-parity.sh`,
+  `test-coverage-threshold.sh`). (4) **Standing-posture pointer
+  in `code-reviewer.md`** — a co-located, discoverable statement
+  of the degraded-review standing posture placed immediately before
+  the three-case delegation rule (lines 72–92 byte-unchanged per
+  Spec AC-6), making the posture discoverable at the checkpoint
+  where it is actionable without requiring a new always-read file
+  (Spec AC-7). (5) **ADR-020 status transitioned `Proposed →
+  Accepted — 2026-05-18`** (the ADR-017/ADR-019 two-session
+  lifecycle). Roadmap row #13 flips `◐ in-progress` → `☑ done`.
+  Spec and ADR are the source of truth:
+  `specs/13-ecc-absent-signal.md` and
+  `.claude/meta/adr/020-ecc-absent-signal.md`.
+
 - **Milestone #12 — now IMPLEMENTED** (two-session split — design
   landed under commit `1390206` / ADR-019 `Proposed — 2026-05-18`;
   implementation completed this session per ADR-019 §Consequences →

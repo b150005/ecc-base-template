@@ -63,6 +63,12 @@ Hand off the language-specific findings to the matching ECC agent. Do
 not duplicate the language-specific review yourself — ECC goes deeper.
 Quote the ECC agent's verdict in your final report.
 
+<!-- Standing posture (ADR-020 §5, Spec AC-7): when ECC is absent the
+     language-specific layer is degraded (template cross-cutting checks
+     only). See README.md ## Prerequisites for the full standing posture.
+     To detect delegation-table drift, run:
+       bash .claude/meta/scripts/check-ecc-delegation-consistency.sh -->
+
 **Delegation outcome — three cases the agent must distinguish:**
 
 1. **Delegation succeeded** — the ECC reviewer returned findings. Quote

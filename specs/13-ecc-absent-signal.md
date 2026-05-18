@@ -119,7 +119,7 @@ Today the only ECC-absent / degraded-review signals are: the per-review verdict-
 - Changing `code-reviewer`'s three-case delegation rule, delegation table semantics, or "pick case 3 by default" posture — ADR-012's runtime contract is correct and is not in scope.
 - Detecting whether ECC is installed in the operator's `~/.claude/` — impossible from a repository/CI by construction and forbidden by `code-reviewer.md` lines 84–87.
 - Vendoring ECC's language-specific reviewers into `.claude/agents/` — ADR-012's deliberately-rejected Counter-proposal; out of scope for #13.
-- Authoring the JA sibling (`specs/13-ecc-absent-signal.ja.md`) — that is technical-writer's responsibility, sequenced after implementation, with heading-tree parity owned by Roadmap #06. <!-- ref-allow: the JA sibling is a forthcoming file authored by technical-writer after implementation; its absence at Spec-authoring time is by design (JA parity owned by #06) -->
+- Authoring the JA sibling (`specs/13-ecc-absent-signal.ja.md`) — that is technical-writer's responsibility, sequenced after implementation, with heading-tree parity owned by Roadmap #06.
 - Changing ADR-012's Decision or its rejected Counter-proposal — #13 addresses ADR-012's recorded-but-unmitigated Negative, it does not dispute ADR-012's Decision.
 - Translating any new scaffold to CI providers other than GitHub Actions.
 

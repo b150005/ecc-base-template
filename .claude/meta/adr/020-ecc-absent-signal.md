@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed — 2026-05-18
+Accepted — 2026-05-18
 
 ## Context
 
@@ -47,14 +47,15 @@ a review?" ADR-014 §(d)'s MECE table names #04/#05/#09/#10/#11 (amended
 for #12 via ADR-019's reasoning) and does **not** pre-reserve a slot
 for #13 — the same substantive distinction ADR-019 §5 drew for #12.
 
-This is a **two-session split** (the ADR-016/017/018/019 lifecycle
-precedent for heavy-implementation milestones): this session ships the
-design (ADR-020 Proposed, Spec Approved) as a `docs(adr-020):` commit;
-the implementation (the detector script, its workflow, and its test
-suite) is deferred to a subsequent session as a `feat(roadmap):`
-commit. Implementation has not been performed; the Status is Proposed.
-The contrasting precedent is #11 (ADR-014 amendment, prose-only,
-single-session collapse); #13's structural weight matches #12, not #11.
+This was a **two-session split** (the ADR-016/017/018/019 lifecycle
+precedent for heavy-implementation milestones): the design session
+shipped the design (ADR-020 Proposed, Spec Approved) as a
+`docs(adr-020):` commit; the implementation session completed the
+implementation (the detector script, its workflow, and its test suite)
+as a `feat(roadmap):` commit. The implementation was performed and the
+Status is now Accepted. The contrasting precedent is #11 (ADR-014
+amendment, prose-only, single-session collapse); #13's structural
+weight matched #12, not #11.
 
 ## Decision
 
@@ -182,7 +183,7 @@ Key-interaction 1).
 
 ### 6. Implementation-session contract (deferred)
 
-The implementation session must, per the Spec's acceptance criteria
+The implementation session did, per the Spec's acceptance criteria
 and this ADR's Decision: author one new default-off detector script
 (the `check-*.sh` family shape #04 established, #05/#06 mirrored) plus
 one forkable workflow; add a dedicated test suite mirroring the
@@ -192,7 +193,7 @@ their test suites (Spec Non-goals); leave `code-reviewer.md`'s
 three-case rule and "pick case 3 by default" posture byte-unchanged
 (Spec AC-6); and keep the detector's mechanism free of any read outside
 the repository (Spec AC-5, §3 above). On implementation completion the
-architect transitions this ADR Proposed → Accepted and reconciles any
+architect transitioned this ADR Proposed → Accepted and reconciled the
 now-false present-tense "not yet implemented" self-narrative to
 past-tense (the ADR-017/ADR-019 two-session reconciliation precedent),
 leaving the Alternatives/Counter-proposal design-time rationale
@@ -243,9 +244,9 @@ unchanged as historical record.
   records a not-pre-reserved-by-ADR-014-§(d) MECE partition; the
   pattern of stating the partition in the ADR itself (rather than
   amending ADR-014 §(d)) is now twice-applied and stable.
-- Implementation is deferred; no script, workflow, or test suite exists
-  yet. The Status is Proposed and will move to Accepted in the
-  implementation session.
+- Implementation was completed in the implementation session; the
+  script, workflow, and test suite now exist. The Status moved to
+  Accepted in the implementation session.
 
 ## Alternatives considered
 
