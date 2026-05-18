@@ -2,7 +2,7 @@
 
 ## ステータス
 
-Proposed — 2026-05-18
+Accepted — 2026-05-18
 
 ## 背景
 
@@ -87,8 +87,8 @@ ADR-018 の Alternatives テーブル行 B は「既存 ADR の amendment に
 
 7 番目の力は **#04 dangling-reference detector** 自体であり、現在
 アクティブな CI である。本 ADR ファイルは #04 ディテクターの Check-1
-スコープ内にある。まだ書かれていない
-`.github/workflows/coverage-gate.yml` <!-- ref-allow: forthcoming implementation artifact; ADR-019 is design-only, implementation deferred to a later session (two-session split per #03/ADR-016, #05/ADR-017, #06/ADR-018) -->
+スコープ内にある。当時まだ書かれていなかった
+`.github/workflows/coverage-gate.yml`
 および計画中の `.claude/meta/scripts/` カバレッジしきい値ヘルパーへの
 言及は Check 2 に該当するが、ADR ファイルは #04 ディテクター自身の
 文書化されたスコープ決定 (ADR ファイルは歴史的記録であり、`.claude/`
@@ -98,7 +98,7 @@ ADR-015、ADR-016、ADR-017、ADR-018 がディテクターの相互作用を列
 
 ## 決定
 
-カバレッジゲートは **`.github/workflows/coverage-gate.yml` <!-- ref-allow: forthcoming implementation artifact; ADR-019 is design-only, implementation deferred to a later session (two-session split) --> という単一のスタンドアロンでフォーク可能なワークフロー**
+カバレッジゲートは **`.github/workflows/coverage-gate.yml` という単一のスタンドアロンでフォーク可能なワークフロー**
 であり、`.github/workflows/ci-base.yml` の変更としてではなく
 それと *並んで* 作成され、テンプレート自身の CI が既定で不活性 green に
 なり派生リポジトリがちょうど 1 つの変更でオプトインできるよう
@@ -115,18 +115,19 @@ CI 時のカバレッジしきい値強制 — を導入する。ADR-014 の §(
 **新規 ADR-019** であり、ADR-014 amendment でも ADR-010 amendment でも
 ない。
 
-本 ADR は **設計のみ** を記録する。実際のワークフローファイル、
-アクティベーション設定成果物、しきい値抽出機構、green-by-construction
-テンプレート保証、テストは **後のセッションに委ねられる** —
-#03/ADR-016、#05/ADR-017、#06/ADR-018 がそれぞれ踏襲した意図的な
-二セッション分割 (決定してから実装) であり、単一セッション崩壊の
-**反対** である。したがってステータスは Accepted ではなく
-**Proposed** である: 決定は記録され、実装は実施されていない。
+本 ADR はまず **設計のみ** の記録として作成された。実際の
+ワークフローファイル、アクティベーション設定成果物、しきい値抽出機構、
+green-by-construction テンプレート保証、テストは **後続の実装セッションで
+着地した** — #03/ADR-016、#05/ADR-017、#06/ADR-018 がそれぞれ踏襲した
+意図的な二セッション分割 (決定してから実装) であり、単一セッション崩壊の
+**反対** である。ステータスは、その実装セッションが成果物を出荷し
+品質ゲートが green を通過したとき **Proposed → Accepted** に移行した:
+決定が先に記録され、次いで忠実な実装によって検証された。
 
 ### 1. CI の構造的形態 — スタンドアロンのフォーク可能ワークフロー、`ci-base.yml` の変更ではない
 
 ゲートは独自のファイル
-`.github/workflows/coverage-gate.yml` <!-- ref-allow: forthcoming implementation artifact; ADR-019 is design-only, implementation deferred to a later session (two-session split) -->
+`.github/workflows/coverage-gate.yml`
 として出荷され、`roadmap-drift-check.yml` と `workaround-check.yml` が
 別のワークフローに接ぎ木されたステップとしてではなく独自のファイルとして
 出荷されるのと同じく `workflow_call` インターフェースを公開する。
@@ -279,7 +280,7 @@ AC-3; ハード制約 3)、`ci-base.yml` の `workflow_call` `test-command`
 | #05 `check-roadmap-drift.sh` (ADR-017) | **双方向 Roadmap インデックス契約** が保たれすべての Status グリフが整形式か? | `.claude/CLAUDE.md` + ADR |
 | #06 `check-bilingual-parity.sh` (ADR-018) | **EN↔JA ペアが構造的に一致** するか (見出しツリー、全角括弧、存在)? | ペアの `.md`/`.ja.md` 成果物 |
 | #11 (verification-domain opt-in ガイダンス、ADR-014 §(d)) | どのプロジェクト特性下でフォークは implementation/design verification ドメインを **有効化** すべきか? | ドキュメント/規約 (ディテクターなし) |
-| **#12 `coverage-gate.yml` (ADR-019)** | **プロジェクトのテストカバレッジは 80% 最小値を満たすか、CI 時に強制されるか?** | **派生リポジトリの事前計算済みカバレッジパーセンテージ** | <!-- ref-allow: forthcoming implementation artifact named as the MECE-partition owner label; ADR-019 is design-only, implementation deferred to a later session (two-session split) -->
+| **#12 `coverage-gate.yml` (ADR-019)** | **プロジェクトのテストカバレッジは 80% 最小値を満たすか、CI 時に強制されるか?** | **派生リポジトリの事前計算済みカバレッジパーセンテージ** |
 
 欠陥はちょうど 1 人のオーナーにマッピングされる: *壊れたポインター*
 は #04 のもの。*Roadmap インデックス不整合* は #05 のもの。
@@ -303,7 +304,7 @@ ADR-018 Alternative-B ディスクリミネーター)。** ADR-018 の Alternati
 **3/3** である:
 
 1. **新しい CI ハードチェック** —
-   `coverage-gate.yml` <!-- ref-allow: forthcoming implementation artifact; ADR-019 is design-only, implementation deferred to a later session (two-session split) -->;
+   `coverage-gate.yml`;
    既存のワークフローはカバレッジしきい値にゲートしない
    (`ci-base.yml` は **しきい値なし** でテストを実行する。4 つの
    ディテクターはカバレッジではなく Markdown 契約をチェックする)。
@@ -331,14 +332,14 @@ ADR-018 Alternative-B ディスクリミネーター)。** ADR-018 の Alternati
 Alternative B がそれぞれ記録したのとまったく同じく支配する。
 
 本 ADR は決定とエージェント契約/ダウンストリームへの示唆を記録する。
-ワークフロー、アクティベーション設定、しきい値抽出機構、テストを
-**自ら書くことはなく**、エージェントプロンプト、Spec、いかなる
-テンプレート、他のいかなる ADR、CHANGELOG、いかなる CI/スクリプト
-ファイルも変更しない — 実装は後のセッションに委ねられ、トレーサビリティ
-のために帰結 → 中立に列挙する。これは ADR-014、ADR-015、ADR-016、
+それ自体はワークフロー、アクティベーション設定、しきい値抽出機構、
+テストを書かず、エージェントプロンプト、Spec、いかなるテンプレート、
+他のいかなる ADR、CHANGELOG、いかなる CI/スクリプトファイルも
+変更しなかった — 実装は後続のセッションに委ねられ、トレーサビリティの
+ために帰結 → 中立に列挙された。これは ADR-014、ADR-015、ADR-016、
 ADR-017、ADR-018 が行うのとまったく同じである。これは #03/ADR-016、
 #05/ADR-017、#06/ADR-018 の二セッション決定してから実装の分割先例を
-継続し、単一セッション崩壊の意図的な反対である。
+継続し、単一セッション崩壊の意図的な反対であった。
 
 ## 帰結
 
@@ -406,14 +407,14 @@ ADR-017、ADR-018 が行うのとまったく同じである。これは #03/ADR
   ファミリーで *最も* 容易に区別できる — ADR-017 が文書化しなければ
   ならなかった意図的な #04↔#05 不在 `adr:` 重複と違い、推論すべき
   重複ゾーンがない。
-- **実装は委ねられる — ギャップは次のセッションまで持続する。**
-  ステータスは Proposed である。実装セッションが
-  `coverage-gate.yml` <!-- ref-allow: forthcoming implementation artifact; ADR-019 is design-only, implementation deferred to a later session (two-session split) -->
-  とアクティベーション設定を出荷するまで、「80% ルールは書かれて
-  存在するが CI で強制されない」状態が動作上の現実のまま (Spec R-01
-  末尾文)。これは二セッション分割の受け入れられた意図的なコストで
-  あり、#03/ADR-016、#05/ADR-017、#06/ADR-018 先例と同一である —
-  設計の正しさが実装開始前に検証される。
+- **実装はひとつのセッション境界を越えて委ねられた。**
+  本 ADR の設計コミットと `coverage-gate.yml`
+  およびアクティベーション設定を出荷した実装セッションの間、「80%
+  ルールは書かれて存在するが CI で強制されない」状態が動作上の現実
+  だった (Spec R-01 末尾文)。これは二セッション分割の受け入れられた
+  意図的なコストであり、#03/ADR-016、#05/ADR-017、#06/ADR-018 先例と
+  同一である — 設計の正しさが実装開始前に検証され、ギャップは今や
+  閉じた。
 
 ### 中立
 
@@ -422,13 +423,13 @@ ADR-017、ADR-018 が行うのとまったく同じである。これは #03/ADR
   5/6) はエージェントプロンプトの変更が不要と述べている。エージェント
   数は変わらない。
 - Roadmap 行 #12 の `Design source` セルは本 ADR への `adr:` リンクを
-  得る (ADR-014 の書き込みオーナーシップに従い本変更が実施:
+  得た (ADR-014 の書き込みオーナーシップに従い設計セッションが実施:
   `architect` が `adr:` リンクを追加し、行 #03/#04/#05/#06 が示すとおり
   既存の予約済み `spec:` リンクの後に `<br>` で結合する)。行の Status
-  グリフは `◐ in-progress` のまま — これは二セッション分割であり実装は
-  委ねられるので #12 は本セッションで `☑` にフリップ **しない**。
-  他の行には触れない。Roadmap フォーマットの変更なし。変更はインデックス
-  のみ (単一セルの編集)。
+  グリフは設計時点では `◐ in-progress` だった — これは二セッション分割で
+  あり、グリフは実装完了時に品質ゲートが通過した時点で `☑` にフリップ
+  する。他の行には触れない。Roadmap フォーマットの変更なし。変更は
+  インデックスのみ (単一セルの編集)。
 - 正確な `workflow_call` 入力名/型、しきい値抽出 awk/grep 形式、
   sourced `.claude/meta/scripts/` ヘルパーを使うかロジックをインラインに
   するか、アクティベーション設定ファイル名と YAML キー名、ジョブ名、
@@ -438,11 +439,11 @@ ADR-017、ADR-018 が行うのとまったく同じである。これは #03/ADR
   から読む、スイッチは数値を持たない)、*入力契約* (呼び出し元が測定を
   供給しテンプレートがしきい値を所有)、*MECE 分割* を固定し、bash は
   固定しない。ADR-015/016/017/018 が使った同じ中立セクション規律。
-- 下流の `implementer` タスク (トレーサビリティのために記録。
-  **本 ADR では実施しない** — 実装は **将来のセッション**、
-  #03/ADR-016、#05/ADR-017、#06/ADR-018 の二セッション分割先例に従う。
-  これは同一セッション実装で **はない**):
-  - `.github/workflows/coverage-gate.yml` <!-- ref-allow: forthcoming implementation artifact; ADR-019 is design-only, implementation deferred to a later session (two-session split) --> —
+- 下流の `implementer` タスク (設計時にトレーサビリティのために記録。
+  #03/ADR-016、#05/ADR-017、#06/ADR-018 の二セッション分割先例に従い
+  **後続の実装セッションで実施された** — 同一セッション実装の意図的な
+  反対):
+  - `.github/workflows/coverage-gate.yml` —
     `workaround-check.yml` default-off 構造と `ci-base.yml`
     `workflow_call` 入力形状に従い作成する: 1 つの必須入力 (呼び出し元の
     事前計算済みカバレッジパーセンテージ、決定 4) を持つ
@@ -529,7 +530,7 @@ Alternative B (新しい ADR 番号なし) と交差させた直接の類似で�
   マイルストーンが新しいチェック + 新しい MECE 境界 + 新しいキーイングを
   導入するかで分類する。#12 は 3 つすべてを満たす (決定 5): 新しい
   CI ハードチェック
-  (`coverage-gate.yml` <!-- ref-allow: forthcoming implementation artifact; ADR-019 is design-only, implementation deferred to a later session (two-session split) -->;
+  (`coverage-gate.yml`;
   今日カバレッジにゲートするものはない)、**ADR-014 §(d) のテーブルが
   事前予約しない** 新しい MECE 分割 (#04/#05/#09/#10/#11 を指名し
   #12 ではない)、そして新しい構造的キーイング (80% の値 + その単一
@@ -579,7 +580,7 @@ Alternative B (新しい ADR 番号なし) と交差させた直接の類似で�
   その時点で #12 は事前予約スロットを埋めることになり、本 ADR が適用
   するまさにそのディスクリミネーターの下でスタンドアロン ADR-019 では
   なく ADR-014 amendment が正しい分類になる。
-- `coverage-gate.yml` <!-- ref-allow: forthcoming implementation artifact; ADR-019 is design-only, implementation deferred to a later session (two-session split) -->
+- `coverage-gate.yml`
   と `ci-base.yml` が実装時に YAML (ジョブスキャフォールド、チェック
   アウト、`workflow_call` 配管) を多く共有し、マージされたワークフロー
   ではなく両方が source する **共有 composite アクション** が正しい
@@ -598,14 +599,16 @@ Alternative B (新しい ADR 番号なし) と交差させた直接の類似で�
 代替 ADR ファイルは作成されない — 却下された反対の正しい状態は
 非存在であり、本 ADR-019 ファイルがその唯一の引用可能なホームである。
 
-注記: 前方の実装成果物 (`coverage-gate.yml` と計画中の <!-- ref-allow: forthcoming implementation artifact named in the self-referential ref-allow note; ADR-019 is design-only, implementation deferred to a later session (two-session split) -->
-`.claude/meta/scripts/` ヘルパー) を参照する行の
-`<!-- ref-allow: -->` 抑制は **本 ADR ファイル**
+注記: 設計時、当時まだ作成されていない実装成果物 (`coverage-gate.yml`
+と計画中の `.claude/meta/scripts/` ヘルパー) を参照する行に
+`<!-- ref-allow: -->` 抑制が置かれていた。対象は **本 ADR ファイル**
 (`.claude/meta/adr/019-coverage-ci-gate.md`) とその JA 兄弟に
-**のみ** 存在し、`specs/12-coverage-ci-gate.md`、
+**限定** され、`specs/12-coverage-ci-gate.md`、
 `specs/11-verification-domain-opt-in-guidance.md`、
-`specs/05-roadmap-drift-detection-ci.md` が設定した先例に従う。
-それらは `.claude/CLAUDE.md` には **現れない**。
+`specs/05-roadmap-drift-detection-ci.md` が設定した先例に従った。
+これらの抑制は成果物が具体化した際に **削除** された (#11 LOW
+先例: 前方参照が解消したときの過剰抑制除去)。
+それらは `.claude/CLAUDE.md` には **現れなかった**。
 
 ## 参照
 

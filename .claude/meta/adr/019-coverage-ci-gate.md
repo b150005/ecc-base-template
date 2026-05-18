@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed — 2026-05-18
+Accepted — 2026-05-18
 
 ## Context
 
@@ -86,8 +86,8 @@ the decision; the rejected counter's correct state is non-existence
 
 A seventh force is the **#04 dangling-reference detector itself**, now
 active CI. This ADR file is in the #04 detector's Check-1 scope; its
-mentions of the not-yet-written
-`.github/workflows/coverage-gate.yml` <!-- ref-allow: forthcoming implementation artifact; ADR-019 is design-only, implementation deferred to a later session (two-session split per #03/ADR-016, #05/ADR-017, #06/ADR-018) -->
+mentions of the then-not-yet-written
+`.github/workflows/coverage-gate.yml`
 and a possible `.claude/meta/scripts/` coverage-threshold helper fall
 under Check 2, from which ADR files are excluded by the #04 detector's
 own documented scope decision (ADR files are historical records; their
@@ -98,7 +98,7 @@ ADR-018 listed detector interactions.
 ## Decision
 
 The coverage gate is a **single standalone, forkable workflow at
-`.github/workflows/coverage-gate.yml`** <!-- ref-allow: forthcoming implementation artifact; ADR-019 is design-only, implementation deferred to a later session (two-session split) -->,
+`.github/workflows/coverage-gate.yml`**,
 authored *alongside* — **not** as a modification of —
 `.github/workflows/ci-base.yml`, run **default-off behind a single
 switch** so the template's own CI is inert-green by default and a
@@ -114,19 +114,21 @@ table (at approximately line 1800; it names #04/#05/#09/#10/#11, **not**
 #12) does **not** pre-reserve, which is why this is a **new ADR-019**,
 not an ADR-014 amendment and not an ADR-010 amendment.
 
-This ADR records the **design only**. The actual workflow file, the
-activation config artifact, the threshold-extraction mechanism, the
-green-by-construction template guarantee, and the tests are
-**deferred to a later session** — the deliberate two-session split that
-#03/ADR-016, #05/ADR-017, and #06/ADR-018 each followed
-(decision-then-implementation), and the **opposite** of a single-session
-collapse. The Status is therefore **Proposed**, not Accepted: the
-decision is recorded; implementation has not been performed.
+This ADR was authored as a **design-only** record first. The actual
+workflow file, the activation config artifact, the threshold-extraction
+mechanism, the green-by-construction template guarantee, and the tests
+were **landed in a subsequent implementation session** — the deliberate
+two-session split that #03/ADR-016, #05/ADR-017, and #06/ADR-018 each
+followed (decision-then-implementation), and the **opposite** of a
+single-session collapse. The Status moved **Proposed → Accepted** when
+that implementation session shipped the artifacts and the quality gate
+passed green: the decision was recorded first, then verified by a
+faithful implementation.
 
 ### 1. CI structural form — a standalone forkable workflow, not a `ci-base.yml` modification
 
 The gate ships as its own file,
-`.github/workflows/coverage-gate.yml` <!-- ref-allow: forthcoming implementation artifact; ADR-019 is design-only, implementation deferred to a later session (two-session split) -->,
+`.github/workflows/coverage-gate.yml`,
 exposing a `workflow_call` interface, the same way
 `roadmap-drift-check.yml` and `workaround-check.yml` ship as their own
 files rather than as steps grafted into another workflow. It is **not**
@@ -287,7 +289,7 @@ distinct from every existing owned question:
 | #05 `check-roadmap-drift.sh` (ADR-017) | Does the **bidirectional Roadmap-index contract** hold and is every Status glyph well-formed? | `.claude/CLAUDE.md` + ADRs |
 | #06 `check-bilingual-parity.sh` (ADR-018) | Does the **EN↔JA pair agree** structurally (heading tree, full-width parens, presence)? | paired `.md`/`.ja.md` artifacts |
 | #11 (verification-domain opt-in guidance, ADR-014 §(d)) | Under what project characteristics should a fork **enable** the implementation/design verification domain? | documentation/convention (no detector) |
-| **#12 `coverage-gate.yml` (ADR-019)** | **Does the project's test coverage meet the 80% minimum, enforced at CI time?** | **the derived repo's already-computed coverage percentage** | <!-- ref-allow: forthcoming implementation artifact named as the MECE-partition owner label; ADR-019 is design-only, implementation deferred to a later session (two-session split) -->
+| **#12 `coverage-gate.yml` (ADR-019)** | **Does the project's test coverage meet the 80% minimum, enforced at CI time?** | **the derived repo's already-computed coverage percentage** |
 
 A defect maps to exactly one owner: a *broken pointer* is #04's; a
 *Roadmap-index inconsistency* is #05's; a *structurally-divergent EN/JA
@@ -310,7 +312,7 @@ milestone that *populates a slot a prior ADR already reserved* folds
 into that ADR's amendment trail. The discriminator triad for #12 is
 **3/3**:
 
-1. **New CI hard-check** — `coverage-gate.yml` <!-- ref-allow: forthcoming implementation artifact; ADR-019 is design-only, implementation deferred to a later session (two-session split) -->;
+1. **New CI hard-check** — `coverage-gate.yml`;
    no existing workflow gates on a coverage threshold (`ci-base.yml`
    runs tests with **no** threshold; the four detectors check Markdown
    contracts, not coverage).
@@ -338,15 +340,15 @@ dominates exactly as ADR-015 §self-classification, ADR-017 Alternative
 B, and ADR-018 Alternative B each recorded.
 
 This ADR records the decision and the agent-contract / downstream
-implications. It does **not** itself write the workflow, the activation
-config, the threshold-extraction mechanism, or the tests, and does
+implications. It did **not** itself write the workflow, the activation
+config, the threshold-extraction mechanism, or the tests, and did
 **not** modify any agent prompt, the Spec, any template, any other ADR,
-the CHANGELOG, or any CI/script file — implementation is deferred to a
-later session and listed under Consequences → Neutral for traceability,
-exactly as ADR-014, ADR-015, ADR-016, ADR-017, and ADR-018 do. This
-continues the #03/ADR-016, #05/ADR-017, #06/ADR-018 two-session
-decision-then-implementation split precedent and is the deliberate
-opposite of a single-session collapse.
+the CHANGELOG, or any CI/script file — implementation was deferred to a
+subsequent session and listed under Consequences → Neutral for
+traceability, exactly as ADR-014, ADR-015, ADR-016, ADR-017, and
+ADR-018 do. This continues the #03/ADR-016, #05/ADR-017, #06/ADR-018
+two-session decision-then-implementation split precedent and was the
+deliberate opposite of a single-session collapse.
 
 ## Consequences
 
@@ -419,29 +421,28 @@ opposite of a single-session collapse.
   family to keep straight — there is no overlap zone to reason about,
   unlike the deliberate #04↔#05 absent-`adr:` overlap ADR-017 had to
   document.
-- **Implementation is deferred — the gap persists until the next
-  session.** The Status is Proposed; until the implementation session
-  ships `coverage-gate.yml` <!-- ref-allow: forthcoming implementation artifact; ADR-019 is design-only, implementation deferred to a later session (two-session split) -->
-  and the activation config, the "80% rule exists in writing, is not
-  enforced by CI" state remains the operating reality (Spec R-01
-  closing sentence). This is the accepted, deliberate cost of the
+- **Implementation was deferred across one session boundary.** Between
+  this ADR's design commit and the implementation session that shipped
+  `coverage-gate.yml` and the activation config, the "80% rule exists in
+  writing, is not enforced by CI" state was the operating reality (Spec
+  R-01 closing sentence). That was the accepted, deliberate cost of the
   two-session split, identical to the #03/ADR-016, #05/ADR-017,
-  #06/ADR-018 precedent — design correctness is verified before
-  implementation begins.
+  #06/ADR-018 precedent — design correctness was verified before
+  implementation began, and the gap is now closed.
 
 ### Neutral
 
 - This is a **CI-layer addition** in the ADR-015/ADR-017/ADR-018 mold:
   no agent is added or removed; the Spec (Key-interaction 5/6) states no
   agent prompt change is required. Agent count unchanged.
-- The Roadmap row #12 `Design source` cell gains an `adr:` link to this
-  ADR (performed by this change per ADR-014 write-ownership:
+- The Roadmap row #12 `Design source` cell gained an `adr:` link to this
+  ADR (performed by the design session per ADR-014 write-ownership:
   `architect` adds the `adr:` link, `<br>`-joined after the existing
   reserved `spec:` link, exactly as rows #03/#04/#05/#06 show). The row
-  Status glyph stays `◐ in-progress` — this is a two-session split;
-  implementation is deferred, so #12 does **not** flip to `☑` this
-  session. No other row is touched; no Roadmap format change; the change
-  is index-only (a single cell edit).
+  Status glyph was `◐ in-progress` at design time — this was a
+  two-session split; the glyph flips to `☑` at implementation
+  completion, when the quality gate passes. No other row is touched; no
+  Roadmap format change; the change is index-only (a single cell edit).
 - The exact `workflow_call` input name/type, the threshold-extraction
   awk/grep form, whether a sourced `.claude/meta/scripts/` helper is
   used or the logic is inline, the activation config filename and YAML
@@ -452,12 +453,12 @@ opposite of a single-session collapse.
   *input contract* (caller supplies measurement, template owns
   threshold), and the *MECE partition* — not the bash. The same
   Neutral-section discipline ADR-015/016/017/018 used.
-- Downstream `implementer` tasks (recorded for traceability, **not
-  performed by this ADR** — implementation is a **future session**, per
-  the #03/ADR-016, #05/ADR-017, #06/ADR-018 two-session split
-  precedent; this is **not** a same-session implementation):
-  - `.github/workflows/coverage-gate.yml` <!-- ref-allow: forthcoming implementation artifact; ADR-019 is design-only, implementation deferred to a later session (two-session split) --> —
-    author following the `workaround-check.yml` default-off structure
+- Downstream `implementer` tasks (recorded for traceability at design
+  time; **performed in the subsequent implementation session** per the
+  #03/ADR-016, #05/ADR-017, #06/ADR-018 two-session split precedent —
+  the deliberate opposite of a same-session implementation):
+  - `.github/workflows/coverage-gate.yml` —
+    authored following the `workaround-check.yml` default-off structure
     and the `ci-base.yml` `workflow_call` input shape: a `workflow_call`
     workflow with one required input (the caller's already-computed
     coverage percentage, Decision 4), gated default-off behind one
@@ -542,7 +543,7 @@ Alternative B (no new ADR number). The argument, taken at full strength:
   ADR-018's Alternative-B test classifies "new ADR vs. amendment" by
   whether the milestone introduces a new check + a new MECE boundary +
   new keying. #12 satisfies all three (Decision 5): a new CI hard-check
-  (`coverage-gate.yml` <!-- ref-allow: forthcoming implementation artifact; ADR-019 is design-only, implementation deferred to a later session (two-session split) -->;
+  (`coverage-gate.yml`;
   nothing gates on coverage today), a new MECE partition **that ADR-014
   §(d)'s table does not pre-reserve** (it names #04/#05/#09/#10/#11,
   not #12), and new structural keying (the 80% value + its single-source
@@ -592,7 +593,7 @@ Alternative B (no new ADR number). The argument, taken at full strength:
   creates). At that point #12 *would* be populating a pre-reserved slot,
   and an ADR-014 amendment — not a standalone ADR-019 — would become the
   correct classification under the very discriminator this ADR applies.
-- `coverage-gate.yml` <!-- ref-allow: forthcoming implementation artifact; ADR-019 is design-only, implementation deferred to a later session (two-session split) -->
+- `coverage-gate.yml`
   and `ci-base.yml` prove at implementation time to share so much YAML
   (job scaffolding, checkout, the `workflow_call` plumbing) that a
   **shared composite action** sourced by both — not a merged workflow —
@@ -613,14 +614,16 @@ ADR-012 / ADR-014 / ADR-015 / ADR-016 / ADR-017 / ADR-018 convention.
 No alternative ADR file is created — the rejected counter's correct
 state is non-existence; this ADR-019 file is its only citable home.
 
-Note: the `<!-- ref-allow: -->` suppressions on lines referencing the
-forthcoming implementation artifacts (`coverage-gate.yml` and any <!-- ref-allow: forthcoming implementation artifact named in the self-referential ref-allow note; ADR-019 is design-only, implementation deferred to a later session (two-session split) -->
-planned `.claude/meta/scripts/` helper) live **only** in this ADR file
-(`.claude/meta/adr/019-coverage-ci-gate.md`) and its JA sibling,
-following the precedent set by `specs/12-coverage-ci-gate.md`,
+Note: at design time, `<!-- ref-allow: -->` suppressions were placed on
+lines referencing the then-forthcoming implementation artifacts
+(`coverage-gate.yml` and the planned `.claude/meta/scripts/` helper)
+in this ADR file (`.claude/meta/adr/019-coverage-ci-gate.md`) and its
+JA sibling, following the precedent set by `specs/12-coverage-ci-gate.md`,
 `specs/11-verification-domain-opt-in-guidance.md`, and
-`specs/05-roadmap-drift-detection-ci.md`. They do **not** appear in
-`.claude/CLAUDE.md`.
+`specs/05-roadmap-drift-detection-ci.md`. Those suppressions were
+**removed** once the artifacts materialized (per the #11 LOW precedent
+for over-suppression removal when the forward-ref resolves). They did
+**not** appear in `.claude/CLAUDE.md`.
 
 ## References
 

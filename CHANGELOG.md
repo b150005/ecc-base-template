@@ -430,6 +430,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Milestone #12 — now IMPLEMENTED** (two-session split — design
+  landed under commit `1390206` / ADR-019 `Proposed — 2026-05-18`;
+  implementation completed this session per ADR-019 §Consequences →
+  Neutral downstream tasks). Four artifacts: (1)
+  **`.github/workflows/coverage-gate.yml`** — standalone forkable
+  `workflow_call` workflow accepting the derived repo's already-computed
+  coverage percentage as input, gated default-off, deriving the 80%
+  threshold by reading `.claude/CLAUDE.md` `## Testing Requirements` at
+  CI runtime, failing closed with a non-zero exit and a human-readable
+  message naming both the measured coverage and the threshold when below
+  it (Spec AC-1), `permissions: contents: read`,
+  `timeout-minutes: 5`. `ci-base.yml` is byte-unchanged (Spec
+  Key-interaction 1 / Spec AC-6). (2)
+  **`.github/coverage-tracker.yml`** — default-off single-switch
+  activation config carrying one `enabled` boolean and no threshold
+  number (Decision 2/3); mirrors the `workaround-check.yml` /
+  `.github/workaround-tracker.yml` shape; the one in-repository
+  change a derived repo makes to opt in (Spec AC-4). (3)
+  **`.claude/meta/scripts/coverage-threshold.sh`** — single-source
+  threshold extractor: reads "Minimum NN% test coverage" out of
+  `.claude/CLAUDE.md` `## Testing Requirements` at runtime, so the
+  enforced threshold tracks the canonical declaration with zero second
+  edit (Decision 3 / Spec AC-2/AC-8). (4)
+  **`.claude/meta/scripts/test-coverage-threshold.sh`** — 13-test TDD
+  suite proving: coverage below threshold FAILs naming measured +
+  threshold; coverage at/above threshold passes; switch off makes the
+  job inert (template green-by-construction, Spec AC-5); missing
+  `## Testing Requirements` line fails closed (Decision 3); threshold
+  tracks a changed `## Testing Requirements` value with no second edit
+  (Spec AC-2/AC-8); `ci-base.yml` and the four detector scripts + three
+  existing test suites are byte-unchanged (Spec AC-6 no scope bleed).
+  ADR-019 Status moved **Proposed → Accepted**. Roadmap row #12 flips
+  `◐ in-progress` → `☑ done`.
+
 - **Milestone #11 — now IMPLEMENTED** (designed AND implemented this
   same session — no prior-session design-only bullet exists; this is a
   deliberate single-session collapse, and the architect's `### Downstream

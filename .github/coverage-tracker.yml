@@ -1,0 +1,30 @@
+# Coverage Gate — derived-project configuration
+#
+# See .claude/meta/adr/019-coverage-ci-gate.md for the full design
+# (Decisions 1–5) and specs/12-coverage-ci-gate.md for the authoritative
+# scope (the eight acceptance criteria, R-01–R-04).
+#
+# Single switch: flip `enabled: true` to activate the
+# .github/workflows/coverage-gate.yml workflow. There is no second
+# `if: false` to remove from the workflow file, no second config key,
+# and no repository variable (ADR-019 Decision 2; Spec AC-4). The
+# single point of control is exactly this one boolean, in-repository
+# and PR-diffable — the workaround-tracker.yml / ADR-002 single-switch
+# discipline.
+#
+# This file deliberately carries NO threshold number. The 80% value has
+# a single source of truth: the `## Testing Requirements` section of
+# .claude/CLAUDE.md ("- Minimum 80% test coverage"). A number here would
+# be the exact second drifting declaration ADR-019 Decision 3 / Spec
+# R-02 forbids. A future threshold change is a one-line edit to
+# `## Testing Requirements` and nothing else.
+#
+# Default-off (ADR-019 Decision 2): the template repository has no
+# application code and no coverage to measure (Spec R-03 / AC-5). With
+# the switch off, the gate job does not run against the template at all,
+# so the template's own CI is green-by-construction with NO inert-branch
+# special case, NO coverage exemption, and NO ref-allow-style
+# suppression. A derived repo opts in with exactly this one change.
+
+# Master switch for the coverage-gate.yml workflow.
+enabled: false
