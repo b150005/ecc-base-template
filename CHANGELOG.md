@@ -381,6 +381,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   written in this change — it is owned by `technical-writer` and deferred
   to a future session, exactly as ADR-017's `.ja.md` was deferred at its
   design-only landing.
+- **Milestone #12 — design only; implementation deferred.**
+  Spec `specs/12-coverage-ci-gate.md` (Approved) closes the gap where
+  `.claude/CLAUDE.md` `## Testing Requirements` mandates "Minimum 80%
+  test coverage" with no CI enforcement (`ci-base.yml` runs tests
+  with no threshold). ADR-019 (`CI coverage gate (80% hard check)`,
+  status `Proposed — 2026-05-18`) records the structural decisions for
+  this milestone. The ADR-018 Alternative-B discriminator triad was
+  applied clause-by-clause and scored **3/3** (new CI hard-check +
+  new MECE partition NOT pre-reserved by ADR-014 §(d), which names
+  #04/#05/#09/#10/#11 but not #12 + new structural keying) → a
+  **new ADR-019**, not an ADR-014 amendment and not an ADR-010
+  amendment — the #04/#05/#06 precedent (ADR-015/ADR-017/ADR-018),
+  the opposite call from #11 (which took an ADR-014 amendment
+  precisely because it populated a pre-reserved §(d) slot; #12 has
+  none). Key ADR-019 resolutions: (1) **CI structural form** = a
+  standalone forkable `.github/workflows/coverage-gate.yml` (NOT a
+  `ci-base.yml` modification — preserves `ci-base.yml`'s unchanged
+  `test-command` contract); (2) **activation posture** = default-off
+  single-switch (the `workaround-check.yml` precedent; chosen because
+  the template has no coverage subject matter so ADR-015's subject-
+  matter-presence rule rejects always-on — this makes the template
+  green-by-construction with no inert branch, satisfying Spec AC-5);
+  (3) **single source of truth** = the 80% number stays canonical in
+  `.claude/CLAUDE.md` `## Testing Requirements`, read at CI runtime;
+  the activation config carries the on/off switch only and no number
+  (satisfies AC-2/AC-8, mitigates R-02 drift); (4) **language-agnostic
+  forkability** = the scaffold accepts the derived repo's already-
+  computed coverage percentage as a `workflow_call` input (mirrors
+  `ci-base.yml`'s input pattern, satisfies AC-3/R-04); (5) **MECE
+  boundary** = #12 owns "coverage-threshold enforcement at CI time", a
+  new partition distinct from #04 (path resolution) / #05 (Roadmap
+  drift, ADR-017) / #06 (bilingual parity, ADR-018) / #11
+  (verification-domain opt-in guidance, doc/convention) and explicitly
+  NOT pre-reserved by ADR-014 §(d). Serious counter-proposal (fold
+  into an ADR-014 amendment / extend `ci-base.yml`) recorded and
+  rejected with exactly 3 re-evaluation trigger conditions, per the
+  ADR-012/ADR-014/ADR-015/ADR-016/ADR-017/ADR-018 convention. Roadmap
+  row #12 moves `☐ todo` → `◐ in-progress` (product-manager, #07
+  rule) and gains an `adr:` link to ADR-019 (architect write-ownership
+  for a new ADR — unlike the #07–#11 amendments which stayed
+  `spec:`-only because ADR-014 has no milestone row of its own; #12
+  gets `adr:` because ADR-019 is a new ADR, the #03/#04/#05/#06
+  precedent). Implementation deferred to a future session. Bilingual
+  `.md` and `.ja.md` (ADR-019 JA mirror landed the same session to
+  keep `check-bilingual-parity.sh` green; the Spec JA sibling
+  `specs/12-coverage-ci-gate.ja.md` also lands this session).
 
 ### Added
 
