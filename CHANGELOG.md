@@ -9,6 +9,66 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Documentation
 
+- **Milestone #13 — design only; implementation deferred.**
+  Spec `specs/13-ecc-absent-signal.md` (Approved) closes the gap
+  where ADR-012's Negative recorded "no CI check on the existence
+  of the target [ECC] agents" and "the dispatcher's delegation
+  rows go stale silently" as costs left unmitigated, with the
+  only ECC-absent signals being `code-reviewer.md`'s per-review
+  verdict line (fires only when a review runs) and a `README.md`
+  `## Prerequisites` paragraph (surfaced at no agent/CI
+  checkpoint). ADR-020 (`ECC-absent degraded-review signal`,
+  status `Proposed — 2026-05-18`) records the structural
+  decisions. The ADR-018 Alternative-B discriminator triad was
+  applied clause-by-clause and scored **3/3** (new default-off
+  detector + new MECE partition NOT pre-reserved by ADR-014 §(d),
+  which names #04/#05/#09/#10/#11 and is amended for #12 but does
+  not include #13 + new keying: intra-prompt delegation-table
+  consistency with zero operator-environment introspection) → a
+  **new ADR-020**, not an ADR-012 amendment — the #04/#05/#06/#12
+  precedent (ADR-015/ADR-017/ADR-018/ADR-019), the opposite call
+  from #11 (which took an ADR-014 amendment precisely because it
+  populated a pre-reserved §(d) slot; #13 has none, exactly as
+  #12 had none). Key ADR-020 resolutions: (1) **mechanism** = a
+  new default-off detector script + forkable workflow validating
+  `code-reviewer.md`'s nine-row ECC delegation table for internal
+  consistency (the `check-*.sh` family shape #04 established,
+  #05/#06/#12 reused); (2) **no operator-environment
+  introspection** — the detector reads only repository artifacts,
+  never probes `~/.claude/` for live ECC presence (impossible
+  from a repo/CI by construction; forbidden by `code-reviewer.md`
+  lines 84–87), so it checks *internal consistency*, not *live
+  presence*; (3) **template-CI-green for the expected ECC-absent
+  case** = because the check is repository-internal, it passes on
+  the template's own `main` with no special-casing (the
+  #12/ADR-019 green-by-construction precedent applied to a
+  consistency detector); (4) **standing-posture placement** =
+  co-located with the artifact the relevant checkpoint already
+  consults, no new always-read file, complementing — not
+  restating — the per-review three-case rule; (5) **MECE
+  boundary** = #13 owns "is `code-reviewer.md`'s ECC delegation
+  table internally consistent, and is the standing degraded-review
+  posture discoverable?", a sixth partition distinct from
+  #04/#05/#06/#11/#12, stated in ADR-020 §2 (the twice-applied
+  #12/ADR-019 not-pre-reserved-by-§(d) pattern). The rejected
+  Counter-proposal (Alternative C — prose-only, #11-style) is
+  recorded seriously: #11 was correctly prose-only because it had
+  no detectable failure mode (adoption guidance); #13 has a
+  concrete one (a drifted delegation-table row, the exact "rows
+  go stale silently" failure ADR-012 named), which a prose
+  paragraph cannot catch. Implementation (the detector script,
+  its workflow, its dedicated test suite — a fifth separated-run
+  suite) is deferred to a subsequent session as a `feat(roadmap):`
+  commit; the architect transitions ADR-020 `Proposed → Accepted`
+  and reconciles the present-tense "not yet implemented"
+  self-narrative to past-tense at that point (the ADR-017/ADR-019
+  two-session lifecycle). EN/JA ADR-020 shipped this session with
+  17 headings, identical level sequence, full-width parens
+  ASCII-normalized per the ADR-019.ja house-style. Roadmap row
+  #13 flipped `☐ todo → ◐ in-progress` with the `adr:` link
+  added (the CLAUDE.md diff is the single row line only,
+  Invariant 2 preserved).
+
 - ADR-014 (`Roadmap Index as the Single Entry Point for
   Design Artifacts`, status `Accepted`) adds a `## Roadmap`
   index table to `.claude/CLAUDE.md`, placed immediately
