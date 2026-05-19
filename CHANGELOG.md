@@ -567,6 +567,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Milestone #16 — now IMPLEMENTED** (single session; no ADR — the
+  ADR-018 Alternative-B triad scored 0/3: no new contract boundary,
+  no new keying/mechanism, no new structural artifact; a mechanical
+  Status-vocabulary correction of an existing historical ADR). One
+  corrected line in each of two files: (1)
+  **`.claude/meta/adr/001-developer-growth-mode.md`** line 5 is
+  whole-line replaced from `Proposed (stabilized). Supersedes earlier
+  drafts...` to `Accepted — 2026-04-22` (U+2014 em-dash, matching the
+  ADR-005 through ADR-021 dominant pattern; date from ADR-001 Metadata
+  `Date: 2026-04-22`), bringing ADR-001's Status into conformance with
+  the ADR template vocabulary (`Proposed | Accepted | Deprecated |
+  Superseded by ADR-NNN`). (2)
+  **`.claude/meta/adr/001-developer-growth-mode.ja.md`** the
+  corresponding JA Status line is whole-line replaced in the same way
+  (to `Accepted — 2026-04-22`, EN em-dash form confirmed by the
+  architect as the consistent corpus pattern: 17 of 20 JA ADR siblings
+  already use this form). Historical narrative preserved verbatim:
+  ADR-001 body text, rationale, alternatives, and the existing
+  "Partially superseded 2026-04-24 by ADR-003" blockquote (EN lines
+  7-9 / JA lines 1-5) are unchanged — the correction is the Status
+  line only (EN net 1-line change, JA net 1-line change). MECE scope:
+  this milestone is ADR-001 Status expression only; CHANGELOG↔ADR
+  acceptance-date sync, ADR-002–005 back-fill, and repo-wide ADR
+  Status format normalization are explicitly out of scope (Roadmap #17
+  / `specs/17-changelog-adr-sync.md`). Spec
+  `specs/16-adr-001-status-resolution.md` (Approved) is the source of
+  truth, with a JA sibling `specs/16-adr-001-status-resolution.ja.md`
+  at exact heading-tree parity. Roadmap row #16 flipped `☐ todo →
+  ◐ in-progress` at pickup (atomic with Spec authoring);
+  `product-manager` flips `◐ in-progress → ☑ done` after the step-6
+  quality gate passes, in this same change (the CLAUDE.md diff is the
+  single row-16 line only, Invariant 2 preserved).
+
 - **Milestone #15 — now IMPLEMENTED** (single session; no ADR — the
   ADR-018 Alternative-B triad scored 0/3: no new contract boundary,
   no new keying/mechanism, no new structural artifact; a

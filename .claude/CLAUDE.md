@@ -155,7 +155,7 @@ Single entry point mapping each milestone to its authoritative design source. Ea
 | 13 | ECC-absent degraded-review signal | ☑ done | spec: `specs/13-ecc-absent-signal.md`<br>adr: `.claude/meta/adr/020-ecc-absent-signal.md` |
 | 14 | Research-tier validation for auth→T2 mis-classifications | ☑ done | spec: `specs/14-research-tier-validation.md`<br>adr: `.claude/meta/adr/021-research-tier-auth-validation.md` |
 | 15 | `init.sh` Roadmap placeholder cleanup at fork time | ☑ done | spec: `specs/15-init-sh-roadmap-cleanup.md` |
-| 16 | ADR-001 "Proposed (stabilized)" status resolution | ☐ todo | spec: `specs/16-adr-001-status-resolution.md` |
+| 16 | ADR-001 "Proposed (stabilized)" status resolution | ☑ done | spec: `specs/16-adr-001-status-resolution.md` |
 | 17 | CHANGELOG↔ADR-acceptance sync and ADR-001–005 back-fill | ☐ todo | spec: `specs/17-changelog-adr-sync.md` |
 | 18 | CI exemption allowlist expiry/review mechanism | ☐ todo | spec: `specs/18-ci-exemption-allowlist-expiry.md` |
 | 19 | Workaround tracking default-on | ☐ todo | spec: `specs/19-workaround-tracking-default-on.md` |
