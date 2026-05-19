@@ -6,7 +6,7 @@
 
 ## Status
 
-Accepted. 2026-04-23.
+Accepted — 2026-04-23
 
 ## Metadata
 

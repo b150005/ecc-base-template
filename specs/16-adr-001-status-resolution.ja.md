@@ -22,7 +22,7 @@ ADR-001 (`001-developer-growth-mode.md`) のステータス行には `Proposed (
 
 ## Non-goals
 
-- **CHANGELOG 同期** — CHANGELOG エントリを ADR 承認日に同期すること、または ADR-002 から ADR-005 の承認日メタデータをバックフィルすることは、Roadmap #17 (`specs/17-changelog-adr-sync.md`) のスコープです。<!-- ref-allow: Roadmap #17 reserved, not yet authored — intentional MECE-boundary forward-ref --> Roadmap #16 は CHANGELOG を変更しません。
+- **CHANGELOG 同期** — CHANGELOG エントリを ADR 承認日に同期すること、または ADR-002 から ADR-005 の承認日メタデータをバックフィルすることは、Roadmap #17 (`specs/17-changelog-adr-sync.md`) のスコープです。Roadmap #16 は CHANGELOG を変更しません。
 - **リポジトリ全体の ADR ステータス形式の正規化** — ADR-002 から ADR-004 は `Accepted. YYYY-MM-DD.` (ピリオド区切り) を使用し、ADR-005 から ADR-021 は `Accepted — YYYY-MM-DD` (em-dash) を使用しています。この 2 フォーマットの不一致は ADR セット全体に存在しており、このマイルストーンのスコープ外です。ここで変更されるのは ADR-001 のステータス行のみです。
 - **ADR 語彙の新しい CI 検出器** — すべての ADR に対して ADR テンプレートの語彙を強制する CI チェックの追加は、このマイルストーンの受け入れ基準を満たすために必要ではありません。アーキテクトが CI ガードを構造的決定として必要と判断した場合、新しい ADR がそれを導入することができますが、この Spec の受け入れ基準には含まれません。
 - **ADR-001 本文の書き直し** — ADR-001 の v1.x パス参照、設計根拠、代替案、および「Partially superseded by ADR-003」blockquote は、ADR-003 Consequences/Neutral に従って意図的に保持された歴史的記録です。スコープ外です。
@@ -143,4 +143,4 @@ ADR-001 自体の承認ステータスではなく、ADR-003 の置き換えス�
 - ADR-001: `.claude/meta/adr/001-developer-growth-mode.md`
 - ADR-003: `.claude/meta/adr/003-learning-mode-relocate-and-rename.md` (部分的置き換えスコープ)
 - ADR テンプレート: `.claude/templates/adr-template.md` (ステータス語彙)
-- Roadmap #17: `specs/17-changelog-adr-sync.md` (CHANGELOG 同期 — #16 のスコープ外) <!-- ref-allow: Roadmap #17 reserved, not yet authored — intentional MECE-boundary forward-ref -->
+- Roadmap #17: `specs/17-changelog-adr-sync.md` (CHANGELOG 同期 — #16 のスコープ外)

@@ -564,6 +564,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `.md` and `.ja.md` (ADR-019 JA mirror landed the same session to
   keep `check-bilingual-parity.sh` green; the Spec JA sibling
   `specs/12-coverage-ci-gate.ja.md` also lands this session).
+- **Milestone #17 — now IMPLEMENTED** (single session; no ADR — the
+  ADR-018 Alternative-B triad scored 0/3: no new contract boundary,
+  no new keying/mechanism, no new structural artifact; a mechanical
+  Status-format normalization of three existing ADRs). Six lines
+  changed across six files: ADR-002 EN (`.claude/meta/adr/002-growth-domains-location.md`)
+  and JA (`.claude/meta/adr/002-growth-domains-location.ja.md`) Status
+  lines normalized from `Accepted. 2026-04-23.` to `Accepted — 2026-04-23`;
+  ADR-003 EN (`.claude/meta/adr/003-learning-mode-relocate-and-rename.md`)
+  and JA (`.claude/meta/adr/003-learning-mode-relocate-and-rename.ja.md`)
+  Status lines normalized (EN: `Accepted. 2026-04-24.` → `Accepted — 2026-04-24`;
+  JA: `採択済み。2026-04-24。` → `Accepted — 2026-04-24`);
+  ADR-004 EN (`.claude/meta/adr/004-coaching-pillar.md`) and JA
+  (`.claude/meta/adr/004-coaching-pillar.ja.md`) Status lines normalized
+  (EN: `Accepted. 2026-04-25.` → `Accepted — 2026-04-25`;
+  JA: `採択済み。2026-04-25。` → `Accepted — 2026-04-25`).
+  All six changes use U+2014 em-dash, matching the template standard
+  (`Accepted — YYYY-MM-DD`) confirmed by Roadmap #16, which corrected
+  ADR-001's Status to `Accepted — 2026-04-22` in the same em-dash form.
+  ADR-001 and ADR-005 are already in template-standard format and are
+  not touched. Historical narrative (body text, rationale, Alternatives,
+  Consequences, Metadata, blockquotes) in each of the six files is
+  preserved verbatim; only the Status line changes in each file.
+  Spec `specs/17-changelog-adr-sync.md` (Approved) is the source of truth.
 
 ### Added
 

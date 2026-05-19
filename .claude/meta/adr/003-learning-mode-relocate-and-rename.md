@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted. 2026-04-24.
+Accepted — 2026-04-24
 
 ## Metadata
 

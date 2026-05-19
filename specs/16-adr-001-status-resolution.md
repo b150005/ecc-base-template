@@ -45,7 +45,7 @@ scope.
 - **CHANGELOG synchronization** — syncing CHANGELOG entries to ADR
   acceptance dates, or back-filling acceptance date metadata for
   ADR-002 through ADR-005, is the scope of Roadmap #17
-  (`specs/17-changelog-adr-sync.md`). <!-- ref-allow: Roadmap #17 reserved, not yet authored — intentional MECE-boundary forward-ref --> Roadmap #16 does not touch
+  (`specs/17-changelog-adr-sync.md`). Roadmap #16 does not touch
   CHANGELOG.
 - **ADR Status format normalization across the repository** — ADR-002
   through ADR-004 use `Accepted. YYYY-MM-DD.` (period-separated) while
@@ -197,4 +197,4 @@ ADR-001 itself.
 - ADR-001: `.claude/meta/adr/001-developer-growth-mode.md`
 - ADR-003: `.claude/meta/adr/003-learning-mode-relocate-and-rename.md` (partial supersession scope)
 - ADR template: `.claude/templates/adr-template.md` (Status vocabulary)
-- Roadmap #17: `specs/17-changelog-adr-sync.md` (CHANGELOG sync — out of scope for #16) <!-- ref-allow: Roadmap #17 reserved, not yet authored — intentional MECE-boundary forward-ref -->
+- Roadmap #17: `specs/17-changelog-adr-sync.md` (CHANGELOG sync — out of scope for #16)
