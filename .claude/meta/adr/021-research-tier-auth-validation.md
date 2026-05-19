@@ -2,9 +2,9 @@
 
 ## Status
 
-Proposed
+Accepted — 2026-05-19
 
-<!-- Two-session split (the #03/ADR-016 · #05/ADR-017 · #06/ADR-018 · #12/ADR-019 · #13/ADR-020 precedent): this is the design-only record. The detector script, its forkable default-off workflow, the activation config, and the test suite are landed in a subsequent implementation session. Status moves Proposed → Accepted when that session ships the artifacts and the step-6 quality gate passes green — the #19/#20 transition precedent. -->
+<!-- Two-session split (the #03/ADR-016 · #05/ADR-017 · #06/ADR-018 · #12/ADR-019 · #13/ADR-020 precedent): this was the design-only record. The detector script, its forkable default-off workflow, the activation config, and the test suite were landed in the subsequent implementation session. Status moved Proposed → Accepted after that session shipped the artifacts and the step-6 quality gate passed green — the #19/#20 transition precedent. -->
 
 ## Context
 
@@ -119,6 +119,7 @@ declared at T2/T3, with the auth→T1 written contract **co-located in
 `protocol.md` immediately under the Tier table** (a new prose subsection
 that *references the existing T1 scope line, never reproduces it*), **zero
 operator-environment introspection**, and the template **green-by-construction**.
+This was shipped in the subsequent implementation session that followed.
 Concretely:
 
 ### 1. New-ADR-vs-amendment — the ADR-018 Alternative-B discriminator, applied clause by clause
@@ -157,7 +158,7 @@ line (⇒ ADR-008 amendment)?* Applied honestly, clause by clause:
   orchestrator's topic-line scan misses* (Spec Goals, Key-interaction 3,
   R-01 (b)).
 - **NEW structural artifact? Yes.** A new `check-*.sh` family member
-  (`check-research-tier-auth.sh`) <!-- ref-allow: forward-reference to the implementation-session detector script named by this design ADR; it does not yet exist by design (two-session split) --> + a new forkable
+  (`check-research-tier-auth.sh`) + a new forkable
   workflow + a new activation config + a new `test-check-*.sh` suite,
   plus a new prose contract subsection in `protocol.md`. None of the five
   existing detectors owns any of these.
@@ -340,16 +341,16 @@ second edit — closing R-04 by construction.
 
 ### 7. Implementation-session contract (deferred — two-session split)
 
-The implementation session will, per the Spec's acceptance criteria and
-this ADR's Decision: author one new default-off detector script
-`check-research-tier-auth.sh` <!-- ref-allow: forward-reference to the implementation-session detector script named by this design ADR; it does not yet exist by design (two-session split) --> following the `check-*.sh` family
+The implementation session, per the Spec's acceptance criteria and
+this ADR's Decision, authored one new default-off detector script
+`check-research-tier-auth.sh` following the `check-*.sh` family
 skeleton (`set -euo pipefail`, `git rev-parse` root resolution,
 `pass`/`warn`/`fail_check` helpers, `fail=0` accumulator, `exit "$fail"`,
 the line-level `<!-- ref-allow: -->` escape hatch reused unmodified, a
 prominent header documenting the auth→T1 contract, the
 no-external-introspection constraint, the R-04 single-source binding, and
 the seven-way MECE-by-contract boundary with a pointer to this ADR); one
-forkable workflow `research-tier-auth-check.yml` <!-- ref-allow: forward-reference to the implementation-session workflow named by this design ADR; it does not yet exist by design (two-session split) --> following the
+forkable workflow `research-tier-auth-check.yml` following the
 `ecc-delegation-consistency-check.yml` default-off single-switch precedent
 (standalone, authored **alongside** — not as a modification of —
 `ci-base.yml`; `ci-base.yml` byte-unchanged; `permissions: contents: read`
@@ -360,31 +361,32 @@ interpolated into a `run:` block — all dynamic values via `env:`; a single
 activation config artifact carrying exactly one `enabled`-style boolean;
 the new prose subsection appended under the `protocol.md` Tier table
 (Decision 2c, 5); and a dedicated `test-check-research-tier-auth.sh`
-<!-- ref-allow: forward-reference to the implementation-session test suite named by this design ADR; it does not yet exist by design (two-session split) --> suite (fixtures: auth content at T2 FAILs naming term+Tier; auth
+suite (fixtures: auth content at T2 FAILs naming term+Tier; auth
 content at T3 FAILs; auth content at T1 passes; non-auth content at T2
 passes; the switch off makes the job inert / template
 green-by-construction; a missing canonical T1 scope line in `protocol.md`
 fails closed; a `protocol.md` T1-scope amendment is tracked with no second
 edit, closing R-04; and `verification.yml`, `orchestrator.md`, the
 `protocol.md` Tier-table lines, and the five existing detectors + suites
-are byte-unchanged, AC-3/AC-4/AC-5/AC-6). It will introduce **zero**
+are byte-unchanged, AC-3/AC-4/AC-5/AC-6). It introduced **zero**
 changes to the five existing detector scripts or their suites. On
-implementation completion the architect transitions this ADR
-Proposed → Accepted and reconciles the now-false present-tense
+implementation completion the architect transitioned this ADR
+Proposed → Accepted and reconciled the now-false present-tense
 "deferred / will" self-narrative to past-tense (the
 ADR-019/ADR-020 two-session reconciliation precedent), leaving the
 Alternatives/Counter-proposal design-time rationale unchanged as
 historical record.
 
 This ADR records the decision and the downstream implications. It does
-**not** itself write the script, the workflow, the activation config, the
-`protocol.md` subsection, or the tests, and does **not** modify any agent
+**not** itself contain the script, the workflow, the activation config, the
+`protocol.md` subsection, or the tests, and did **not** modify any agent
 prompt, the Spec, any template, any other ADR, the CHANGELOG, or any
-CI/script file — implementation is deferred to a subsequent session and
+CI/script file in the design session — implementation was deferred to,
+and carried out in, the subsequent implementation session and is
 listed under Consequences → Neutral for traceability, exactly as
-ADR-014/ADR-015/ADR-016/ADR-017/ADR-018/ADR-019/ADR-020 do. This continues
+ADR-014/ADR-015/ADR-016/ADR-017/ADR-018/ADR-019/ADR-020 do. This continued
 the #03/ADR-016 · #05/ADR-017 · #06/ADR-018 · #12/ADR-019 · #13/ADR-020
-two-session decision-then-implementation split precedent and is the
+two-session decision-then-implementation split precedent and was the
 deliberate **opposite** of a single-session collapse.
 
 ## Consequences
@@ -602,7 +604,7 @@ as a strawman. The argument, taken at full strength:
   Tiers). The detector's subject matter then vanishes and the
   subject-matter-presence rule retires or reclassifies the detector — at
   which point this whole ADR is re-evaluated, not just the counter.
-- `check-research-tier-auth.sh` <!-- ref-allow: forward-reference to the implementation-session detector script named by this design ADR; it does not yet exist by design (two-session split) --> and the existing
+- `check-research-tier-auth.sh` and the existing
   `check-*.sh` detectors prove to share so much parsing code (Tier-table
   walking, fence tracking, escape-hatch handling) that a **shared parsing
   library** sourced by all of them — not a merged script — becomes the

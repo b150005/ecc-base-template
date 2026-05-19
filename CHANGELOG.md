@@ -9,6 +9,83 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Documentation
 
+- **Milestone #14 — design only; implementation deferred.**
+  Spec `specs/14-research-tier-validation.md` (Approved) closes the
+  gap where the auth→T1 requirement exists only as a descriptive
+  Tier-table row in `research/protocol.md` and as the orchestrator's
+  runtime keyword scan — neither expressing the rule as a testable,
+  independently-checkable written contract separate from the
+  orchestrator's runtime judgement. A Generator output whose topic
+  description says "login flow" or "session management" (auth content,
+  no "auth" keyword) can declare T2 and silently reach the Critic at
+  T2 without the orchestrator guardrail firing; neither `protocol.md`
+  nor `verification.yml` states the auth→T1 rule as a contract
+  independently checkable against the artifact. ADR-021
+  (`Research-tier auth→T1 validation — a new default-off detector
+  validating auth-touching verification-review artifacts against the
+  protocol.md T1 scope, contract co-located with the Tier table, new
+  MECE partition not pre-reserved by ADR-014 §(d)`, status
+  `Proposed — 2026-05-18`) records the structural decisions. The
+  ADR-018 Alternative-B discriminator triad was applied
+  clause-by-clause and scored **3/3** (new default-off content-keyed
+  detector + new MECE partition NOT pre-reserved by ADR-014 §(d),
+  which names #04/#05/#07/#08 and its lineage extends to
+  #09/#10/#11/#12/#13 but does not include #14 + new keying:
+  auth-keyword presence in a verification-review artifact's content
+  versus the Tier declared on that same artifact, deliberately
+  scanning the body to catch the topic-description-omission the
+  orchestrator's topic-line scan misses) → a **new ADR-021**, not an
+  ADR-008 amendment — the #04/#05/#06/#12/#13 precedent
+  (ADR-015/ADR-017/ADR-018/ADR-019/ADR-020), the opposite call from
+  #11 (which took an ADR-014 amendment precisely because it populated
+  a pre-reserved §(d) slot; #14 has none, exactly as #12/#13 had
+  none). Key ADR-021 resolutions: (1) **mechanism** = (c) + (d) —
+  a new prose subsection in `protocol.md` immediately below the Tier
+  table stating the auth→T1 obligation as a mandatory rule
+  (independently readable without `orchestrator.md`), referencing the
+  existing T1 scope line by pointer rather than reproducing it (R-04
+  single-source binding, the ADR-019 §3 "reference don't re-declare"
+  discipline applied to the T1 scope line), PLUS a new default-off
+  `check-research-tier-auth.sh` detector that audits
+  verification-review artifact *bodies* (not topic lines) for
+  auth-scope keyword presence at T2/T3, catching the
+  topic-description-omission the orchestrator guardrail misses; (a)
+  (elevate the Tier-table line to a machine-readable rule) and (b)
+  (new agent-prompt constraint) rejected with reasons; (2) **no
+  operator-environment introspection** — the detector reads only
+  repository artifacts and runtime-derives its auth-scope keyword set
+  from `protocol.md`'s T1 scope line, so the template CI is
+  deterministic and AC-8 is satisfied by construction; (3)
+  **template-CI-green for the expected no-verification-review-artifact
+  case** = default-off single-switch (the
+  `workaround-check.yml`/`coverage-gate.yml`/
+  `ecc-delegation-consistency-check.yml` precedent; the template's own
+  CI is green-by-construction without any special case); (4)
+  **contract placement** = co-located under the Tier table in
+  `protocol.md` so a future T1-scope amendment tracks with zero second
+  edit — closing R-04 by single-source reference; (5) **MECE
+  boundary** = #14 owns "Is a research-verification output with
+  auth-touching content declared at T1, as an independently-checkable
+  written contract?", a seventh partition distinct from
+  #04/#05/#06/#12/#13, stated in ADR-021 §3. The serious
+  Counter-proposal (Alternative E — documentation/convention statement
+  only, no detector, mirroring #11's prose-only collapse) is recorded
+  seriously: #11 was correctly prose-only because it had no detectable
+  failure mode (adoption guidance) and populated a pre-reserved §(d)
+  slot; #14 has a concrete detectable failure mode (auth content +
+  declared T2/T3) and no reserved slot, so the same discrimination
+  that made #11 prose-only makes #14 detector-required. Implementation
+  (the detector script, its forkable default-off workflow, the
+  activation config, the `protocol.md` subsection, and the dedicated
+  test suite) is deferred to a subsequent session as a
+  `feat(roadmap):` commit; the architect transitions ADR-021
+  `Proposed → Accepted` and reconciles the present-tense
+  "not yet implemented" self-narrative to past-tense at that point
+  (the ADR-017/ADR-019/ADR-020 two-session lifecycle). Roadmap row
+  #14 flipped `☐ todo → ◐ in-progress` with the `adr:` link added
+  (the CLAUDE.md diff is the single row line only, Invariant 2
+  preserved).
+
 - **Milestone #13 — design only; implementation deferred.**
   Spec `specs/13-ecc-absent-signal.md` (Approved) closes the gap
   where ADR-012's Negative recorded "no CI check on the existence
@@ -489,6 +566,69 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `specs/12-coverage-ci-gate.ja.md` also lands this session).
 
 ### Added
+
+- **Milestone #14 — now IMPLEMENTED** (two-session split — design
+  landed under commit `2591082` / ADR-021 `Proposed`;
+  implementation completed this session per ADR-021 §Consequences →
+  Neutral downstream tasks and Decision 7 implementation-session
+  contract). Six artifacts: (1)
+  **`.claude/meta/scripts/check-research-tier-auth.sh`** — new
+  default-off detector auditing verification-review artifact *bodies*
+  for auth-scope keyword presence (auth, authn, authz, crypto,
+  security-sensitive APIs — derived at run time from `protocol.md`'s
+  Tier-table T1 scope line, never hardcoded) while the declared Tier
+  is T2 or T3; scans the artifact body not just the topic line,
+  catching the topic-description-omission the orchestrator guardrail
+  misses; fails closed with a human-readable message naming the
+  artifact, matched auth term, and declared Tier vs required T1; if
+  the canonical T1 scope line is not found in `protocol.md`, the
+  detector fails closed loudly ("canonical T1 scope line not found"),
+  never silently passes — R-04 closed by construction. (2)
+  **`.github/workflows/research-tier-auth-check.yml`** — forkable
+  default-off standalone workflow (`push` / `pull_request` triggers,
+  the `ecc-delegation-consistency-check.yml` precedent); single
+  activation switch
+  `enabled: false` in **`.github/research-tier-auth-tracker.yml`**
+  (the `workaround-check.yml` / `coverage-gate.yml` /
+  `ecc-delegation-consistency-check.yml` single-switch precedent;
+  `ci-base.yml` byte-unchanged; `permissions: contents: read`;
+  `timeout-minutes: 5`; no `${{ inputs.* }}` ever interpolated into
+  a `run:` block). (3)
+  **`.claude/meta/scripts/test-check-research-tier-auth.sh`** —
+  dedicated 12-test TDD suite, making the separated-run test suite
+  count six (alongside `test-check-dangling-refs.sh`,
+  `test-check-roadmap-drift.sh`, `test-check-bilingual-parity.sh`,
+  `test-coverage-threshold.sh`,
+  `test-check-ecc-delegation-consistency.sh`); fixtures cover: auth
+  content at T2 FAILs naming term + Tier; auth content at T3 FAILs;
+  auth content at T1 passes; non-auth content at T2 passes; switch
+  off makes the job inert (template green-by-construction, AC-8);
+  missing canonical T1 scope line fails closed; a `protocol.md`
+  T1-scope amendment is tracked with zero second edit (R-04); and
+  `verification.yml`, `orchestrator.md`, the `protocol.md`
+  Tier-table lines, and the five existing detectors + suites are
+  byte-unchanged (AC-3/AC-4/AC-5/AC-6). (4) **`### Auth→T1 mandatory
+  rule` subsection** appended under the Tier table in
+  `.claude/skills/verification-layer/research/protocol.md` —
+  the auth→T1 written contract stated as a mandatory rule
+  (independently readable without `orchestrator.md`), referencing
+  the existing T1 scope line by pointer rather than reproducing it;
+  the Tier-table row lines themselves are byte-unchanged (AC-4). (5)
+  **ADR-021 status transitioned `Proposed → Accepted — 2026-05-19`**
+  (the ADR-017/ADR-019/ADR-020 two-session lifecycle); the
+  now-false present-tense "deferred / will" self-narrative reconciled
+  to past-tense in EN + JA (heading-tree parity 18 == 18, level-seq
+  identical, JA full-width parens 0). (6) **`specs/14-research-tier-validation.ja.md`**
+  — JA sibling of the Spec authored by `technical-writer` this
+  session (18 headings EN/JA parity, JA parens 0; the
+  `specs/13-ecc-absent-signal.ja.md` precedent). AC-1..AC-8 all
+  verified; the five existing detectors + suites,
+  `verification.yml`, `orchestrator.md`, and `ci-base.yml`
+  byte-unchanged (AC-3/AC-4/AC-5/AC-6); default-off
+  green-by-construction (AC-8). Roadmap row #14 flips
+  `◐ in-progress` → `☑ done`. Spec and ADR are the source of
+  truth: `specs/14-research-tier-validation.md` and
+  `.claude/meta/adr/021-research-tier-auth-validation.md`.
 
 - **Milestone #13 — now IMPLEMENTED** (two-session split — design
   landed under commit `92aaa0a` / ADR-020 `Proposed — 2026-05-18`;

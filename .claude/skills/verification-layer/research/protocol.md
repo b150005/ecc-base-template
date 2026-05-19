@@ -54,6 +54,40 @@ orchestrator can escalate upward (T3 → T2, T2 → T1) but never downward.
 
 If unsure between Tiers, choose the higher one.
 
+### Auth→T1 mandatory rule (independently checkable, no `orchestrator.md` required)
+
+**MANDATORY RULE — not guidance, not a best-practice suggestion:**
+
+A verification-review output whose content concerns any item in the Tier
+table's T1 scope line above MUST be declared T1. Declaring T2 or T3 for such
+content is non-conformant regardless of how the topic line is worded. This
+obligation holds even when the topic description omits the canonical keyword
+(e.g., "login flow" or "session management" without the word "auth") —
+content governs, not the topic line.
+
+The canonical scope for T1 is defined entirely by the Tier table's T1 scope
+line above. The present subsection references that line by pointer and never
+reproduces or redefines it — the Tier table is the single source of truth for
+what T1 covers (R-04, ADR-021 §5). A future amendment to the T1 scope line
+(e.g., adding "OAuth flows") automatically extends this rule's coverage with
+zero second edit here.
+
+This rule is **complementary and non-duplicative** with the **Tier-confirmation
+guardrail** block in `.claude/agents/orchestrator.md` (§"Research domain
+routing"). The orchestrator guardrail is the *runtime routing* check — it fires
+when the orchestrator recognises auth-scope keywords in the research topic
+description. The present subsection is the *written, independently-checkable*
+statement of the same obligation — it is enforceable as a written contract even
+when the guardrail's topic-keyword scan does not fire (because the topic
+description omitted the keyword while the content is still auth-touching).
+The detector `check-research-tier-auth.sh` (ADR-021) enforces this rule by
+scanning verification-review artifact *content*, not only topic lines — exactly
+closing the gap the guardrail alone leaves open.
+
+See `.claude/meta/adr/021-research-tier-auth-validation.md` §Decision 2 for the
+mechanism rationale and §Decision 3 for the MECE boundary against the existing
+five detectors (#04/#05/#06/#12/#13).
+
 ## Protocol (T1 / T2)
 
 ```
