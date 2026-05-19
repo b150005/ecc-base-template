@@ -567,6 +567,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Milestone #15 — now IMPLEMENTED** (single session; no ADR — the
+  ADR-018 Alternative-B triad scored 0/3: no new contract boundary,
+  no new keying/mechanism, no new structural artifact; a
+  straightforward extension of `init.sh`'s existing
+  `has_placeholder`-gated CLAUDE.md mutation scope). Two artifacts:
+  (1) **`.claude/meta/scripts/init.sh`** gains a
+  `clean_roadmap_section()` function (called inside the existing
+  `if [[ $has_placeholder -eq 1 ]]` block) that, at fork time,
+  strips the 21 template dogfooding Roadmap rows and the `**Spec
+  reservation rule:**` paragraph from the fork's `.claude/CLAUDE.md`
+  and injects exactly one placeholder row `| — | [Add your first
+  milestone here] | ☐ todo | (none yet) |` (em-dash in the `#` cell
+  is invisible to `check-roadmap-drift.sh`'s digit parser;
+  `(none yet)` carries no `spec:` or `adr:` token so
+  `check-dangling-refs.sh` stays green); the `## Roadmap` heading,
+  intro sentence, table header+separator, and `**Rules:**` block are
+  preserved; honors `--dry-run`; idempotent (gated on
+  `has_placeholder`); single awk pass + temp-file/mv (no bash
+  read-loop); byte-count guard aborts rather than truncating
+  CLAUDE.md on malformed output. (2)
+  **`.claude/meta/scripts/test-init-sh-roadmap-cleanup.sh`** — 17
+  tests covering AC-1a–AC-1g (all seven post-cleanup structural
+  invariants), AC-2 (glyph well-formedness), AC-3 (no
+  dangling-ref token), AC-4a/b (idempotency + skip message),
+  AC-5a/b (dry-run parity), AC-7 (ok message), AC-8 (structural
+  awk presence), and two regression guards (Fix-2, Fix-3); all 17
+  pass; fixture-isolated, never runs non-dry-run `init.sh` against
+  the live template CLAUDE.md. Spec `specs/15-init-sh-roadmap-cleanup.md`
+  (Approved) is the source of truth, with a JA sibling
+  `specs/15-init-sh-roadmap-cleanup.ja.md` at exact heading-tree
+  parity. Roadmap row #15 flipped `☐ todo → ◐ in-progress` at
+  pickup (atomic with Spec authoring); `product-manager` flips
+  `◐ in-progress → ☑ done` after the step-6 quality gate passes,
+  in this same change (the CLAUDE.md diff is the single row-15 line
+  only, Invariant 2 preserved).
+
 - **Milestone #14 — now IMPLEMENTED** (two-session split — design
   landed under commit `2591082` / ADR-021 `Proposed`;
   implementation completed this session per ADR-021 §Consequences →
