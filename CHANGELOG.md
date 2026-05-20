@@ -9,6 +9,55 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Milestone #23 — ACTIVATED (Spec authored, ADR-026 accepted; implementation
+  deferred to follow-up session)** (Agent Team consultation on 2026-05-21
+  producing one new ADR at triad 3/3 and a Spec with 12 acceptance criteria;
+  branch-cutover and main-side artifact purge are out of scope for this
+  activation). Three artifacts:
+  (1) **Spec `specs/23-template-fork-branch-separation.md`** (and `.ja.md`
+  sibling preserving EN ↔ JA heading-tree parity per #06) — Approved. Twelve AC
+  covering branch creation order (AC-1: `develop` branched from the
+  `pre-phase-b`-tagged SHA), deletion completeness on `main` (AC-2:
+  template-internal artifacts purged; AC-4: workflow inventory partitioned —
+  4 fork-reusable workflows kept on `main`, 8 template-internal workflows
+  develop-only, 1 new `payload-manifest-check.yml` on develop targeting
+  main-bound PRs), payload-manifest mechanism (AC-3, AC-6), `init.sh` shrink
+  target ≤ 30 lines (AC-5), fork-facing `README.md` rewrite (AC-7), GitHub
+  "Use this template" default-branch behavior (AC-9), restore path via the
+  `pre-phase-b` tag (AC-10), and bilingual-parity check continuity on `develop`
+  (AC-11). Each AC is independently verifiable with a git or file command.
+  Forward references to `.claude/payload-manifest.txt` are suppressed via
+  `<!-- ref-allow: ... forward reference -->` markers (created during Phase B
+  implementation, not yet on disk).
+  (2) **ADR-026** (`Accepted — 2026-05-21`) — template/fork branch separation
+  strategy; triad 3/3 per ADR-018 Alternative-B discriminator (new contract
+  boundary: `main` = fork-clean payload / `develop` = template-development +
+  new keying mechanism: `.claude/payload-manifest.txt` allowlist enforced by a
+  CI gate + new structural artifact: long-lived `develop` branch plus the
+  `payload-manifest-check.yml` workflow). Cites ADR-014 (Roadmap index
+  residency) and ADR-018 (parity detector) for precedent; cites
+  `docs.github.com` template-repo and branch-protection pages as primary
+  source for `Use this template` default-branch semantics. JA sibling
+  preserves EN ↔ JA heading-tree parity (#06). Back-links Roadmap row #23.
+  (3) **`.claude/ROADMAP.md` row #23** — status flipped `☐ todo → ◐ in-progress`;
+  `adr:` cell appended with the ADR-026 link. Local-only restore tag
+  `pre-phase-b` created on commit `9d2b00d` (the Phase A ship commit) before
+  this activation so Phase B's destructive operations (branch cutover,
+  main-side artifact purge, `init.sh` shrink, README rewrite,
+  `payload-manifest-check.yml` authoring) have a known-good restore target.
+
+  **Why ADR-026 (not an ADR-014 amendment).** ADR-014 keys *Roadmap index
+  location*; the new decision keys *branch-scoped file-tree membership* — an
+  orthogonal contract. All three triad axes pass independently (new
+  boundary, new keying, new artifact), so a new ADR is the correct vehicle,
+  matching the convention used for ADR-024 and ADR-025 in Milestone #22.
+
+  **Phase B implementation deferred.** This activation only ships the Spec
+  and the ADR. The branch creation, file deletions, `init.sh` shrink,
+  `README.md` rewrite, and `payload-manifest-check.yml` workflow are deferred
+  to a follow-up session. The Roadmap row stays `◐ in-progress` until
+  step-6 quality-gate pass per #07/#21; on pass it flips `◐ → ☑`.
+
 - **Milestone #22 — CLAUDE.md invariant-only refactor + Roadmap relocation +
   subagent-dispatch / worktree-advisory protocols** (single session; Agent Team
   consultation on 2026-05-20 producing two new ADRs each at triad 3/3 and one

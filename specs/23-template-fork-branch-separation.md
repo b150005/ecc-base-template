@@ -1,0 +1,217 @@
+# Template / Fork Structural Separation
+
+## Status
+
+Approved
+
+**Owner:** product-manager / implementer
+**Target release:** template v3.12.0
+
+## Problem
+
+The template repository currently uses a single `main` branch that carries
+both the fork-reusable payload (agent prompts, workflows, settings) and the
+template-internal development infrastructure (ADRs, specs, learning-mode
+scaffolding, CI meta-scripts). When a team forks the template, they inherit
+every template-internal artifact — over a hundred files that are irrelevant to
+their project and must be deleted by hand. This creates a high-friction fork
+experience and makes future template upgrades noisier because payload changes
+are entangled with template-internal history. There is no structural guarantee
+that `main` stays clean; each new internal artifact requires another manual
+purge step in fork instructions.
+
+## Goals
+
+- **G1 — Payload-only `main`.** `main` carries only the fork-reusable payload:
+  agent definitions, fork-facing workflows, settings, and templates. Template-
+  internal development artifacts (ADRs, specs, CI meta-scripts, learning mode)
+  live exclusively on `develop`.
+- **G2 — `develop` as the template-dev branch.** All template-internal work
+  (Roadmap row authoring, ADR authoring, spec authoring, quality-gate work,
+  CI meta-script updates) happens on `develop`. Payload changes flow from
+  `develop` → `main` via a merge or cherry-pick protocol.
+- **G3 — Verified payload boundary.** A CI workflow (`payload-manifest-check.yml`)
+  on `develop` validates that every file merged or proposed for `main` is on
+  the approved payload manifest. PRs targeting `main` cannot land without it.
+- **G4 — Clean fork experience.** A team forking `main` gets only fork-relevant
+  files; they do not need to delete template-internal artifacts.
+- **G5 — Workflow inventory correctly partitioned.** Each GitHub Actions
+  workflow is explicitly classified as keep-on-main or develop-only, and the
+  classification is documented in ADR-026.
+
+## Non-goals
+
+- Migrating existing forks already derived from the old single-branch `main`.
+  This spec covers the template repository itself; fork migration guidance is
+  deferred.
+- Automated cherry-pick tooling from `develop` to `main`. The v1 protocol is
+  manual (PR or git cherry-pick with a review step).
+- Shrinking `init.sh` beyond removing the `develop`-only initialisation steps
+  that are now irrelevant for payload forks. A deeper `init.sh` redesign is
+  deferred to a follow-on milestone.
+- Re-running the full agent-team workflow on `main`. The quality gate, ADR
+  authoring, and Roadmap management all happen on `develop`.
+- Adding a CI check that enforces agent-team workflow steps (e.g., that a spec
+  exists before an ADR). The payload-manifest check is structural, not
+  process-oriented.
+
+## User stories
+
+| As a...                        | I want to...                                          | So that...                                           |
+|-------------------------------|-------------------------------------------------------|------------------------------------------------------|
+| team forking the template     | fork `main` and get only fork-relevant files          | I do not spend time deleting template internals      |
+| template maintainer           | work on ADRs and specs on `develop`                   | `main` stays clean without manual purge steps        |
+| template maintainer           | have CI block non-payload files from reaching `main`  | the boundary is enforced, not just documented        |
+| fork maintainer               | pull updates from template `main`                     | I receive only payload changes, not internal noise   |
+| devops-engineer               | see a clear list of which workflows stay on `main`    | I can configure branch protection rules correctly    |
+
+## Acceptance criteria
+
+**AC-1.** `develop` branch exists in the template repository and is set as the
+default branch for development work. `main` remains the default for forks (the
+branch from which `git clone` and GitHub "Use this template" derive). Verified
+by: `git branch -r` lists `origin/develop`; repository default branch setting
+is `develop` (or `main`, per the chosen convention — ADR-026 Decision governs).
+
+**AC-2.** All template-internal artifacts are present on `develop` and absent
+from `main`. Specifically: `specs/`, `.claude/meta/`, `.claude/ROADMAP.md`,
+`.claude/learn/`, `.claude/output-styles/`, `.claude/skills/`, `.claude/hooks/`, <!-- ref-allow: .claude/learn/ is intentionally absent (opt-in/default-off per ADR-015 amendment) -->
+`workarounds/` (if non-empty), and `.github/workflows/` develop-only workflow
+files are not present on `main`. Verified by: `git ls-tree --name-only main`
+does not list those paths.
+
+**AC-3.** The payload manifest file exists at `.claude/payload-manifest.txt` <!-- ref-allow: payload-manifest.txt is created in Phase B implementation - forward reference -->
+on `develop`. It enumerates every file and directory that is allowed on `main`,
+one entry per line. Verified by: the file exists with at least one entry and
+all currently keep-on-main files are listed.
+
+**AC-4.** The workflow inventory is partitioned as follows and matches the
+classification in ADR-026:
+
+- **Keep on `main`** (4 fork-reusable workflows):
+  - `.github/workflows/ci-base.yml`
+  - `.github/workflows/security.yml`
+  - `.github/workflows/coverage-gate.yml`
+  - `.github/workflows/workaround-check.yml`
+- **Keep on `develop`, runs against `main`-bound PRs** (1 enforcement workflow):
+  - `.github/workflows/payload-manifest-check.yml`
+- **Develop-only** (8 template-internal workflows, not present on `main`):
+  - `.github/workflows/bilingual-parity-check.yml`
+  - `.github/workflows/dangling-ref-check.yml`
+  - `.github/workflows/docs-freshness.yml`
+  - `.github/workflows/ecc-delegation-consistency-check.yml`
+  - `.github/workflows/learn-invariants.yml`
+  - `.github/workflows/research-tier-auth-check.yml`
+  - `.github/workflows/roadmap-drift-check.yml`
+  - `.github/workflows/skill-invariants.yml`
+
+Verified by: `git ls-tree --name-only main .github/workflows/` lists exactly
+the 4 keep-on-main workflows (payload-manifest-check lives only on `develop`).
+
+**AC-5.** `main` carries the 4 keep-on-main workflows unmodified and each
+passes its own execution path on a clean fork (no references to develop-only
+paths in their `uses:` or `run:` steps). Verified by: `act` dry-run or a CI
+run on a test fork shows all 4 passing.
+
+**AC-6.** `.github/workflows/payload-manifest-check.yml` exists on `develop`,
+triggers on `pull_request` with `base: main`, and exits non-zero if any file in
+the PR diff is not listed in `.claude/payload-manifest.txt`. <!-- ref-allow: payload-manifest.txt is created in Phase B implementation - forward reference --> Verified by:
+opening a test PR to `main` that contains a develop-only path causes the check
+to fail; a PR containing only payload paths passes.
+
+**AC-7.** `CLAUDE.md` on `main` is a reduced payload-facing version. It retains
+the Agent Team table, Document Templates section, Development Workflow overview,
+Testing Requirements, Code Quality Standards, and Extending This File section.
+It does not carry the `## Developer Learning Mode`, `## Subagent dispatch
+contract`, `## Worktree advisory protocol`, `## Roadmap`, or `## Plan-First &
+Learning-Aware Defaults` sections (those are develop-only guidance). Verified
+by: `git show main:.claude/CLAUDE.md` does not contain the string
+`## Developer Learning Mode`.
+
+**AC-8.** `.github/workflows/payload-manifest-check.yml` matches the filename
+convention `<purpose>-check.yml` adopted by the template (consistent with
+`dangling-ref-check.yml`, `bilingual-parity-check.yml`, etc.). Verified by:
+the file is named exactly `.github/workflows/payload-manifest-check.yml` on
+`develop`.
+
+**AC-9.** `init.sh` on `develop` is updated to remove any steps that reference
+develop-only paths (e.g., steps that modify `specs/` or `.claude/meta/`). The
+fork-facing `init.sh` on `main` guides the forking team through payload-only
+setup. Verified by: `bash -n init.sh` passes (no syntax errors) and the script
+does not reference `.claude/meta/` or `specs/` paths.
+
+**AC-10.** The `README.md` on `main` is updated to describe the two-branch
+model: `main` = fork payload, `develop` = template development. It includes a
+"Forking" section explaining that teams should fork `main`, and a "Contributing
+to the template" section explaining that PRs should target `develop`. Verified
+by: `git show main:README.md | grep -q 'develop'` exits 0.
+
+**AC-11.** Roadmap row #23 status is flipped to `☑` on `develop` after the
+quality-gate pass. `main` carries no `ROADMAP.md` (it is a develop-only
+artifact). Verified by: `git ls-tree --name-only main .claude/` does not list
+`ROADMAP.md`; `git show develop:.claude/ROADMAP.md | grep '| 23 |'` shows `☑ done`.
+
+**AC-12.** The branch protection rules on the template repository are updated
+so that PRs to `main` require the `payload-manifest-check` status check to
+pass. Verified by: repository Settings > Branches > `main` protection rule
+lists `payload-manifest-check` as a required status check.
+
+## Key interactions
+
+1. **Template maintainer authors a new ADR or spec.** Work happens entirely on
+   `develop`. The ADR and spec files are created in `.claude/meta/adr/` and
+   `specs/` respectively — paths that are develop-only and never flow to `main`.
+
+2. **Template maintainer updates an agent prompt.** The agent file is in
+   `.claude/agents/`, which is on the payload manifest and present on both
+   branches. The maintainer edits on `develop`, then opens a PR targeting `main`.
+   The `payload-manifest-check` workflow on `develop` validates the PR diff;
+   all changed files are on the manifest, so the check passes and the PR merges.
+
+3. **Team forks the template.** They fork from `main`. They receive only
+   payload-manifest files. They run `init.sh` which guides them through
+   project-specific setup without referencing any develop-only paths.
+
+4. **Fork maintainer pulls a template update.** They add the template repository
+   as a remote, fetch `main`, and merge or cherry-pick the payload delta. Because
+   `main` carries no develop-only history, the diff is small and conflict-free.
+
+## Metrics
+
+- **Leading:** Number of files on `main` at branch-separation milestone
+  completion (target: equal to `wc -l .claude/payload-manifest.txt`). <!-- ref-allow: payload-manifest.txt is created in Phase B implementation - forward reference -->
+- **Leading:** `payload-manifest-check` pass rate on PRs to `main` (target: 100%
+  within 2 weeks of branch separation landing).
+- **Lagging:** Reduction in "delete template internals" issues or questions from
+  fork users after v3.12.0 ships (target: zero such issues in the first 60 days).
+
+## Risks and open questions
+
+- **Merge protocol complexity.** A manual cherry-pick / PR flow from `develop`
+  to `main` requires discipline. If maintainers forget, `main` drifts behind.
+  Mitigation: `payload-manifest-check` CI on `develop` fails fast on any PR
+  that would introduce a develop-only file, making the boundary self-enforcing.
+- **`docs-freshness.yml` reclassification.** This workflow was initially
+  considered for keep-on-main but reclassified as develop-only because its
+  snapshot file lives inside `.claude/` (absent from `main`). The reclassification
+  is captured in ADR-026. If a fork wants freshness checking, they add their
+  own workflow.
+- **Open question:** Should `main` carry its own minimal `CHANGELOG.md` tracking
+  only payload-facing changes, separate from the full `develop` changelog? Deferred
+  to ADR-026 Decision; default is no separate `main` changelog in v1.
+
+## Out of scope
+
+- Migrating existing forks to the new branch model.
+- Automated `develop` → `main` cherry-pick tooling.
+- Deep redesign of `init.sh` (only the develop-only step removal is in scope).
+- Adding a payload-manifest editor UI or generator script (the manifest is
+  maintained manually by template maintainers in v1).
+- CI enforcement of the agent-team workflow sequence on `develop`.
+
+## References
+
+- `.claude/meta/adr/026-template-fork-branch-separation.md` — architectural
+  decision record for this milestone (branch model, payload-manifest schema,
+  workflow inventory classification, ADR-026 Decision).
+- `.claude/ROADMAP.md` — Roadmap row: #23
