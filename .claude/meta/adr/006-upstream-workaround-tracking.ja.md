@@ -4,7 +4,7 @@
 
 ## ステータス
 
-Accepted — 2026-05-06
+Accepted — 2026-05-06; Amended — 2026-05-20 (Roadmap #19): デフォルト `enabled` 値を `false` から `true` に変更。下記 §改訂 — 2026-05-20 (default-on への移行) を参照。原則 1 のシングルスイッチ形態は保持され、変更されるのはスイッチのデフォルト値のみ。
 
 ## 背景
 
@@ -226,7 +226,7 @@ Workaround が `status: resolved` に遷移したとき、`technical-writer` は
 | `adr-template.md` に「Workaround」節を追加 | テンプレート 1 つで保守 | 不変の決定と可変の状態を混在させる。ADR は状態変化に伴う書き換えを想定しない | architect / technical-writer がライフサイクル不一致を理由に却下 |
 | コードマーカーのみ (レジストリなし) | 最大限の簡潔さ | 構造化されていない grep 専用データ。複数行コンテキスト (検証手順、セキュリティ影響) を持てない。非エンジニアには検索困難 | technical-writer が発見可能性の低さで却下 |
 | レジストリのみ (マーカーなし) | source of truth が 1 つ | 「全マーカーにレジストリエントリが存在する」を CI で検証するためにレジストリを round-trip しなければならない。レビュアーはコメントを理解するためにレジストリ参照が必要 | レビュー作業性で却下 |
-| default-on の CI ワークフロー | 採用率が高い | Workaround ゼロのプロジェクトに保守コストを強要。テンプレート既存の default-off 規約と矛盾 | devops-engineer が作業性と規約整合性で却下 |
+| default-on の CI ワークフロー | 採用率が高い | Workaround ゼロのプロジェクトに保守コストを強要。テンプレート既存の default-off 規約と矛盾 | devops-engineer が作業性と規約整合性で却下。**2026-05-20 Roadmap #19 で再評価: この代替案が選択された。** テンプレートの並列 CI scaffold (#01 `verification.yml`、forthcoming #20 `compliance.yml`) が default-active 規約を確立し、具体的な検証 (Spec AC-3) が空の `workarounds/` インベントリで CI ノイズゼロを確認したことにより、コスト/ベネフィットの計算が変わった。「workaround ゼロのプロジェクトへの保守コスト」という当初の異議は無効化された。下記 §改訂 — 2026-05-20 (default-on への移行) を参照。 |
 | 二重スイッチ (workflow `if: false` + config `enabled: false`) | 二重防御 | 両者の drift がサイレント失敗モードになる (片方だけ有効化)。オンボーディング負荷も倍 | Round 1 レビューで fail-unsafe 性が指摘され却下 |
 | ecosystem ごとのバージョン比較ジョブを出荷 (TS/Go/Python など) | adopter にとって turn-key | バージョンとツーリングが陳腐化する。`ci-base.yml` が言語セットアップを含めない理由と同じ | `ci-base.yml` の言語非依存スタンスと同じ理由で却下 |
 
@@ -245,3 +245,134 @@ Workaround が `status: resolved` に遷移したとき、`technical-writer` は
   ガル例外) で対処された問題を顕在化させた。findings は上記の
   §決定 と §検討した代替案 に統合済みで、別途のレビューログはコ
   ミットしない。
+- Roadmap 行: #19 (この ADR の 2026-05-20 改訂がそのマイルストーンで決定した default-on 移行を記録する。
+  下記 §改訂 — 2026-05-20 を参照)
+
+## 改訂 — 2026-05-20 (default-on への移行)
+
+この改訂は `.github/workaround-tracker.yml` の `enabled` のデフォルト値を `false` から `true` に変更します。
+Roadmap マイルストーン #19 (「Workaround tracking default-on」) の設計決定を記録し、
+ADR-006 整合性の問題を文書で対処することを求める Spec AC-5 要件を解決します。
+改訂は原則 1 の**シングルスイッチ**形態を保持します — 設定フラグはまだ 1 つで、ワークフローファイルに
+外すべき第 2 の `if: false` はなく — スイッチの**デフォルト値のみを変更**します。
+すでに `enabled: false` を設定した fork の grandfather プロパティは intact です:
+その明示的な値は引き続き新しいテンプレートデフォルトを上回ります。
+
+### 三項分類 — 1/3、改訂であって新 ADR でない
+
+Spec は `architect` に ADR-018 Alternative-B 三項識別器
+(新しい契約境界 + 新しいキーイング/メカニズム + 新しい構造的成果物 ⇒ 新 ADR;
+既存の契約内の結果明確化/値変更 ⇒ 改訂) を渡します。#19 に各条項を適用すると:
+
+- **新しい契約境界か? Yes。** 原則 1 のテキストはデフォルト方向として default-off を契約のデフォルトとして固定し、
+  元の Alternatives テーブルは記録された根拠で「default-on CI ワークフロー」を却下していました。
+  そのデフォルト方向を逆転させることは、変更されない契約内の値の調整ではなく、契約レベルの変更です。
+- **新しいキーイング/メカニズムか? No。** `enabled` YAML フィールド、`yq -r '.enabled // false'` 読み取りパターン、
+  3 つのジョブそれぞれの `if: steps.cfg.outputs.enabled == 'true'` 短絡はバイト単位で変更されません (Spec AC-2)。
+  新しい YAML キー、新しい正規表現、新しい短絡構文はありません。
+  `pull_request_target` 規律 (この ADR の Out of scope、最終箇条) は変更なしに保持されます。
+  `annotate_dependabot_prs: false` (AC-9) と `fail_on_marker_drift: false` (AC-10) は保守的な opt-in デフォルトのまま。
+- **新しい構造的成果物か? No。** 新しいファイル、新しいディレクトリ、新しい CI ワークフロー、
+  新しい検出器、新しいテストスイートはありません。Spec AC-4 はテンプレート本体で `workarounds/` ディレクトリが
+  存在しないことを要求します。Spec AC-6/AC-7 は既存の 7 つの検出器と 8 つのテストスイートが
+  変更なしにパスすることを要求します。
+
+三項合計: **1/3**。ADR-018 Alternative-B (および同じ識別器の ADR-022 §1 適用) により、
+1-2/3 は**既存 ADR の改訂**に向かい、新 ADR ではありません。ADR-022 の「新 ADR vs. 改訂」の理由付けは
+三項が 3/3 で発火して新 ADR を正当化することを明示的に述べており、#19 の 1/3 は反対のケースです。
+新 ADR-023 は検討されたが却下された (Spec AC-5 はその名前を使用): <!-- ref-allow: counterfactual reference; ADR-023 deliberately not issued per triad 1/3 outcome | expires: 2026-06-20 -->
+ADR-006 自体に解決策を組み込むことで、歴史的記録と新しい決定を単一の source of truth に同居させ、
+ADR-014 の改訂形態に一致し (ADR-014 は 2026-05-16 に新 ADR 番号を生成せずに 2 つの改訂を受けた)、
+将来の読者が調整する必要のある 2 つの ADR に原則 1 のポリシーが分断されることを回避します。
+
+### 元の「default-on CI ワークフロー」却下がもはや成立しない理由
+
+2026-05-06 の Alternatives テーブルは「default-on CI ワークフロー」を 2 つの理由で却下しました。
+現在利用可能な具体的な証拠に対してここで再検討します:
+
+1. **「workaround ゼロのプロジェクトに保守コストを課す。」**
+   Spec AC-3 は逆を経験的に検証します: `enabled: true` で `workarounds/` にファイルがない場合、
+   `marker-consistency` ジョブは終了コード 0 で完了し `Markers found: 0` と
+   `Active registry entries: 0` を示すステップサマリーを生成します。
+   フォールスポジティブ失敗も保守作業もなく — ジョブは実行されて何も報告しません。
+   元の懸念は空インベントリ境界で発生しない保守コストを想定していました。
+   短絡がすでにそれを吸収しています。
+2. **「テンプレート既存の default-off 規約と矛盾する。」**
+   規約自体が変化しました。Roadmap マイルストーン #01 (`research.enabled: true` でコミットされたデフォルトとしての
+   `verification.yml`) が 2026 年に出荷し、デフォルト状態が空インベントリに対して安全であることが確認された
+   CI scaffold が fork が手動アクティベーションなしで実際の保護を継承できるようデフォルトでアクティブに
+   出荷されるという前例を確立しました。forthcoming マイルストーン #20 (`compliance.yml` をアクティブなデフォルトとして) は
+   同じパターンを拡張します。#01 と #20 が opt-in CI scaffold ファミリーの default-active 規約を確立することで、
+   workaround-tracker の default-off 位置は現在**外れ値**となっており、デフォルトではありません。
+   2026-05-06 の「既存の default-off 規約」はもはやテンプレートの実際のスタンスを説明していません。
+
+元の却下は 2026-05-06 時点では妥当でした (#01 の前例はなく、AC-3 の検証は実施されていなかった)。
+2026-05-20 時点では成立しません。
+
+### この改訂が変更すること
+
+| 項目 | 変更前 (2026-05-06) | 変更後 (2026-05-20) |
+|---|---|---|
+| `.github/workaround-tracker.yml` のデフォルト `enabled` | `false` | `true` |
+| 原則 1 の形態 | シングルスイッチ、default-off | シングルスイッチ、**default-on** |
+| 既存 fork のオーバーライド (`enabled: false` がすでにコミット済み) | 尊重される | 尊重される (自動移行なし) |
+| `annotate_dependabot_prs` デフォルト | `false` | `false` (変更なし; Spec AC-9) |
+| `fail_on_marker_drift` デフォルト | `false` | `false` (変更なし; Spec AC-10) |
+| `expires_on` / `expiry_warning_days` のセマンティクス | ADR-006 に従う | ADR-006 に従う (変更なし; Spec Non-goals) |
+| ワークフロー短絡ロジック | `enabled` フラグに従う | `enabled` フラグに従う (バイト単位で変更なし; Spec AC-2) |
+| `pull_request_target` 規律 | `dependabot-annotate` ジョブに制限 | `dependabot-annotate` ジョブに制限 (変更なし; Out of scope 最終箇条) |
+
+### 原則 1 — 改訂テキスト
+
+元の原則 1:
+
+> **default-off、シングルスイッチ。** 有効化は `.github/workaround-tracker.yml` の
+> `enabled: true` への 1 箇所変更のみ。
+
+改訂された原則 1 (2026-05-20 以降有効):
+
+> **default-on、シングルスイッチ。** 無効化は `.github/workaround-tracker.yml` の
+> `enabled: false` への 1 箇所変更のみ。ワークフロー自体にはまだ外すべき第 2 の `if: false` はなく
+> — すべてのジョブが config を読んで無効時に短絡します。非アクティブのままにしたい fork
+> (例: workaround インベントリがゼロで使用予定のないテンプレートの早期採用者) は
+> シングルスイッチをオフにします。元の 2026-05-06 の文言に対する非対称性は意図的で、
+> 反転したデフォルトを反映しています。
+
+「シングルスイッチ、外すべき第 2 のトグルなし」というプロパティ — 原則 1 の load-bearing な
+失敗モード防止 — は変更なしに保持されます。変わるのはデフォルトの極性のみです。
+
+### この改訂のスコープ
+
+- 決定 §原則 1 は上記の通り改訂されます。他の原則 (2 〜 6) は変更されません。
+- 検討した代替案テーブル — 「default-on CI ワークフロー」行に「2026-05-20 Roadmap #19 で再評価」
+  の注記が追加されます。歴史的な却下テキストは並べて逐語的に保持されます。
+- ステータス行に `Amended — 2026-05-20` の表記が追加されます。
+- Out of scope は変更されません: `dependabot-annotate` 以外のジョブへの `pull_request_target`
+  拡張禁止は intact で保持されます。
+- 必須ワークアラウンドレコードフィールド、CHANGELOG マッピング、削除検知戦略、提供成果物の各節は変更されません。
+- 日本語版 (`006-upstream-workaround-tracking.ja.md`) は step 7 に `technical-writer` が
+  Roadmap #06 heading-tree parity 所有権に従って同等の改訂を受けます。
+- `.claude/CLAUDE.md` の `### Upstream workaround lifecycle` セクション (「ships **default-off**」) は
+  この改訂ではなく step 7 に `technical-writer` が #19 後の状態を反映して更新します。
+
+### `implementer` への実装指示
+
+architect レベルで記録された上記の決定: **`.github/workaround-tracker.yml` を編集して
+`enabled` のリテラル値を `false` から `true` に変更する**。代替メカニズム (ワークフローの
+`yq -r '.enabled // false'` フォールバックを `// true` に変更して `enabled` を欠如させる) は
+2 つの理由で**却下**されました:
+
+1. **明示的 > 暗示的。** この ADR-006 自体の原則 5 (「言語非依存な CI スコープのみ」) は
+   可視な動作に基づきます。より広いテンプレートの `## Architecture Principles` テーブル
+   (`.claude/CLAUDE.md`) には「explicit over implicit」が含まれます。config ファイルを読むユーザーは
+   ファイルでアクティブなデフォルトを確認できるはずです。フォールバック駆動のデフォルトは
+   ユーザーがワークフローを読まない限りアクティブな状態を不可視にします。
+2. **最小ブラスト半径。** AC-2 はワークフロー短絡ロジックがバイト単位で変更なしであることを要求します。
+   config ファイルのみを編集することでその制約を最大限に尊重します。ワークフローの `// false`
+   フォールバックを変更するとワークフローファイルに触れ、config ファイルの意図と一致した状態を
+   保つべき第 2 のサイトを作成します。
+
+implementer は `.github/workaround-tracker.yml` の行 12 を `enabled: false` から `enabled: true` に編集します。
+付随するヘッダーコメント (「Master switch for the workaround-check.yml workflow.」) は変更なしで保持されます。
+#19 後の default-on 状態に言及するオプションの 1 行の明確化を追加することは可能ですが、
+この改訂では必須ではありません。ワークフローファイルの編集は不要です。

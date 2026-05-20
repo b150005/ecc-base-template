@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted — 2026-05-06
+Accepted — 2026-05-06; Amended — 2026-05-20 (Roadmap #19): default `enabled` value flipped from `false` to `true`. See §Amendment — 2026-05-20 (default-on transition) below. Principle 1's single-switch shape is preserved; only the default value of the switch changes.
 
 ## Context
 
@@ -229,7 +229,7 @@ which adds an ecosystem-specific job that reads its own lockfile.
 | Add a "Workaround" section to `adr-template.md` | Single template to maintain | Conflates immutable decisions with mutable status; ADRs are not meant to be edited as state changes | Rejected by architect and technical-writer for lifecycle mismatch |
 | Code marker as the only artifact (no registry) | Maximum simplicity | Unstructured grep-only data; cannot capture multi-line context (verification steps, security impact); not searchable for non-engineers | Rejected by technical-writer for poor discoverability |
 | Registry as the only artifact (no marker) | One source of truth | CI cannot verify "every marker has a registry entry" without round-tripping through the registry; reviewers must look up the registry to understand a comment | Rejected for review ergonomics |
-| Default-on CI workflow | Higher adoption rate | Inflicts maintenance cost on projects with zero workarounds; conflicts with the template's existing default-off convention | Rejected by devops-engineer for ergonomics and convention |
+| Default-on CI workflow | Higher adoption rate | Inflicts maintenance cost on projects with zero workarounds; conflicts with the template's existing default-off convention | Rejected by devops-engineer for ergonomics and convention. **Re-evaluated 2026-05-20 in Roadmap #19: this alternative is now selected.** The cost-benefit calculus shifted as the template's parallel CI scaffolds (#01 `verification.yml`, forthcoming #20 `compliance.yml`) established a default-active convention, and concrete verification (Spec AC-3) confirms zero CI noise on an empty `workarounds/` inventory — invalidating the original "maintenance cost on projects with zero workarounds" objection. See §Amendment — 2026-05-20 (default-on transition) below. |
 | Two-toggle activation (workflow `if: false` + config `enabled: false`) | Belt-and-suspenders | Drift between the two is a silent-failure mode (one flipped, one not); doubles the on-boarding friction | Rejected after Round 1 review for fail-unsafe ergonomics |
 | Ship per-ecosystem version-comparison jobs (TS/Go/Python/etc.) | Turn-key for adopters | Versions and tooling drift; the same reason `ci-base.yml` does not include language setup applies | Rejected for the same reason as `ci-base.yml`'s language-agnostic stance |
 
@@ -248,3 +248,176 @@ which adds an ecosystem-specific job that reads its own lockfile.
   omit-from-CHANGELOG, bilingual exception for the reference doc).
   Findings are folded into §Decision and §Alternatives considered
   above; no separate review log is committed.
+- Roadmap row: #19 (this ADR's 2026-05-20 amendment records the
+  default-on transition decided by that milestone; see §Amendment —
+  2026-05-20 below)
+
+## Amendment — 2026-05-20 (default-on transition)
+
+This amendment flips the default value of `enabled` in
+`.github/workaround-tracker.yml` from `false` to `true`. It records the
+design decision for Roadmap milestone #19 ("Workaround tracking
+default-on") and resolves the Spec AC-5 requirement that the
+ADR-006-consistency question be addressed in writing. The amendment
+preserves Principle 1's **single-switch** shape — there is still one
+config flag, still no second `if: false` in the workflow file — and
+changes **only the default value** of that switch. The grandfather
+property for forks that have already set `enabled: false` is intact:
+their explicit value continues to win over the new template default.
+
+### Triad classification — 1/3, amendment-not-new-ADR
+
+The Spec hands `architect` the ADR-018 Alternative-B triad
+discriminator (new contract boundary + new keying/mechanism + new
+structural artifact ⇒ new ADR; consequence-clarification / value
+change inside an existing contract ⇒ amendment). Applied clause by
+clause to #19:
+
+- **New contract boundary? Yes.** Principle 1's text fixes
+  default-off as the contract's default direction, and the original
+  Alternatives table rejected "Default-on CI workflow" with a recorded
+  rationale. Reversing that default direction is a contract-level
+  change, not a value tweak inside an unchanged contract.
+- **New keying / mechanism? No.** The `enabled` YAML field, the
+  `yq -r '.enabled // false'` read pattern, and the `if:
+  steps.cfg.outputs.enabled == 'true'` short-circuit on each of the
+  three jobs are byte-for-byte unchanged (Spec AC-2). No new YAML
+  key, no new regex, no new short-circuit syntax. The
+  `pull_request_target` discipline (this ADR's Out of scope, final
+  bullet) is preserved unchanged. `annotate_dependabot_prs: false`
+  (AC-9) and `fail_on_marker_drift: false` (AC-10) remain the
+  conservative opt-in defaults.
+- **New structural artifact? No.** No new file, no new directory,
+  no new CI workflow, no new detector, no new test suite. Spec AC-4
+  requires the `workarounds/` directory to remain absent in the
+  template body. Spec AC-6/AC-7 require the existing seven
+  detectors and eight test suites to pass unchanged.
+
+Triad total: **1/3**. Per ADR-018 Alternative-B (and the
+ADR-022 §1 application of the same discriminator), 1-2/3 routes to an
+**amendment of the existing ADR**, not a new ADR. ADR-022's
+"new-ADR-vs-amendment" reasoning explicitly states that the triad
+fires 3/3 to warrant a new ADR; #19's 1/3 is the opposite case. A
+new ADR-023 was considered (Spec AC-5 uses that name) and rejected: <!-- ref-allow: counterfactual reference; ADR-023 deliberately not issued per triad 1/3 outcome | expires: 2026-06-20 -->
+folding the resolution into ADR-006 itself keeps the historical
+record and the new decision colocated at a single source of truth,
+matches the ADR-014 amendment shape (ADR-014 received two amendments
+in 2026-05-16 without spawning new ADR numbers), and avoids
+fragmenting Principle 1's policy across two ADRs that a future
+reader would have to reconcile.
+
+### Why the original "Default-on CI workflow" rejection no longer holds
+
+The original 2026-05-06 Alternatives table rejected "Default-on CI
+workflow" for two reasons. Both are re-examined here against concrete
+evidence available now:
+
+1. **"Inflicts maintenance cost on projects with zero workarounds."**
+   Spec AC-3 verifies the opposite empirically: with `enabled: true`
+   and no files in `workarounds/`, the `marker-consistency` job
+   completes with exit code 0 and a step summary showing
+   `Markers found: 0` and `Active registry entries: 0`. No
+   false-positive failures, no maintenance work — the job runs and
+   reports nothing. The original concern assumed a maintenance cost
+   that does not materialize at the empty-inventory boundary; the
+   short-circuit already absorbs it.
+2. **"Conflicts with the template's existing default-off convention."**
+   The convention itself has shifted. Roadmap milestone #01
+   (`verification.yml` as a committed default with
+   `research.enabled: true`) shipped 2026 and established the
+   precedent that a CI scaffold whose default state is known safe
+   for an empty inventory ships active so forks inherit real
+   protection without a manual activation step. Forthcoming
+   milestone #20 (`compliance.yml` as active default) extends the
+   same pattern. With #01 and #20 establishing a default-active
+   convention for the family of opt-in CI scaffolds, the
+   workaround-tracker's default-off position is now the **outlier**,
+   not the default. The 2026-05-06 "existing default-off
+   convention" no longer describes the template's actual posture.
+
+The original rejection was sound at 2026-05-06 (no #01 precedent
+existed; the AC-3 verification had not been performed). It does not
+hold at 2026-05-20.
+
+### What this amendment changes
+
+| Item | Before (2026-05-06) | After (2026-05-20) |
+|---|---|---|
+| Default `enabled` in `.github/workaround-tracker.yml` | `false` | `true` |
+| Principle 1 shape | Single switch, default-off | Single switch, **default-on** |
+| Existing fork override (`enabled: false` already committed) | Honored | Honored (no auto-migration) |
+| `annotate_dependabot_prs` default | `false` | `false` (unchanged; Spec AC-9) |
+| `fail_on_marker_drift` default | `false` | `false` (unchanged; Spec AC-10) |
+| `expires_on` / `expiry_warning_days` semantics | Per ADR-006 | Per ADR-006 (unchanged; Spec Non-goals) |
+| Workflow short-circuit logic | Per `enabled` flag | Per `enabled` flag (byte-for-byte unchanged; Spec AC-2) |
+| `pull_request_target` discipline | Restricted to `dependabot-annotate` job | Restricted to `dependabot-annotate` job (unchanged; Out of scope final bullet) |
+
+### Principle 1 — amended text
+
+The original Principle 1 read:
+
+> **Default-off, single switch.** Activation is a single config flip:
+> `enabled: true` in `.github/workaround-tracker.yml`.
+
+The amended Principle 1 reads (effective 2026-05-20):
+
+> **Default-on, single switch.** Deactivation is a single config flip:
+> `enabled: false` in `.github/workaround-tracker.yml`. The workflow
+> itself still has no second `if: false` to remove — every job reads
+> the config and short-circuits when disabled. Forks that wish to
+> remain inactive (e.g. early adopters of the template with zero
+> workaround inventory and no planned use) flip the single switch off;
+> the asymmetry against the original 2026-05-06 wording is intentional
+> and reflects the inverted default.
+
+The "single switch, no second toggle to drift" property — the load-
+bearing failure-mode prevention of Principle 1 — is preserved
+unchanged. Only the polarity of the default flips.
+
+### Scope of this amendment
+
+- Decision §Principle 1 is amended as above. The other Principles
+  (2 through 6) are unchanged.
+- Alternatives considered table — "Default-on CI workflow" row gains
+  a "Re-evaluated 2026-05-20 in Roadmap #19" note; the historical
+  rejection text is preserved verbatim alongside.
+- Status line gains the `Amended — 2026-05-20` notation.
+- Out of scope is unchanged: the `pull_request_target` extension
+  prohibition for jobs other than `dependabot-annotate` is preserved
+  intact.
+- Required workaround record fields, CHANGELOG mapping, removal-
+  detection strategy, and Provided artifacts sections are unchanged.
+- The Japanese counterpart (`006-upstream-workaround-tracking.ja.md`)
+  receives the equivalent amendment at step 7 by `technical-writer`,
+  per Roadmap #06 heading-tree parity ownership.
+- The `### Upstream workaround lifecycle` section in
+  `.claude/CLAUDE.md` ("ships **default-off**") is updated at step 7
+  by `technical-writer` to reflect the post-#19 state, not by this
+  amendment.
+
+### Implementation directive for `implementer`
+
+The architect-level decision recorded above is: **edit
+`.github/workaround-tracker.yml` to change the literal value of
+`enabled` from `false` to `true`**. The alternative mechanism (leave
+`enabled` absent and change the workflow's `yq -r '.enabled // false'`
+fallback to `// true`) is **rejected** for two reasons:
+
+1. **Explicit > implicit.** Principle 5 of this ADR-006 itself
+   ("Language-agnostic CI scope only") rests on visible behavior; the
+   wider template's `## Architecture Principles` table (`.claude/CLAUDE.md`)
+   includes "explicit over implicit." A user reading the config file
+   should see the active default in the file; a fallback-driven default
+   makes the active state invisible until the user reads the workflow.
+2. **Minimal blast radius.** AC-2 requires the workflow short-circuit
+   logic to be byte-for-byte unchanged. Editing only the config file
+   honors that constraint maximally; changing the workflow's `// false`
+   fallback touches the workflow file and creates a second site to keep
+   consistent with the config file's intent.
+
+The implementer edits `.github/workaround-tracker.yml` line 12 from
+`enabled: false` to `enabled: true`. The accompanying header comment
+("Master switch for the workaround-check.yml workflow.") is
+preserved unchanged; an optional one-line clarification noting the
+post-#19 default-on state may be added but is not required by this
+amendment. No workflow file edit is required.

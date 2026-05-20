@@ -3,13 +3,14 @@
 # See .claude/meta/adr/006-upstream-workaround-tracking.md for the full design.
 # See .claude/meta/references/upstream-workaround-tracking.md for usage details.
 #
-# Single switch: flip `enabled: true` to activate the
-# `.github/workflows/workaround-check.yml` workflow. There is no second
-# toggle to remove from the workflow file. Until then, every job in the
-# workflow short-circuits via `if: steps.cfg.outputs.enabled == 'true'`.
+# Single switch: the `.github/workflows/workaround-check.yml` workflow
+# is active by default (per Roadmap #19 / ADR-006 amendment 2026-05-20).
+# To deactivate, flip `enabled: false` below. There is no second toggle
+# in the workflow file; every job short-circuits via
+# `if: steps.cfg.outputs.enabled == 'true'` when this flag is false.
 
 # Master switch for the workaround-check.yml workflow.
-enabled: false
+enabled: true
 
 # Directory containing per-workaround registry files (NNN-*.md).
 # Override if you keep them elsewhere (e.g. "docs/workarounds").

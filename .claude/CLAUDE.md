@@ -158,7 +158,7 @@ Single entry point mapping each milestone to its authoritative design source. Ea
 | 16 | ADR-001 "Proposed (stabilized)" status resolution | ☑ done | spec: `specs/16-adr-001-status-resolution.md` |
 | 17 | CHANGELOG↔ADR-acceptance sync and ADR-001–005 back-fill | ☑ done | spec: `specs/17-changelog-adr-sync.md` |
 | 18 | CI exemption allowlist expiry/review mechanism | ☑ done | spec: `specs/18-ci-exemption-allowlist-expiry.md`<br>adr: `.claude/meta/adr/022-ci-exemption-expiry.md` |
-| 19 | Workaround tracking default-on | ☐ todo | spec: `specs/19-workaround-tracking-default-on.md` |
+| 19 | Workaround tracking default-on | ☑ done | spec: `specs/19-workaround-tracking-default-on.md`<br>adr: `.claude/meta/adr/006-upstream-workaround-tracking.md` (amended 2026-05-20) |
 | 20 | Commit `compliance.yml` as active default | ☐ todo | spec: `specs/20-ship-compliance-yml-committed.md` |
 | 21 | Quality-gate loop re-entry anchored to Roadmap row | ☐ todo | spec: `specs/21-quality-gate-row-anchor.md` |
 
@@ -209,10 +209,13 @@ lifecycle defined in ADR-006: triage → search → record → track → remove.
 See `.claude/meta/references/upstream-workaround-tracking.md` for the
 day-to-day usage details and `.claude/meta/adr/006-upstream-workaround-tracking.md`
 for the rationale. The CI scaffold lives at
-`.github/workflows/workaround-check.yml` and ships **default-off**.
-Activation is a single switch — set `enabled: true` in
+`.github/workflows/workaround-check.yml` and ships **default-on**
+(per Roadmap #19 / ADR-006 amendment 2026-05-20). Deactivation is a
+single switch — set `enabled: false` in
 `.github/workaround-tracker.yml`. There is no second toggle to remove
-from the workflow file.
+from the workflow file. Forks that wish to opt out flip the single
+switch off; the `annotate_dependabot_prs` and `fail_on_marker_drift`
+overlays remain `false` by default and are unaffected by this change.
 
 ## Testing Requirements
 
