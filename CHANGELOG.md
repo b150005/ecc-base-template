@@ -55,6 +55,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   JA sibling `specs/18-ci-exemption-allowlist-expiry.ja.md` also lands this
   session per Roadmap #06 ownership).
 
+- **Compliance config** (`.claude/compliance.yml`): committed to template
+  baseline for the first time (Roadmap #20 / ADR-011 amendment 2026-05-20).
+  Architect applied the ADR-018 Alternative-B triad and scored Path B (ADR-011
+  amendment, not a new ADR-023) — new contract boundary (committed vs. absent
+  file), same keying/mechanism (single `enabled` toggle), no new structural
+  artifact beyond the committed file itself. File ships with `enabled: false`
+  and `target_jurisdictions: []`; inline comments document the operator-assertion
+  requirement and explain that the Skill refuses to run on an empty list
+  (Invariant 5 preserved at the config layer). `.claude/compliance.yml.example`
+  retained unchanged as fully-annotated documentation reference (AC-4).
+  `SKILL.md` is byte-for-byte unchanged (AC-6). Existing forks that forked
+  before #20 and have no `.claude/compliance.yml` on disk are not auto-migrated;
+  they adopt by pulling this upstream change or by
+  `cp .claude/compliance.yml.example .claude/compliance.yml`. Spec
+  `specs/20-ship-compliance-yml-committed.md` (Approved, 11 AC) and JA sibling
+  `specs/20-ship-compliance-yml-committed.ja.md` land this session per Roadmap
+  #06 ownership.
+
 ### Changed
 
 - **Workaround tracking** (`.github/workaround-tracker.yml`): default `enabled` value flipped from `false` to `true` (Roadmap #19 / ADR-006 amendment 2026-05-20). The `marker-consistency` job now runs on every PR by default; `expiry-warning` runs on schedule/dispatch. `annotate_dependabot_prs` and `fail_on_marker_drift` remain `false` by default (conservative opt-in overlays). Existing forks with `enabled: false` explicitly committed continue to override the new template default; only new forks and forks that pull this change inherit `enabled: true`.

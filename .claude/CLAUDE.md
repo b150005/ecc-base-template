@@ -159,7 +159,7 @@ Single entry point mapping each milestone to its authoritative design source. Ea
 | 17 | CHANGELOG↔ADR-acceptance sync and ADR-001–005 back-fill | ☑ done | spec: `specs/17-changelog-adr-sync.md` |
 | 18 | CI exemption allowlist expiry/review mechanism | ☑ done | spec: `specs/18-ci-exemption-allowlist-expiry.md`<br>adr: `.claude/meta/adr/022-ci-exemption-expiry.md` |
 | 19 | Workaround tracking default-on | ☑ done | spec: `specs/19-workaround-tracking-default-on.md`<br>adr: `.claude/meta/adr/006-upstream-workaround-tracking.md` (amended 2026-05-20) |
-| 20 | Commit `compliance.yml` as active default | ☐ todo | spec: `specs/20-ship-compliance-yml-committed.md` |
+| 20 | Commit `compliance.yml` as active default | ☑ done | spec: `specs/20-ship-compliance-yml-committed.md`<br>adr: `.claude/meta/adr/011-compliance-checklist-skill.md` (amended 2026-05-20) |
 | 21 | Quality-gate loop re-entry anchored to Roadmap row | ☐ todo | spec: `specs/21-quality-gate-row-anchor.md` |
 
 **Rules:**
