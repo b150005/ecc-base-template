@@ -157,7 +157,7 @@ Single entry point mapping each milestone to its authoritative design source. Ea
 | 15 | `init.sh` Roadmap placeholder cleanup at fork time | ☑ done | spec: `specs/15-init-sh-roadmap-cleanup.md` |
 | 16 | ADR-001 "Proposed (stabilized)" status resolution | ☑ done | spec: `specs/16-adr-001-status-resolution.md` |
 | 17 | CHANGELOG↔ADR-acceptance sync and ADR-001–005 back-fill | ☑ done | spec: `specs/17-changelog-adr-sync.md` |
-| 18 | CI exemption allowlist expiry/review mechanism | ☐ todo | spec: `specs/18-ci-exemption-allowlist-expiry.md` |
+| 18 | CI exemption allowlist expiry/review mechanism | ☑ done | spec: `specs/18-ci-exemption-allowlist-expiry.md`<br>adr: `.claude/meta/adr/022-ci-exemption-expiry.md` |
 | 19 | Workaround tracking default-on | ☐ todo | spec: `specs/19-workaround-tracking-default-on.md` |
 | 20 | Commit `compliance.yml` as active default | ☐ todo | spec: `specs/20-ship-compliance-yml-committed.md` |
 | 21 | Quality-gate loop re-entry anchored to Roadmap row | ☐ todo | spec: `specs/21-quality-gate-row-anchor.md` |
@@ -187,6 +187,20 @@ Single entry point mapping each milestone to its authoritative design source. Ea
 9. **Commit**: Conventional commits format (feat, fix, refactor, docs, test, chore, perf, ci)
 
 When an `◐ in-progress` milestone crosses a session or compaction boundary, its in-flight workflow state persists to `specs/NN-progress.md` (`NN` = the Roadmap row number) per ADR-016 — created/updated by `product-manager`/`implementer` at the boundary, read by `orchestrator` at the Analyze step, deleted on the `◐ → ☑`/`✗` flip, and composable with (not a replacement for) `/save-session`.
+
+### Ref-allow expiry review cadence
+
+**Ref-allow expiry review cadence (ADR-022).** ref-allow markers in
+template artifacts may carry an optional `| expires: YYYY-MM-DD`
+clause. Expired markers produce a WARN (not FAIL) from
+`.claude/meta/scripts/check-ref-allow-expiry.sh`. Review ownership is
+three-tier: (a) template maintainers review template-internal markers
+in `specs/`, `.claude/meta/adr/`, `.claude/CLAUDE.md`, and
+`.claude/agents/`; (b) fork maintainers review markers authored in
+their derived repositories; (c) the `technical-writer` removes markers
+that have become over-suppressions (i.e., the referenced artifact now
+exists on disk) as part of step 7 documentation work for each
+milestone. The pre-#18 reason-only form remains permanent grandfather.
 
 ### Upstream workaround lifecycle
 

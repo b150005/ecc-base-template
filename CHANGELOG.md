@@ -7,6 +7,54 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Milestone #18 — now IMPLEMENTED** (single session; **ADR-022** — the
+  ADR-018 Alternative-B triad scored 3/3: new contract boundary [AC-10 (c)
+  technical-writer step-7 review responsibility], new keying/mechanism
+  [extended ref-allow syntax `<!-- ref-allow: <reason> | expires: YYYY-MM-DD -->`],
+  new structural artifact [a sixth detector + shared library forming a new MECE
+  partition in the ref-allow family]). Six artifacts: (1)
+  **`.claude/meta/scripts/check-ref-allow-expiry.sh`** — the sixth detector,
+  scanning the union of the five ref-allow consumers' scopes (CLAUDE.md,
+  `specs/`, `.claude/meta/adr/`, `.claude/agents/`) for expired markers and
+  emitting WARN-not-FAIL diagnostics; (2)
+  **`.claude/meta/scripts/lib/ref-allow-expiry.sh`** — shared library providing
+  `parse_ref_allow_expiry`, `check_ref_allow_expiry`, and
+  `parse_and_warn_ref_allow` functions, sourced by the sixth detector; (3)
+  **`.claude/meta/scripts/test-check-ref-allow-expiry.sh`** — 27-test suite
+  covering AC-1 through AC-13 (ISO 8601 format enforcement, extended syntax
+  parsing, WARN-not-FAIL on past dates, future/today silence, grandfather
+  behavior, scope coverage across CLAUDE.md / `specs/` / `adr/` / `agents/`,
+  progress-md exclusion, repo-wide grandfather verification, existing
+  seven-suite regression check); (4) **ADR-022** (`Accepted — 2026-05-20`) —
+  records the syntax decision, the WARN-not-FAIL semantic, the three-tier
+  review-cadence ownership, and the new-ADR-vs-amendment discriminator
+  rationale; (5) Spec `specs/18-ci-exemption-allowlist-expiry.md` (Approved)
+  — thirteen acceptance criteria; (6) AC-10 review-cadence ownership snippet
+  added to `.claude/CLAUDE.md` to satisfy the AC-10 documentation requirement.
+
+  **Implementation-shape note (AC-12):** The implementer chose option (c) — a
+  separate sixth detector — over option (a)/(b) (per-detector amendment or
+  shared library sourced by the five existing detectors) because AC-7
+  hard-requires that "all existing tests pass without modification" and the
+  scope-bleed guards in `test-check-ecc-delegation-consistency.sh`,
+  `test-check-research-tier-auth.sh`, and `test-coverage-threshold.sh`
+  byte-compare the five ref-allow-consuming detectors against earlier
+  milestones' design commits. A per-detector amendment would fail those guards;
+  the sixth-detector shape preserves the existing five detectors byte-for-byte
+  while delivering identical observable behavior (AC-6 union scope).
+
+  **Grandfather corpus (AC-13):** 372 existing `<!-- ref-allow:` markers across
+  template artifact scope (CLAUDE.md + `specs/` + `.claude/meta/adr/` +
+  `.claude/agents/`) are grandfathered unconditionally and permanently. No
+  marker produces a new WARN or FAIL at ship time. The grandfather rule is not
+  time-limited per AC-8.
+
+  Bilingual `.md` and `.ja.md` (ADR-022 EN/JA both landed this session; Spec
+  JA sibling `specs/18-ci-exemption-allowlist-expiry.ja.md` also lands this
+  session per Roadmap #06 ownership).
+
 ### Documentation
 
 - **Milestone #14 — design only; implementation deferred.**
