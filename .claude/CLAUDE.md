@@ -160,7 +160,7 @@ Single entry point mapping each milestone to its authoritative design source. Ea
 | 18 | CI exemption allowlist expiry/review mechanism | ☑ done | spec: `specs/18-ci-exemption-allowlist-expiry.md`<br>adr: `.claude/meta/adr/022-ci-exemption-expiry.md` |
 | 19 | Workaround tracking default-on | ☑ done | spec: `specs/19-workaround-tracking-default-on.md`<br>adr: `.claude/meta/adr/006-upstream-workaround-tracking.md` (amended 2026-05-20) |
 | 20 | Commit `compliance.yml` as active default | ☑ done | spec: `specs/20-ship-compliance-yml-committed.md`<br>adr: `.claude/meta/adr/011-compliance-checklist-skill.md` (amended 2026-05-20) |
-| 21 | Quality-gate loop re-entry anchored to Roadmap row | ☐ todo | spec: `specs/21-quality-gate-row-anchor.md` |
+| 21 | Quality-gate loop re-entry anchored to Roadmap row | ☑ done | spec: `specs/21-quality-gate-row-anchor.md`<br>adr: `.claude/meta/adr/014-roadmap-index-single-entry-point.md` (amended 2026-05-20) |
 
 **Rules:**
 - One row per milestone; row number stable, never reused (follows ADR-number convention). A split = new row + note on old row.
@@ -171,6 +171,7 @@ Single entry point mapping each milestone to its authoritative design source. Ea
 - Index only — never duplicate acceptance criteria or rationale; the linked Spec/ADR is the source of truth.
 - Write-ownership: `product-manager` creates/updates the row + `spec:` link; `architect` adds the `adr:` link; `orchestrator` only reads.
 - Status glyph transitions: `product-manager` flips `☐→◐` atomically with authoring the Spec at pickup, and `◐→☑` after the step-6 quality gate passes (deleting `specs/NN-progress.md` in the same change per ADR-016); drops (`◐→✗`, `☑→✗`) are decided by `orchestrator` at Analyze and written by `product-manager`, row retained (history not rewritten). #05 checks glyph *value* well-formedness; #07 governs *who* flips and *when* — no CI enforces #07.
+- Quality-gate loop re-entry (#21): while a row is `◐ in-progress` and one or more CRITICAL/HIGH findings from any step-6 quality-gate agent (code-reviewer, linter, security-reviewer, performance-engineer) remain open, `orchestrator` routes the fix task back to `implementer` and the row stays `◐` for the full loop duration. The `◐→☑` flip per #07 fires only after every quality-gate agent passes for that milestone — the loop's exit condition, not a mid-loop action. ADR-016 progress files apply only when the loop crosses a session or compaction boundary; an in-session loop creates no progress file. #08 G1–G3 govern initial dispatch (pre-dispatch); #21 governs re-entry after a quality-gate agent has returned findings (post-review) — non-overlapping triggers, same `orchestrator` router. No CI enforces #21 (process rule; #05 owns glyph-value well-formedness, the orthogonal check axis).
 - At 100+ milestones, split into `### Phase N` sub-tables under `## Roadmap`.
 
 ## Development Workflow

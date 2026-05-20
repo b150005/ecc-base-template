@@ -77,6 +77,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Workaround tracking** (`.github/workaround-tracker.yml`): default `enabled` value flipped from `false` to `true` (Roadmap #19 / ADR-006 amendment 2026-05-20). The `marker-consistency` job now runs on every PR by default; `expiry-warning` runs on schedule/dispatch. `annotate_dependabot_prs` and `fail_on_marker_drift` remain `false` by default (conservative opt-in overlays). Existing forks with `enabled: false` explicitly committed continue to override the new template default; only new forks and forks that pull this change inherit `enabled: true`.
 
+- **Quality-gate loop re-entry** (`.claude/CLAUDE.md` `## Roadmap` Rules block):
+  one bullet added formalizing the unnamed "loop owner" interim practice exercised across
+  all prior milestones (Roadmap #21 / ADR-014 amended 2026-05-20). Triad 0/3 (no new
+  contract boundary, no new keying/mechanism, no new structural artifact) ⇒ ADR-014
+  amendment, not a new ADR-023. The bullet names `orchestrator` as the routing owner when
+  a step-6 quality-gate agent (code-reviewer, linter, security-reviewer,
+  performance-engineer) returns CRITICAL or HIGH findings, states the row-anchor invariant
+  (the `◐ in-progress` row stays `◐` for the full loop duration; `◐→☑` fires only after
+  every gate agent passes), and restates the MECE boundaries against ADR-016 progress files
+  (cross-session boundary, not in-session loop) and #08 G1–G3 (pre-dispatch, not
+  post-review). No agent prompts edited; no CI detector added (AC-7 bounds canonical
+  detectors at seven; AC-8 bounds canonical test suites at eight). JA mirror of
+  ADR-014 amendment and Spec sibling `specs/21-quality-gate-row-anchor.ja.md` landed
+  this session per Roadmap #06 ownership.
+
 ### Documentation
 
 - **Milestone #14 — design only; implementation deferred.**

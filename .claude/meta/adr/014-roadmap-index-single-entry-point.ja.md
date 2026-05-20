@@ -1930,3 +1930,444 @@ amendment としてネストするより良い。
 ADR-014 自身の §(d) MECE テーブルが #11 のために事前予約したスロットを
 populate する配置決定を記録するものであり、決定を再開するものではない
 (ADR-010 の決定も再開せず、逐語的に維持する)。
+
+## Amendment — 2026-05-20 (品質ゲートループ再エントリのロードマップ行アンカー)
+
+本 amendment は 2026-05-17 の status-transition 所有権マトリクスの
+`◐ in-progress → ☑ done` 行の失敗パス逆命題を閉じる。そのマトリクスは
+**成功パス** (`product-manager` が所有する、step-6 品質ゲート **合格** 後の
+`◐→☑`) を認可した。ゲート中に 1 つ以上の品質ゲートエージェントが
+CRITICAL または HIGH の指摘を返す場合に何が起きるかは **述べていなかった** ――
+実践的にはすべての先行マイルストーンが実施してきたにもかかわらず、いかなる
+正式規則も名付けなかった fix-and-re-review ループ。
+`specs/21-quality-gate-row-anchor.md` (ロードマップ行 #21) が権威あるスコープであり、
+構造的な *how* を `architect` に委任する (Risk R-01 (a)-(d))。本 amendment は
+その決定を記録する。これは **2026-05-17 の status-transition マトリクスの
+帰結明確化** であり、新しい構造的決定ではない: マトリクスの `◐→☑` 行は
+すでにゲート合格トリガーを述べており; #21 はゲートが *まだ* 合格していない
+間に何が保持されるかを名付ける。新しいディテクター、境界、キーイング、
+またはメカニズムは導入されない。本 ADR の 2026-05-16、2026-05-17 (×5)、
+2026-05-20 (ADR-006)、2026-05-20 (ADR-011) の各 amendment が適用した
+ECC 前例 ("帰結明確化は amendment に折り込む; 新 ADR 番号は新しい構造的
+決定のために予約する" — ADR-015 §Context、ADR-017/ADR-018 Alternative B)
+に従い、これは ADR-014 amendment であり、**ADR-023 ではない**。ADR-023 は作成されない; ロードマップ行 #21 は <!-- ref-allow: ADR-023 is the deliberately-rejected counter-proposal; it is intentionally never created (see Counter-proposal below) -->
+`(amended 2026-05-20)` アノテーション付きで ADR-014 への `adr:` リンクを取得し、
+行 #19/#20 の amendment 引用形状を踏襲する一方、ADR-014 には独自のマイルストーン
+行がなく、そのため #21 の `Roadmap row:` 行を持たない ── 行バックリンク
+コントラクトは一方向 (行 → amendment) であり、対応するロードマップ行を
+`spec:` のみで残した #07/#08/#09/#10/#11 の amendment 前例と整合する。
+
+(#21 の行が本 amendment で `adr:` リンクを受け取るのは、Spec AC-9 が、
+新 ADR が発行された場合に `adr:` リンクが ADR を指すことを明示的に要求するためであり、
+明示的なロードマップ行帰属を持つ amendment は引用目的において行バインド ADR の
+実質的等価物だからである。#07/#08/#09/#10/#11 の行が `adr:` リンクを受け取らなかったのは
+それらの Spec がその受け入れ基準を述べなかったためであり; #21 の Spec は述べている。
+コントラクト表面 ── "行は構造的解決の源を指す" ── は両方の形状で等価に満たされる。)
+
+### Triad classification — 0/3, amendment-not-new-ADR
+
+Spec は `architect` に ADR-018 Alternative-B トライアド識別子 (新しいコントラクト
+境界 + 新しいキーイング/メカニズム + 新しい構造的アーティファクト ⇒ 新 ADR;
+既存コントラクト内の帰結明確化 ⇒ amendment) を渡す。#21 に条項ごとに適用:
+
+- **新しいコントラクト境界? いいえ。** 上記 2026-05-17 の #07 status-transition
+  amendment (行 415-425) はすでに `◐→☑` トリガー条件を逐語的に確立している:
+  "マイルストーンの Workflow step 6 品質ゲートが合格した後 … `product-manager`
+  … がフリップを実行する; 他のロールはできない。" #21 の行アンカー不変条件
+  (Spec AC-2) はその既述の成功条件の **論理的逆** である: ゲートがまだ
+  合格していない間は (1 つ以上の CRITICAL/HIGH 指摘がオープン)、行遷移は
+  起きない。これは既述のトリガーの帰結明確化であり、新しいコントラクト境界
+  ではない。再エントリルーティング (Spec AC-1: `orchestrator` が修正を
+  `implementer` にルーティングする) は、ADR-014 がすでに確立した Workflow
+  コントラクトを持つロール ── `orchestrator` は Analyze/ルーティング権威 (#08
+  amendment 行 716-760)、`implementer` は同じマイルストーンの Spec 内の修正を
+  含む step-5 実装を所有する (ロール変更なし) ── にマップされる。
+  新しいロール、新しい所有権概念、新しいコントラクト表面はない。
+- **新しいキーイング / メカニズム? いいえ。** ループが管理されるメカニズムは
+  #07 amendment がすでに所有する **同じ Status glyph セル** であり、誰がいつ
+  書くかを文書化する同じ `## Roadmap` Rules ブロックである。Spec は
+  "品質ゲートループコンプライアンスのための新しい CI ディテクターの追加" (非目標) と
+  "一般的なワークフロー状態機械エンジンの設計" (非目標) を明示的に禁止する。
+  Spec R-01 (d) は CI ディテクターの必要性を `architect` に委任する; 本 amendment
+  の判断は **ディテクターなし** (下の §(d) 参照)。新しい YAML キー、新しい
+  regex、新しいファイル形式、新しいショートサーキット、新しいディテクターはない。
+  既存の `check-roadmap-drift.sh` (#05) glyph 値正確性チェックが Status セルへの
+  唯一の自動タッチとして残る ── #05 に対する MECE 境界 (#07 Rules ブロック
+  bullet がすでに述べた "no CI enforces #07") は #21 に対して変更なしで延長される。
+- **新しい構造的アーティファクト? いいえ。** 新しいファイル、新しいディレクトリ、
+  新しい CI ワークフロー、新しいエージェントロール、新しい Skill、新しいテンプレート、
+  新しいワークフローステップはない (Spec 非目標: "品質ゲートループはすでに
+  step 6 に暗示されている; #21 は新しいステップ番号ではなくそのステップ内の
+  所有権とアンカー不変条件を名付ける")。配置先は #07 amendment が populate した
+  CLAUDE.md の同じ `## Roadmap` Rules ブロックであり; アーティファクトは新しい
+  セクション、テーブル、またはサブ見出しではなく 1 つの追加された Rules-block
+  bullet である。Spec AC-7 は 7 つの正規ディテクターすべてを green と要求し;
+  AC-8 は 8 つの正規テストスイートすべての合格を要求する ── 新しいディテクター/
+  テストが正規セットに加わらないことの明示的な Spec 確認。
+
+トライアド合計: **0/3**。ADR-018 Alternative-B (および同じ識別子を適用した
+ADR-022 §1 / ADR-006 amendment 2026-05-20 / ADR-011 amendment 2026-05-20)
+に従い、0-2/3 は新 ADR ではなく **既存 ADR の amendment** にルーティングされる。
+ADR-022 の "new-ADR-vs-amendment" 推論は、トライアドが新 ADR を正当化するには
+3/3 が必要と明示する; #21 の 0/3 はファミリー内で最強の amendment ケースである
+(#19 の 1/3 および #20 の 1/3 より強い、なぜなら #21 は新しいコントラクト方向を
+文字通り何も導入せず、本 ADR 自身の内部にすでにある 1 つの逆命題のみだから)。
+新しい ADR-023 が <!-- ref-allow: ADR-023 is the deliberately-rejected counter-proposal, intentionally never created -->
+検討され (Spec AC-6 はそれを OR の一方の枝として名指しする)、却下された: <!-- ref-allow: counterfactual reference; ADR-023 deliberately not issued per triad 0/3 outcome | expires: 2026-07-20 -->
+解決を ADR-014 自身に折り込むことで、4 行の Status-Transition マトリクスと
+その逆命題文 (行アンカー不変条件) が単一の真実の源に共置され、
+#07/#08/#09/#10/#11 amendment 形状と正確に一致し、Roadmap メカニズム
+コントラクトの 2 つの ADR への断片化を回避する ── #07 amendment 反対案の
+行 599-607 が成功方向マトリクスの別個の ADR-019 を却下するために使用した
+同じ推論。 <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal for the #07 success-direction matrix; intentionally never created -->
+
+### The row-anchor invariant and re-entry routing rule
+
+正確に 2 つの補完的なステートメント、どちらも 2026-05-17 status-transition
+マトリクスの `◐→☑` 行の帰結:
+
+**行アンカー不変条件 (Spec AC-2 / AC-3)。** `◐ in-progress` のロードマップ行は、
+1 つ以上の step-6 品質ゲートエージェント (`code-reviewer`、`linter`、
+`security-reviewer`、`performance-engineer`) からの CRITICAL または HIGH の
+指摘がオープンである間、`◐ in-progress` に留まる。いかなるアクターも
+ループが進行中に `☑`、`✗`、または `☐` にフリップしない。`◐→☑` 遷移は、
+そのマイルストーンに対してすべての品質ゲートエージェントが合格した **ときにのみ
+1 度だけ** 発火する ── 出口条件であり、ループ中間アクションではない。
+`◐→✗` 遷移は `orchestrator` が確認したドロップ決定 (マトリクス行 3、変更なし)
+のみで発火する。
+
+**再エントリルーティング (Spec AC-1)。** いずれかの品質ゲートエージェントが
+1 つ以上の CRITICAL または HIGH の指摘を返す場合、**orchestrator** が名指しの
+ルーティング所有者である: 修正タスクを `implementer` にルーティングし直し、
+再レビューを開始する。他のエージェントが orchestrator のルーティングなしに
+修正を自己割り当てしない; 品質ゲートエージェントが orchestrator のルーティング
+なしに自己ループバックしない。`implementer` は同じ Spec に対して修正アクションを
+所有し、`implementer` が修正完了を報告したとき同じ品質ゲートエージェントが
+再レビューする。すべての CRITICAL/HIGH 指摘が解決されるまで (ゲート合格 ⇒
+マトリクス行 2 に従う `◐→☑` に適格) またはマイルストーンがドロップされる
+(`◐→✗` マトリクス行 3 に従う) まで、サイクルが続く。
+
+**名付けられていなかった "ループ所有者" の曖昧性の解決 (Spec R-01 (a))。**
+暫定プラクティスはルーティング所有者を暗黙にしていた。本 amendment は
+それを **名指しのロール: `orchestrator`** に解決する。ADR-014 の #08 amendment が
+Analyze ステップのプレディスパッチ (G1-G3 ガード) のためにすでに確立した
+ルーティング権威。#08 に対する MECE 境界は精確: #08 は **初期ディスパッチ**
+の **プレディスパッチ** 前提条件 (行は存在するか? Spec はディスク上にあるか?
+progress ファイルは表面化されたか?) を管理する; #21 は品質ゲートエージェントが
+すでに実装をレビューして指摘を返した後に発火する **ポストディスパッチ再ルーティング**
+を管理する。同じルーティングロール、2 つの非重複トリガーポイント、
+所有権のギャップなし (下の §(d) を参照して明示的な境界文を確認)。
+
+**ADR-016 との結合可能性 (Spec AC-4)。** ADR-016 の `specs/NN-progress.md`
+メカニズムは、`◐ in-progress` 中のセッションまたはコンパクション境界によって
+トリガーされ、品質ゲートループラウンドによってではない。単一セッション内で
+完了するループは progress ファイルを作成しない (境界を越えないため); セッション
+終了時にループが進行中の場合は両方のメカニズムが起動する (ループが境界を越えて
+続く; progress ファイルが再開エージェント向けにループ中間状態を捕捉する ──
+Spec R-02 は `progress-template.md` の `## Notes` フィールドのループ状態を
+記録するための自然な拡張を名付ける、これは step 5 での実装者詳細であり ADR 層
+メカニズムではない)。2 つのメカニズムは異なるトリガーで動作し非重複である。
+
+**2026-05-17 の #07 マトリクスとの結合可能性。** #21 の行アンカー不変条件は
+マトリクス行 2 の成功トリガー条件の逆命題である: 一緒に `◐→☑` 境界の
+完全な MECE 図を形成する。マトリクス行 2 は `◐→☑` が **いつ** 認可されるかを
+述べ (ゲート合格); #21 は **いつ** 禁止されるかを述べる (ゲートはまだ合格
+していない)。重複なし、ギャップなし。マトリクス行 3-4 (`◐→✗` / `☑→✗`) は
+影響を受けない; #21 の不変条件はオープンループ中の `◐→☑` 方向のみに適用される。
+
+### Documentation placement (Spec R-01 (a))
+
+正式化された再エントリルールと行アンカー不変条件は、**CLAUDE.md の `## Roadmap`
+Rules ブロック** に 1 つの追加された bullet として存在し、Development Workflow
+セクションにも、エージェントプロンプトに複製されることもない。根拠 (#07/#09
+amendment が適用した同じ 3 ステップ論拠、#21 に延長):
+
+- Rules ブロックは **インデックス隣接かつコンパクション耐久性を持つ**: すべての
+  エージェントがすべてのステップで読む Roadmap テーブルの直下に位置する
+  (Invariant 2)、そのため `orchestrator` と `implementer` は再エントリルールと
+  行アンカー不変条件に、修正をルーティングするかフリップを実行するまさにその
+  ステップで、**追加のファイル読み込みゼロで** 遭遇する ── Spec の R-01 (a)
+  受け入れ基準 ("step 6 を実行するエージェントが追加のファイル読み込みなしで
+  遭遇するよう文書化")。
+- **CLAUDE.md 行数ガイダンスを尊重する最も厳密な配置** である: Rules ブロックは
+  Roadmap セクションの *内部* であり、それはすでに認可された行数例外 (本 ADR の
+  2026-05-16 行数 amendment)。すでに免除されたセクションへの 1 つの追加
+  bullet は他の場所でバジェットを消費しない; `## Development Workflow` step 6 に
+  散文を追加すると非免除セクションを膨らませ、マトリクスをその逆命題から
+  分断することにもなる (一方は Rules ブロック内、他方は Workflow 散文内) ──
+  本 ADR が除去するために作成された "どのドキュメントが権威あるか" の
+  再発見問題そのもの。
+- **マトリクス隣接** である: 行アンカー不変条件は既存の #07 bullet の
+  `◐→☑` 句の逆命題である。成功方向 bullet の 1 つ下に逆命題を置くことで、
+  同じマトリクス行の 2 つの側面が共置され、#07 amendment が確立した
+  "ロードマップセルをフリップできる者の単一の真実の源" 特性を満たす。
+
+`orchestrator.md` Workflow step 散文へのルール配置が検討された (Spec R-01 (c)
+代替); 却下: (i) ルールは 4 つのロール (`orchestrator` がルーティング、
+`implementer` が修正、品質ゲートエージェントが再レビュー、`product-manager` が
+*早まってフリップしない*) を制約する ── 1 つのロールのプロンプトに置くと、
+4 つすべてにわたる複製 (ドリフト面) か、4 つのうち 3 つのロールが別のロールの
+プロンプトを読んでルールを発見することが必要になる (常時可読不変条件に違反);
+(ii) Rules ブロックと同じ方法でコンパクション耐久性を持たない (Invariant 2)、
+セッションごとに再読み込みを強制する; (iii) #07/#08/#09/#10/#11 amendment が
+同じ Roadmap メカニズムルールファミリーのために確立した規律を逆転させる ──
+すべての先行 amendment がエージェントプロンプトではなく Rules ブロックに
+ルールを配置した。
+
+正確な 1-bullet 文言は下の `implementer` に渡す; #08 G1-G3 に対する MECE
+境界 (Spec AC-5) と ADR-016 に対する MECE 境界 (Spec AC-4) は bullet 内で
+再述されるので、将来のマイルストーン著者が再エントリの質問を #08 に、
+progress ファイルの質問を #21 にルーティングしない。
+
+### Spec R-01 (b)(c)(d) judgements recorded for the implementer
+
+- **(b) Amendment vs new ADR:** ADR-014 amendment (トライアド 0/3、上記で決定)。
+  ADR-023 なし。行 #21 Design-source セルは #19/#20 amendment 引用形状で <!-- ref-allow: ADR-023 is the deliberately-rejected counter-proposal, intentionally never created -->
+  `adr:` リンクを取得:
+  `<br>adr: \`.claude/meta/adr/014-roadmap-index-single-entry-point.md\` (amended 2026-05-20)`。
+  これは Spec AC-6 の枝 (b) ("既存の ADR がそれらの質問に明示的に対処する
+  amendment を受け取る") と AC-9 ("新しい ADR が発行された場合、`adr:` リンクが
+  … `023-*.md` に解決する") を満たす ── `adr:` リンクは構造的解決を持つ ADR
+  (ここでは修正された ADR-014) に解決し、それは AC-9 がエンコードする
+  実質的コントラクトである。
+- **(c) エージェントプロンプト影響:** **エージェントプロンプト編集不要。**
+  再エントリルールはルーティングを ADR-014 の #08 amendment がすでに確立した
+  ルーティングコントラクトを持つロール (`orchestrator` が Analyze ステップ
+  ルーティングを所有する) に割り当てる。`implementer` はすでに Workflow step 5
+  実装を所有し、同じマイルストーンの Spec 内の修正を含む ── ロール変更なし。
+  4 つの品質ゲートエージェントはすでに step-6 レビューを所有する (`.claude/CLAUDE.md`
+  §Development Workflow step 6、変更なし); 再レビューアクションは初期ディスパッチで
+  実行するのと同じアクションであり、単に再ルーティングされた入力に対して。
+  `product-manager` はすでに ADR-014 §Decision および #07 マトリクスに従って
+  行書き込みを所有する; 行アンカー不変条件は `product-manager` がすでに唯一の
+  所有者である書き込みの *いつ* (方法や誰ではない) を制約する。常時読み込み
+  Rules ブロックにルールを記録する (プロンプトではなく) のは意図的な
+  最小表面の選択であり、#07/#08/#09/#10/#11 amendment がエージェントプロンプトから
+  変更を除外した一貫性と合致する。
+- **(d) CI ディテクター必要性:** **ディテクターは不要。** 3 つの理由:
+  1. **検出は存在しない監査ログインフラを要求する。** "CRITICAL/HIGH 指摘が
+     オープンな間に `☑` にフリップされた行" インシデントは、CI が glyph を
+     フリップしたコミットに対して品質ゲートエージェントの過去の指摘を
+     読めるときにのみ検出可能。テンプレートにそのような監査ログはない;
+     サブエージェントの指摘はエフェメラルなセッションアーティファクトであり、
+     コミットされない。そのインフラを構築することは #21 のスコープをはるかに
+     超える (Spec 非目標: "品質ゲートループコンプライアンスのための新しい CI
+     ディテクターの追加 … 存在しないスコープ外の監査ログインフラを要求する")。
+  2. **#05 はすでに glyph 値正確性を所有する (直交するチェック軸)。**
+     `check-roadmap-drift.sh` は各 Status セルが 4 つの認可された glyph
+     (☐ / ◐ / ☑ / ✗) のいずれかを保持することを検証する。それが Roadmap
+     メカニズムが実行できる静的チェックである。#21 のプロセスルール (誰がいつ、
+     どのゲート状態でフリップしたか) は動的であり #05 が所有する静的アーティファクト
+     コントラクトの外にある。#07 amendment の Rules-block bullet はすでにこの
+     MECE 境界を逐語的に述べている ("#05 は glyph *値* 正確性をチェックする;
+     #07 は *誰が* いつフリップするかを管理する ── CI は #07 を強制しない");
+     #21 の bullet は対称性のために再述された同じ境界を継承する。
+  3. **プロセスディテクターはディテクターファミリーの規律にない。** 既存の
+     7 つのディテクター (#04 dangling-refs、#05 drift、#06 bilingual-parity、
+     ADR-022 ref-allow-expiry、#14 research-tier-auth、ECC-delegation-consistency、
+     skill-invariants) はすべて **静的アーティファクトコントラクト** を強制する
+     (ファイルが存在する / ポインタが解決する / 見出しシーケンスが一致する /
+     glyph が 4 文字のいずれかである)。動的プロセスコンプライアンス (どのサブ
+     エージェントレビューラウンド中に行をフリップしたか) を監査するディテクターを
+     追加すると、新しいディテクターカテゴリを導入し、ファミリーの
+     locality-of-behavior 規律を破る。Spec AC-7 は正規セットを 7 つに明示的に
+     制限する; プロセスルールのための 8 番目のディテクターを追加すると
+     Spec AC-7 が閉じるコントラクトを拡張する。
+
+  この判断は #07 amendment のディテクターなし判断 (行 543-545: "CI ワークフロー
+  なし (Spec 非目標; #07 はプロセス/文書割り当てであり自動チェックではない)")
+  と対称であり、ファミリー内で最強のそのようなケースである (監査ログインフラ
+  なしでは自動強制は理論的にも達成不可能)。
+
+- **(d) claude-md-authoring Skill 必要性:** CLAUDE.md 編集の延期は
+  **既存の `## Roadmap` Rules リストへの 1 bullet 追記** であり ── CLAUDE.md の
+  `## CLAUDE.md authoring guidance` セクションの明示的なカーブアウト
+  ("Routine small edits (typo, single bullet, version bump) do not need the Skill")
+  による "ルーティン小規模編集 (…single bullet…)"。これは "重要な再構成"
+  ではない (セクション追加/移動/分割なし、見出し変更なし、不変条件タッチなし)。
+  **判断: #21 実装編集に対して claude-md-authoring Skill は不要。**
+  (もし実装者が代わりにサブ見出しやテーブルを追加することを選択した場合、それは
+  再構成に入り込み Skill が適用される ── しかしここでの設計は正確にルーティン
+  編集カーブアウトの下に留まるための意図的な単一 bullet であり、#07/#09
+  amendment を踏襲する。)
+
+### MECE boundary statement against #07 / #08 / #04 / #05 / ADR-016 (Spec R-03, AC-4, AC-5)
+
+再エントリルールは境界を再描画することなく既存のパーティションに適合する:
+
+| 所有者 | 質問 | トリガーポイント |
+|---|---|---|
+| #07 (上記 amendment) | ロードマップ Status glyph をフリップできる者はだれか、いつ各遷移が発火するか? | 遷移イベント自体 (成功パス: ゲート合格; ドロップパス: orchestrator 確認ドロップ) |
+| #21 (本 amendment) | ディスパッチと `◐→☑` フリップの **間** に 1 つ以上の品質ゲートエージェントが指摘を返す場合に何が保持されるか? | step-6 レビューが CRITICAL/HIGH 指摘を返した後、すべてのゲートエージェントが合格する前 |
+| #08 (上記 amendment) | いずれかのサブエージェントが最初にディスパッチされるために満たされなければならない前提条件は何か? | orchestrator の Analyze ステップ、プレディスパッチ |
+| #04 `check-dangling-refs.sh` | すべてのクロスリファレンスポインタが解決するか? | 静的アーティファクトスキャン、常時オン CI |
+| #05 `check-roadmap-drift.sh` | 各 Status セルが認可された glyph 値であるか、双方向 Roadmap インデックスコントラクトは intact か? | 静的アーティファクトスキャン、常時オン CI |
+| ADR-016 `specs/NN-progress.md` | インフライト状態はセッションまたはコンパクション境界を越えるか? | `◐` 中のセッション/コンパクション境界 |
+
+欠陥はちょうど 1 つの所有者にマップする: 指摘後のルーティング決定の欠如 ⇒ #21;
+glyph 文字ミスマッチ ⇒ #05; 壊れたポインタ ⇒ #04; プレディスパッチ前提条件
+失敗 ⇒ #08; フリップ自体の所有権とタイミング ⇒ #07; クロスセッション状態
+キャリー ⇒ ADR-016。Spec の AC-5 (#08 との境界) と AC-4 (ADR-016 との境界) は
+尊重される: #08 のトリガーポイントはプレディスパッチ (G1-G3 はいずれかの
+サブエージェントがタスクを受け取る **前** に発火する); #21 のトリガーポイントは
+ポストレビュー (サブエージェントはすでに指摘を返している **後**)。同じ
+`orchestrator` ロールが両方のルーティング決定を所有するが、トリガーポイントは
+時間的に入力的に非重複である。
+
+### Composability with #13 (ECC-absent degraded-review signal — Spec Key Interaction 4)
+
+#13 は、対応する ECC `<lang>-reviewer` Skill がフォークに存在しない場合に
+デグレードレビュー警告を発する ── 言語深度カバレッジは低減されるがレビューは
+続行する。#21 の再エントリルールは指摘の **生成** ではなく **ルーティング** を
+管理する。#13 が発火するとき、`code-reviewer` はメタレビューロールを引き続き
+所有し指摘を返す (一部 CRITICAL/HIGH、一部は存在しない Skill によりダウングレード);
+それらの指摘が届いたとき、#21 の再エントリルーティングは変更なく適用される ──
+orchestrator は指摘が完全またはデグレードレビューから来たかどうかに関わらず
+修正を `implementer` にルーティングする。2 つのマイルストーンは **非干渉**:
+#13 は再エントリルーティングや行アンカー不変条件を変更しない; #21 は
+デグレードレビューシグナルを変更しない。Spec Key Interaction 4 のステートメントは
+逐語的に保持される。
+
+### Downstream `implementer` tasks (performed in this same session — for #21 the two-session decision-then-implementation split used by #03/ADR-016 · #05/ADR-017 · #06/ADR-018 · #07/ADR-014-amendment · #08/ADR-014-amendment · #09/ADR-014-amendment · #10/ADR-014-amendment was deliberately collapsed; the rationale matches #11's collapse: #21's implementation is a single prose-only Rules-block bullet edit, fully enumerated below and verifiable against Spec AC-1 / AC-2 / AC-3 / AC-4 / AC-5 in one pass, requiring no separate review cycle; the task list is retained verbatim for traceability and as the precedent shape for milestones whose implementation *is* deferred)
+
+- `.claude/CLAUDE.md` の `## Roadmap` **Rules** ブロック ── 既存の #07
+  status-glyph-transitions bullet の後に 1 つの bullet を追記:
+  *"品質ゲートループ再エントリ (#21): 行が `◐ in-progress` であり、いずれかの
+  step-6 品質ゲートエージェント (code-reviewer、linter、security-reviewer、
+  performance-engineer) からの 1 つ以上の CRITICAL/HIGH 指摘がオープンである間、
+  `orchestrator` は修正タスクを `implementer` にルーティングし直し、行は
+  ループ全期間 `◐` に留まる。`◐→☑` フリップは #07 に従い、そのマイルストーンの
+  すべての品質ゲートエージェントが合格した後のみ発火する ── ループの出口条件であり、
+  ループ中間アクションではない。ADR-016 progress ファイルはループがセッションまたは
+  コンパクション境界を越える場合のみ適用される; インセッションループは
+  progress ファイルを作成しない。#08 G1-G3 は初期ディスパッチ (プレディスパッチ) を
+  管理する; #21 は品質ゲートエージェントが指摘を返した後の再エントリ (ポストレビュー)
+  を管理する ── 非重複トリガー、同じ `orchestrator` ルーター。CI は #21 を
+  強制しない (プロセスルール; #05 は glyph 値正確性を所有し、直交するチェック軸)。"*
+  単一 bullet、サブ見出しなし、テーブルなし ── ルーティン編集カーブアウト内に
+  留まる (claude-md-authoring Skill 起動不要)、正確に #07 amendment 形状。
+- `.claude/CLAUDE.md` の `## Roadmap` テーブル行 #21 ── Design-source セルを
+  `spec:` のみから以下に:
+  `spec: \`specs/21-quality-gate-row-anchor.md\`<br>adr: \`.claude/meta/adr/014-roadmap-index-single-entry-point.md\` (amended 2026-05-20)`。
+  これは ADR-014 の既存の書き込み所有権ルール ("architect が `adr:` リンクを
+  追加する") に従う `architect` 書き込み; **本 amendment の同じ変更で** 実行され、
+  行 #19/#20 のパターンを踏襲して新 ADR ではなく修正された ADR を指す。行の
+  Status glyph は `product-manager` が Spec 著作時に `☐→◐` にフリップした
+  (#07 amendment が義務付けたアトミックアクション); 本 amendment は glyph に
+  触れずに同じ行の `adr:` リンクセルのみを追加する。`product-manager` は
+  #07 amendment に従い、step-6 品質ゲートが合格し step 7-9 が完了した後、
+  step 6 クローズアウトで `◐→☑` フリップを実行する。
+- **エージェントプロンプト編集なし** (上記判断)。実装者は `orchestrator.md`、
+  `implementer.md`、`code-reviewer.md`、`product-manager.md`、またはその他の
+  エージェントファイルに再エントリルーティング散文を追加して **はならない**;
+  Rules ブロックが単一の情報源である。
+- **CI ワークフローなし、新ディテクターなし、新テストスイートなし** (上記判断;
+  Spec 非目標と AC-7/AC-8)。既存の 7 つのディテクターと 8 つのテストスイートは
+  変更なしに合格し続ける。
+- **本 amendment では `progress-template.md` 編集なし。** Spec R-02 はセッション
+  境界を越える品質ゲートループのループ状態を記録するためのテンプレートの
+  `## Notes` フィールドの自然な拡張を識別する; それはその正確なシナリオで
+  progress ファイルを著作する際の `implementer` step-5 詳細であり、本 amendment
+  が実行するテンプレート変更ではない。現在のテンプレートはすでに自由形式の
+  ノートを許可している; ループ状態を `## Notes` エントリとしてエンコードすることは
+  既存の表面を変更なしで使用する。
+- 本 ADR の日本語版 (`014-roadmap-index-single-entry-point.ja.md`) は
+  鏡映 amendment を受け取らなければならず、CLAUDE.md の日本語版 (存在する場合) は
+  鏡映 Rules-block bullet を受け取らなければならない ── `technical-writer` の
+  タスクであり、本変更の一部ではない。**本 amendment は ADR-014 の JA/EN
+  見出しの一時的なミスマッチを生じさせる (`technical-writer` が鏡映するまで);
+  #06 bilingual-parity ディテクター (`check-bilingual-parity.sh`) は鏡映が
+  着陸するまで ADR-014 で FAIL する。これは期待されるキューに入った
+  `technical-writer` タスクであり、本 EN amendment を省略する理由ではない。**
+  (同じ一時的状態が #07、#08、#09、#10、#11、#19、#20 の各 amendment で
+  順次受け入れられた。)
+- `specs/21-quality-gate-row-anchor.ja.md` はロードマップ #06 見出しツリー
+  パリティ所有権に従い step 7 で `technical-writer` が著作する;
+  本 amendment の一部ではない。
+- `CHANGELOG.md` の `## [Unreleased]` 下の品質ゲートループ再エントリ
+  正式化を記録するエントリは step 7 で `technical-writer` が著作する
+  (Spec AC-10); 本 amendment の一部ではない。
+
+### Counter-proposal
+
+真剣な反対案は **新 ADR-023 ── 品質ゲートループ再エントリルールを ADR-014 <!-- ref-allow: ADR-023 is the deliberately-rejected counter-proposal, intentionally never created -->
+amendment ではなくスタンドアロン ADR として正式化する** である。これは
+ADR-012 / ADR-014 / ADR-015 / ADR-016 / ADR-017 / ADR-018 の、却下された
+代替案をストローマンとしてではなく真剣に取り上げる慣例に従い記録する。
+論拠:
+
+1. Spec は `architect` に明示的な (b) 選択肢 ("新 ADR-023 が存在する … または <!-- ref-allow: ADR-023 is the deliberately-rejected counter-proposal, intentionally never created -->
+   既存の ADR がそれらの質問に対処する amendment を受け取る") を渡す ──
+   Spec AC-6 は ADR-023 を最初の枝として名指しし、#03 / #04 / #05 / #06 / <!-- ref-allow: ADR-023 is the deliberately-rejected counter-proposal, intentionally never created -->
+   #12 / #13 が新 ADR を受け取ったマイルストーンとのパリティを示唆する。
+2. orchestrator の失敗パスルーティングを制約する再エントリルーティングルールは
+   第一級の引用可能なコントラクトである; 長い ADR-014 トレールの 7 番目の
+   amendment として埋めることは、"品質ゲートループ ADR" として引用できる
+   専用 ADR-023 より発見しにくくする。 <!-- ref-allow: ADR-023 is the deliberately-rejected counter-proposal, intentionally never created -->
+3. 再エントリパスは複数の ADR と相互作用する (progress ファイル境界を介した
+   ADR-016、`◐→☑` 逆命題を介した #07 マトリクス、ルーティングトリガー MECE
+   境界を介した #08、デグレードレビュー互換性を介した #13)。スタンドアロン
+   ADR は 4 方向境界ステートメントを明示的に所有でき、2400+ 行の ADR-014 に
+   別のセクションを追記するよりよい。
+
+**反対案を採用しなかった理由:**
+
+- ADR-017、ADR-018、ADR-019、ADR-020、ADR-021、ADR-022 はそれぞれ ADR-018
+  Alternative-B トライアドで 2/3 または 3/3 スコアで新 ADR 相当と自己分類した。
+  #21 は **0/3** をスコアする ── ファミリー内で最強の amendment ケース (新しい
+  コントラクト境界なし、新しいキーイング/メカニズムなし、新しい構造的アーティファクト
+  なし)。兄弟対称性論拠は検査すると逆転する: #03/#04/#05/#06/#12/#13 が
+  自身に使用した同じトライアド識別子を適用すると、#21 について "amendment"
+  が出る、なぜなら彼らにとって支配的だった構造的半分が #21 では完全に
+  不在だから ── ルールは ADR-014 自身がすでに述べる成功パストリガーの
+  失敗パス逆命題 (まさにこれが延長する amendment 内) である。これは正確に
+  #07/#08/#09/#10/#11 amendment が別の ADR-019 番号を拒否するために使用した
+  推論であり、#19/#20 amendment が 1/3 で再適用した。
+- 発見容易性は ADR-014 amendment として *より良く*、悪くない: 4 行の
+  Status-Transition マトリクスとその逆命題文 (行アンカー不変条件) は 1 つの
+  ファイルに属し、2 つにではない。"step 6 中のロードマップ行の Status を
+  管理するものは何か" を読者が探す正規の場所は、Roadmap を定義し成功方向
+  トリガーをすでに述べる ADR; 別個の ADR-023 はマトリクスを 2 つの ADR <!-- ref-allow: ADR-023 is the deliberately-rejected counter-proposal, intentionally never created -->
+  に *断片化する* ── orchestrator は `◐→☑` の完全な図を知るために
+  ADR-014 *と* ADR-023 の両方を読む必要があり、ADR-014 が除去するために <!-- ref-allow: ADR-023 is the deliberately-rejected counter-proposal, intentionally never created -->
+  存在する "どのドキュメントが権威あるか" の再発見問題を再導入する。
+- 双方向バックリンク論拠は新 ADR なしで満たされる: 本 amendment は
+  `(amended 2026-05-20)` アノテーション付きで行 #21 の `adr:` リンクを
+  #19/#20 形状で populate し、AC-9 が要求する引用表面を行に与える。
+  ADR-014 には独自のマイルストーン行がないため、バックリンクは正しく
+  一方向 (行 → amendment) であり、#07/#08/#09/#10/#11 の前例と整合する。
+- 4 方向境界論拠は ADR-014 amendment として *より良く*、悪くない: #08
+  (ルーティングトリガー MECE 境界パートナー) 自体が ADR-014 amendment であり、
+  #07 マトリクス (成功方向パートナー) 自体が ADR-014 amendment である。
+  ADR-014 に 4 方向境界を述べることで 4 つの境界パートナーすべてが 1 つの
+  ファイルに保持される; 別個の ADR-023 では境界が ADR-014 の 3 つのセクションを <!-- ref-allow: ADR-023 is the deliberately-rejected counter-proposal, intentionally never created -->
+  行範囲でクロス引用しなければならない ── 局所性論拠は amendment の方向に
+  厳密に働く。
+
+**この反対案を再評価するトリガー条件 (すなわち ADR-023 が正当化されるとき):** <!-- ref-allow: ADR-023 is the deliberately-rejected counter-proposal, intentionally never created -->
+
+- 将来のマイルストーンが品質ゲートループコンプライアンスを静的に監査する
+  **CI ディテクター** を追加する ── 例えば各サブエージェントの指摘とそれに
+  続くコミットを記録する監査ログメカニズム、および未解決の CRITICAL/HIGH
+  指摘を古くするコミットより `◐→☑` フリップをフラグするディテクター。
+  そのディテクター + #05 の glyph 値チェックに対する MECE 境界 + キーイング
+  ルールはトライアドを満たし独自の ADR を正当化する (本 amendment のプロセス
+  ルールをその継承ベースラインとして)。
+- 品質ゲートループが process bullet を超える **新しい構造的メカニズム** を
+  必要とすると判明する ── 例えば再エントリ時に orchestrator がパースする
+  マシン読み取り可能なマイルストーンごとのゲート状態マニフェスト、または
+  `◐` 内に名付けられたサブ状態を持つ品質ゲート状態機械。そのようなメカニズムは
+  新しいキーイングルールと新しいアーティファクトを導入し、トライアドを満たす。
+- 4 方向境界ステートメント (#21 vs #07、#08、#04、#05、ADR-016、#13) が
+  フォークプロファイルごとに分岐した再エントリセマンティクスを必要とすると
+  判明する (例えば 1 つ以上の品質ゲートエージェントをドロップするフォークが
+  異なるルーティングルールを必要とする) ── その時点では ADR-014 の単一ルールが
+  それを表現できず、専用 ADR のプロファイルごとルーティングマトリクスが
+  正当化される。
+
+反対案は ADR-012 / ADR-014 / ADR-015 / ADR-016 / ADR-017 / ADR-018 の
+慣例に従い、決定の最も深刻な異論の歴史的記録として本 amendment に残る。
+
+元のステータス行 (`Accepted — 2026-05-15`) は変更しない; 本 amendment は
+2026-05-17 status-transition amendment が成功パスですでに認可した所有権ルールの
+失敗パス逆命題を記録するものであり、決定を再開するものではない。

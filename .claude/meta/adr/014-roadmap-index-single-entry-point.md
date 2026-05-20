@@ -209,6 +209,10 @@ the templates — those are downstream implementation tasks owned by
   "Roadmap row: #NN" example/back-link (downstream task).
 - `.github/workflows/workaround-check.yml` — the shape the deferred,
   out-of-scope drift-check CI would follow if added later.
+- Roadmap row: #21 (this ADR's 2026-05-20 amendment records the
+  quality-gate loop re-entry rule and row-anchor invariant decided
+  by that milestone; see §Amendment — 2026-05-20 (quality-gate loop
+  re-entry anchored to Roadmap row) below)
 
 ## Amendment — 2026-05-16 (Spec reservation rule)
 
@@ -2420,3 +2424,510 @@ The original Status line (`Accepted — 2026-05-15`) is unchanged; this
 amendment records a placement decision that populates a slot ADR-014's
 own §(d) MECE table pre-reserved for #11 and does not reopen the
 Decision (nor ADR-010's, which it leaves verbatim).
+
+## Amendment — 2026-05-20 (quality-gate loop re-entry anchored to Roadmap row)
+
+This amendment closes the failure-path converse of the
+`◐ in-progress → ☑ done` row of the 2026-05-17 status-transition
+ownership matrix above. That matrix sanctioned the **success path**
+(`◐→☑` after the step-6 quality gate **passes**, owned by
+`product-manager`). It did **not** state what happens during the gate
+when one or more quality-gate agents return CRITICAL or HIGH findings —
+the fix-and-re-review loop that, in practice, every prior milestone has
+exercised but no formalized rule named. `specs/21-quality-gate-row-anchor.md`
+(Roadmap row #21) is the authoritative scope; it defers the structural
+*how* to `architect` (its Risk R-01 (a)–(d)). This amendment records
+that decision. It is a **consequence-clarification of the 2026-05-17
+status-transition matrix**, not a new structural decision: the matrix's
+`◐→☑` row already states the gate-pass trigger; #21 names what holds
+while the gate has *not yet* passed. No new detector, boundary, keying,
+or mechanism is introduced. Per the ECC precedent this ADR's
+2026-05-16, 2026-05-17 (×5), 2026-05-20 (ADR-006), and 2026-05-20
+(ADR-011) amendments apply ("consequence-clarifications fold into
+amendments; new ADR numbers are reserved for new structural decisions" —
+ADR-015 §Context, ADR-017/ADR-018 Alternative B), this is an ADR-014
+amendment, **not ADR-023**. No ADR-023 is created; Roadmap row #21 <!-- ref-allow: ADR-023 is the deliberately-rejected counter-proposal; it is intentionally never created (see Counter-proposal below) -->
+gains an `adr:` link to ADR-014 with the `(amended 2026-05-20)`
+annotation, mirroring the row #19/#20 amendment-citation shape, while
+ADR-014 has no milestone row of its own and so carries no
+`Roadmap row:` line for #21 — the row-back-link contract is one-way
+(row → amendment), consistent with the #07/#08/#09/#10/#11 amendment
+precedents that left their corresponding Roadmap rows `spec:`-only.
+
+(#21's row receives an `adr:` link in this amendment because Spec AC-9
+explicitly requires the `adr:` link to resolve to the ADR if any new ADR
+was issued — and an amendment with an explicit Roadmap row attribution
+is the substantive equivalent of a row-bound ADR for citation purposes.
+The #07/#08/#09/#10/#11 rows did not receive `adr:` links because their
+Specs did not state that acceptance criterion; #21's Spec does. The
+contract surface — "the row points to the source of structural
+resolution" — is honored equivalently in both shapes.)
+
+### Triad classification — 0/3, amendment-not-new-ADR
+
+The Spec hands `architect` the ADR-018 Alternative-B triad
+discriminator (new contract boundary + new keying/mechanism + new
+structural artifact ⇒ new ADR; consequence-clarification inside an
+existing contract ⇒ amendment). Applied clause by clause to #21:
+
+- **New contract boundary? No.** The 2026-05-17 #07 status-transition
+  amendment above (lines 415–425) already established the
+  `◐→☑` trigger condition verbatim: "After the Workflow step 6 quality
+  gate passes for the milestone … `product-manager` … performs the
+  flip; no other role may." #21's row-anchor invariant (Spec AC-2) is
+  the **logical converse** of that already-stated success condition:
+  while the gate has not yet passed (one or more CRITICAL/HIGH findings
+  open), no row transition occurs. This is consequence-clarification of
+  an already-stated trigger, not a new contract boundary. The re-entry
+  routing (Spec AC-1: `orchestrator` routes the fix back to
+  `implementer`) maps to roles whose Workflow contracts ADR-014 already
+  establishes — `orchestrator` is the Analyze/routing authority (#08
+  amendment lines 716–760), `implementer` owns step-5 implementation
+  including fixes within the same milestone's Spec (no role change).
+  No new role, no new ownership concept, no new contract surface.
+- **New keying / mechanism? No.** The mechanism by which the loop is
+  governed is the **same Status glyph cell** the #07 amendment already
+  owns; the same `## Roadmap` Rules block already documents who may
+  write it and when. The Spec explicitly forbids "Adding a new CI
+  detector for quality-gate loop compliance" (Non-goal) and "Designing
+  a general workflow-state-machine engine" (Non-goal). Spec R-01 (d)
+  defers the CI detector necessity to `architect`; this amendment's
+  judgement is **no detector** (see §(d) below). No new YAML key, no
+  new regex, no new file format, no new short-circuit, no new
+  detector. The existing `check-roadmap-drift.sh` (#05) glyph-value
+  well-formedness check remains the sole automated touch on the Status
+  cell — the MECE boundary against #05 (already stated by the #07
+  bullet in the Rules block: "no CI enforces #07") extends unchanged
+  to #21.
+- **New structural artifact? No.** No new file, no new directory, no
+  new CI workflow, no new agent role, no new Skill, no new template,
+  no new workflow step (Spec Non-goal: "The quality-gate loop is
+  already implicit in step 6; #21 names the ownership and anchor
+  invariant within that step, not a new step number"). The placement
+  target is the same `## Roadmap` Rules block in CLAUDE.md the #07
+  amendment populated; the artifact is one added Rules-block bullet,
+  not a new section, table, or sub-heading. Spec AC-7 requires the
+  seven canonical detectors all green; AC-8 requires the eight
+  canonical test suites all passing — explicit Spec affirmation that
+  no new detector/test joins the canonical set.
+
+Triad total: **0/3**. Per ADR-018 Alternative-B (and the
+ADR-022 §1 / ADR-006 amendment 2026-05-20 / ADR-011 amendment
+2026-05-20 applications of the same discriminator), 0–2/3 routes to an
+**amendment of the existing ADR**, not a new ADR. ADR-022's
+"new-ADR-vs-amendment" reasoning explicitly states that the triad
+fires 3/3 to warrant a new ADR; #21's 0/3 is the strongest amendment
+case in the family (stronger than #19's 1/3 and #20's 1/3 because #21
+introduces literally no new contract direction, only the converse
+statement of one already inside this very ADR). A new ADR-023 was <!-- ref-allow: ADR-023 is the deliberately-rejected counter-proposal, intentionally never created -->
+considered (Spec AC-6 names it as one branch of the OR) and rejected: <!-- ref-allow: counterfactual reference; ADR-023 deliberately not issued per triad 0/3 outcome | expires: 2026-07-20 -->
+folding the resolution into ADR-014 itself keeps the four-row
+Status-Transition Matrix and its converse-statement (the row-anchor
+invariant) co-located at a single source of truth, matches the
+#07/#08/#09/#10/#11 amendment shape exactly, and avoids fragmenting the
+Roadmap-mechanism contract across two ADRs — the same reasoning the
+#07 amendment counter-proposal lines 599–607 used to reject a separate
+ADR-019 for the success-direction matrix. <!-- ref-allow: ADR-019 is the deliberately-rejected counter-proposal for the #07 success-direction matrix; intentionally never created -->
+
+### The row-anchor invariant and re-entry routing rule
+
+Exactly two complementary statements, both consequences of the
+2026-05-17 status-transition matrix's `◐→☑` row:
+
+**Row-anchor invariant (Spec AC-2 / AC-3).** A Roadmap row at
+`◐ in-progress` remains at `◐ in-progress` for the full duration of
+the quality-gate loop; no actor flips it to `☑`, `✗`, or `☐` while one
+or more CRITICAL or HIGH findings from any step-6 quality-gate agent
+(`code-reviewer`, `linter`, `security-reviewer`, `performance-engineer`)
+are open. The `◐→☑` transition fires **once and only when** every
+quality-gate agent has passed for that milestone — the exit condition,
+not a mid-loop action. The `◐→✗` transition fires only on an
+`orchestrator`-confirmed drop decision (matrix row 3 unchanged).
+
+**Re-entry routing (Spec AC-1).** When any quality-gate agent returns
+one or more CRITICAL or HIGH findings, the **orchestrator** is the
+named routing owner: it routes the fix task back to `implementer` and
+initiates re-review. No other agent self-assigns the fix unilaterally;
+no quality-gate agent loops back to itself without orchestrator
+routing. `implementer` owns the fix action against the same Spec, and
+the same quality-gate agents re-review when `implementer` reports the
+fix complete. The cycle continues until all CRITICAL/HIGH findings are
+resolved (gate passes ⇒ row eligible for `◐→☑` per matrix row 2) or
+the milestone is dropped (`◐→✗` per matrix row 3).
+
+**Resolving the unnamed "loop owner" ambiguity (Spec R-01 (a)).** The
+interim practice left the routing owner implicit. This amendment
+resolves it to a **named role: `orchestrator`**, the routing authority
+ADR-014's #08 amendment already established for Analyze-step pre-
+dispatch (G1–G3 guard). The MECE boundary against #08 is precise: #08
+governs the **pre-dispatch** preconditions for **initial dispatch**
+(does the row exist? Spec on disk? progress file surfaced?); #21
+governs the **post-dispatch re-routing** that fires when a
+quality-gate agent has already reviewed an implementation and returned
+findings. Same routing role, two non-overlapping trigger points, no
+ownership gap. (See §(d) below for the explicit boundary statement.)
+
+**Composability with ADR-016 (Spec AC-4).** ADR-016's
+`specs/NN-progress.md` mechanism is triggered by a session or
+compaction boundary while `◐ in-progress`, not by a quality-gate loop
+round. A loop that completes within a single session creates no
+progress file (no boundary crossed); a loop mid-flight when a session
+ends invokes both mechanisms (the loop continues across the boundary;
+the progress file captures the mid-loop state for the resuming
+agent — Spec R-02 names the natural extension of the
+`progress-template.md` `## Notes` field to record loop state, which is
+an implementer detail at step 5, not an ADR-layer mechanism). The two
+mechanisms operate on different triggers and are non-overlapping.
+
+**Composability with the 2026-05-17 #07 matrix.** #21's row-anchor
+invariant is the converse of matrix row 2's success-trigger condition:
+together they form a complete MECE picture of the `◐→☑` boundary.
+Matrix row 2 says **when** `◐→☑` is authorized (gate passes); #21
+says **when** it is prohibited (gate has not yet passed). No overlap,
+no gap. Matrix rows 3–4 (`◐→✗` / `☑→✗`) are unaffected; #21's invariant
+applies only to the `◐→☑` direction during an open loop.
+
+### Documentation placement (Spec R-01 (a))
+
+The formalized re-entry rule and row-anchor invariant live in the
+**CLAUDE.md `## Roadmap` Rules block** as one added bullet, **not** in
+the Development Workflow section and **not** duplicated into agent
+prompts. Rationale (the same three-step argument the #07/#09 amendments
+applied, now extended to #21):
+
+- The Rules block is **index-adjacent and compaction-durable**: it
+  sits directly under the Roadmap table every agent reads on every
+  step (Invariant 2), so `orchestrator` and `implementer` encounter
+  the re-entry rule and row-anchor invariant at exactly the step they
+  would route a fix or perform a flip, with **zero additional file
+  reads** — the Spec's R-01 (a) acceptance criterion ("documented so
+  an agent executing step 6 encounters them without additional file
+  reads").
+- It is the **tightest placement** respecting the CLAUDE.md
+  line-budget guidance: the Rules block is *inside* the Roadmap
+  section, which is already the sanctioned line-budget exception (this
+  ADR's 2026-05-16 line-budget amendment). One added bullet to an
+  already-exempt section costs no budget elsewhere; adding prose to
+  `## Development Workflow` step 6 would bloat a non-exempt section
+  and would also fragment the matrix from its converse (one in the
+  Rules block, one in the Workflow prose) — the exact rediscovery
+  problem this ADR was created to remove.
+- It is **matrix-adjacent**: the row-anchor invariant is the converse
+  of the existing #07 bullet's `◐→☑` clause. Placing the converse one
+  bullet below the success-direction bullet keeps the two facets of
+  the same matrix row co-located, satisfying the "one source of
+  truth for who may flip a Roadmap cell" property #07's amendment
+  established.
+
+Placing the rule in `orchestrator.md` Workflow step prose was
+considered (Spec R-01 (c) alternative); rejected because (i) the rule
+constrains four roles (`orchestrator` routes, `implementer` fixes,
+quality-gate agents re-review, `product-manager` does *not* flip
+prematurely) — placing it in one role's prompt would require either
+duplicating it across four prompts (drift surface) or leaving three of
+the four roles to discover the rule by reading another role's prompt
+(violates the always-readable invariant); (ii) it would not be
+compaction-durable in the same way the Rules block is (Invariant 2),
+forcing re-reads each session; (iii) it would invert the discipline
+the #07/#08/#09/#10/#11 amendments established for the same family of
+Roadmap-mechanism rules — every prior amendment placed its rule in the
+Rules block, never in an agent prompt.
+
+The exact one-bullet wording is handed to `implementer` below; the
+MECE boundary against #08 G1–G3 (Spec AC-5) and the MECE boundary
+against ADR-016 (Spec AC-4) are restated in the bullet so a future
+milestone author does not route a re-entry question to #08 or a
+progress-file question to #21.
+
+### Spec R-01 (b)(c)(d) judgements recorded for the implementer
+
+- **(b) Amendment vs new ADR:** ADR-014 amendment (triad 0/3, decided
+  above). No ADR-023. Row #21 Design-source cell gains an `adr:` link <!-- ref-allow: ADR-023 is the deliberately-rejected counter-proposal, intentionally never created -->
+  in the #19/#20 amendment-citation shape:
+  `<br>adr: \`.claude/meta/adr/014-roadmap-index-single-entry-point.md\` (amended 2026-05-20)`.
+  This satisfies Spec AC-6 branch (b) ("an existing ADR receives an
+  amendment explicitly addressing those questions") and AC-9 ("if a
+  new ADR was issued, the `adr:` link resolves to … `023-*.md`") — the
+  `adr:` link resolves to the ADR carrying the structural resolution
+  (here, the amended ADR-014), which is the substantive contract AC-9
+  encodes.
+- **(c) Agent-prompt impact:** **no agent prompt requires editing.**
+  The re-entry rule assigns routing to a role whose routing contract
+  ADR-014's #08 amendment already established (`orchestrator` owns
+  Analyze-step routing). `implementer` already owns Workflow step 5
+  implementation, which includes fixes within the same milestone's
+  Spec — no role change. The four quality-gate agents already own
+  step-6 review (`.claude/CLAUDE.md` §Development Workflow step 6,
+  unchanged); the re-review action is the same action they perform on
+  initial dispatch, just on a re-routed input. `product-manager`
+  already owns row writes per ADR-014 §Decision and the #07 matrix;
+  the row-anchor invariant constrains *when* (not *how* or *who*) for
+  a write `product-manager` is already the sole owner of. Recording
+  the rule in the always-read Rules block (not in prompts) is the
+  deliberate minimal-surface choice, consistent with the
+  #07/#08/#09/#10/#11 amendments keeping their changes out of agent
+  prompts.
+- **(d) CI detector necessity:** **no detector is warranted.** Three
+  reasons:
+  1. **Detection requires audit-log infrastructure that does not
+     exist.** A "row flipped to `☑` while CRITICAL/HIGH findings open"
+     incident is only detectable if the CI can read the quality-gate
+     agents' historical findings against the commit that flipped the
+     glyph. The template has no such audit log; sub-agent findings are
+     ephemeral session artifacts, not committed. Building that
+     infrastructure is far beyond #21's scope (Spec Non-goal:
+     "Adding a new CI detector for quality-gate loop compliance …
+     requires audit-log infrastructure that does not exist and is not
+     in scope").
+  2. **#05 already owns glyph-value well-formedness (the orthogonal
+     check axis).** `check-roadmap-drift.sh` validates that every
+     Status cell holds one of the four sanctioned glyphs (☐ / ◐ / ☑ /
+     ✗). That is the static check the Roadmap mechanism can perform.
+     #21's process rule (who flipped when, in what gate state) is
+     dynamic and lies outside the static-artifact contract #05 owns.
+     The #07 amendment's Rules-block bullet already states this MECE
+     boundary verbatim ("#05 checks glyph *value* well-formedness;
+     #07 governs *who* flips and *when* — no CI enforces #07"); #21's
+     bullet inherits the same boundary, restated for symmetry.
+  3. **A process detector is not the discipline of the detector
+     family.** The existing seven detectors (#04 dangling-refs, #05
+     drift, #06 bilingual-parity, ADR-022 ref-allow-expiry, #14
+     research-tier-auth, ECC-delegation-consistency, skill-invariants)
+     all enforce **static-artifact contracts** (a file exists / a
+     pointer resolves / a heading sequence matches / a glyph is one of
+     four characters). Adding a detector that audits dynamic process
+     compliance (who flipped a row during which sub-agent review
+     round) would introduce a new detector category and break the
+     family's locality-of-behavior discipline. Spec AC-7 explicitly
+     bounds the canonical set at seven; adding an eighth detector for
+     a process rule would expand a contract Spec AC-7 closes.
+
+  The judgement is symmetric with the #07 amendment's no-detector
+  judgement (lines 543–545: "No CI workflow (Spec Non-goals; #07 is a
+  process/documentation assignment, not an automated check)") and is
+  the strongest such case in the family (no automated enforcement is
+  even theoretically achievable without audit-log infrastructure).
+
+- **(d) claude-md-authoring Skill necessity:** the deferred CLAUDE.md
+  edit is **one bullet appended to the existing `## Roadmap` Rules
+  list** — a "routine small edit (… single bullet …)" by the explicit
+  carve-out in CLAUDE.md's `## CLAUDE.md authoring guidance` section
+  ("Routine small edits (typo, single bullet, version bump) do not
+  need the Skill"). It is **not** "significant restructuring" (no
+  section added/moved/split, no heading change, no invariant touched).
+  **Judgement: the claude-md-authoring Skill is NOT required** for
+  the #21 implementation edit. (If the implementer instead chooses to
+  add a sub-heading or a table, that *would* cross into restructuring
+  and the Skill would then apply — but the design here is
+  deliberately a single bullet precisely to stay under the
+  routine-edit carve-out, mirroring the #07/#09 amendments.)
+
+### MECE boundary statement against #07 / #08 / #04 / #05 / ADR-016 (Spec R-03, AC-4, AC-5)
+
+The re-entry rule fits the existing partition without re-drawing any
+boundary:
+
+| Owner | Question | Trigger point |
+|---|---|---|
+| #07 (above amendment) | Who flips a Roadmap Status glyph, and when does each transition fire? | The transition event itself (success path: gate passes; drop path: orchestrator-confirmed drop) |
+| #21 (this amendment) | What holds **between** dispatch and the `◐→☑` flip when one or more quality-gate agents return findings? | After step-6 review returns CRITICAL/HIGH findings, before all gate agents pass |
+| #08 (above amendment) | What preconditions must hold for any sub-agent to be dispatched in the first place? | Orchestrator's Analyze step, pre-dispatch |
+| #04 `check-dangling-refs.sh` | Does every cross-reference pointer resolve? | Static-artifact scan, always-on CI |
+| #05 `check-roadmap-drift.sh` | Is each Status cell a sanctioned glyph value, and is the bidirectional Roadmap-index contract intact? | Static-artifact scan, always-on CI |
+| ADR-016 `specs/NN-progress.md` | What in-flight state crosses a session or compaction boundary? | Session/compaction boundary while `◐` |
+
+A defect maps to exactly one owner: a missing routing decision after
+findings ⇒ #21; a glyph-character mismatch ⇒ #05; a broken
+pointer ⇒ #04; a pre-dispatch precondition failure ⇒ #08; the
+ownership-and-timing of a flip itself ⇒ #07; cross-session state
+carry ⇒ ADR-016. The Spec's AC-5 (boundary against #08) and AC-4
+(boundary against ADR-016) are honored: #08's trigger point is
+pre-dispatch (G1–G3 fire **before** any sub-agent receives a task);
+#21's trigger point is post-review (a sub-agent has **already**
+returned findings). The same `orchestrator` role owns both routing
+decisions, but the trigger points are non-overlapping in time and in
+input.
+
+### Composability with #13 (ECC-absent degraded-review signal — Spec Key Interaction 4)
+
+#13 emits a degraded-review warning when the matching ECC
+`<lang>-reviewer` Skill is absent in a fork — the language-depth
+coverage is reduced but the review still proceeds. #21's re-entry rule
+governs **routing** of findings, not their **production**. When #13
+fires, the `code-reviewer` still owns the meta-review role and still
+returns findings (some CRITICAL/HIGH, some downgraded due to the
+absent Skill); when those findings arrive, #21's re-entry routing
+applies unchanged — the orchestrator routes the fix back to
+`implementer` regardless of whether the findings came from a full or
+degraded review. The two milestones are **non-interfering**: #13 does
+not alter the re-entry routing or the row-anchor invariant; #21 does
+not alter the degraded-review signal. The Spec Key Interaction 4
+statement holds verbatim.
+
+### Downstream `implementer` tasks (performed in this same session — for #21 the two-session decision-then-implementation split used by #03/ADR-016 · #05/ADR-017 · #06/ADR-018 · #07/ADR-014-amendment · #08/ADR-014-amendment · #09/ADR-014-amendment · #10/ADR-014-amendment was deliberately collapsed; the rationale matches #11's collapse: #21's implementation is a single prose-only Rules-block bullet edit, fully enumerated below and verifiable against Spec AC-1 / AC-2 / AC-3 / AC-4 / AC-5 in one pass, requiring no separate review cycle; the task list is retained verbatim for traceability and as the precedent shape for milestones whose implementation *is* deferred)
+
+- `.claude/CLAUDE.md` `## Roadmap` **Rules** block — append one bullet
+  after the existing #07 status-glyph-transitions bullet, of the form:
+  *"Quality-gate loop re-entry (#21): while a row is `◐ in-progress`
+  and one or more CRITICAL/HIGH findings from any step-6 quality-gate
+  agent (code-reviewer, linter, security-reviewer,
+  performance-engineer) remain open, `orchestrator` routes the fix
+  task back to `implementer` and the row stays `◐` for the full loop
+  duration. The `◐→☑` flip per #07 fires only after every quality-gate
+  agent passes for that milestone — the loop's exit condition, not a
+  mid-loop action. ADR-016 progress files apply only when the loop
+  crosses a session or compaction boundary; an in-session loop creates
+  no progress file. #08 G1–G3 govern initial dispatch (pre-dispatch);
+  #21 governs re-entry after a quality-gate agent has returned
+  findings (post-review) — non-overlapping triggers, same `orchestrator`
+  router. No CI enforces #21 (process rule; #05 owns glyph-value
+  well-formedness, the orthogonal check axis)."* Single bullet, no
+  sub-heading, no table — stays within the routine-edit carve-out (no
+  claude-md-authoring Skill invocation required), exactly the #07
+  amendment shape.
+- `.claude/CLAUDE.md` `## Roadmap` table row #21 — flip the
+  Design-source cell from `spec:`-only to:
+  `spec: \`specs/21-quality-gate-row-anchor.md\`<br>adr: \`.claude/meta/adr/014-roadmap-index-single-entry-point.md\` (amended 2026-05-20)`.
+  This is the `architect` write per ADR-014's existing write-ownership
+  rule ("architect adds the `adr:` link"); performed by **this
+  amendment in the same change**, mirroring rows #19/#20's pattern of
+  pointing to an amended ADR rather than a new ADR. The row's Status
+  glyph was flipped `☐→◐` by `product-manager` at Spec authoring (the
+  atomic action mandated by the #07 amendment); this amendment adds
+  only the `adr:` link cell to the same row without touching the
+  glyph. `product-manager` performs the `◐→☑` flip at step 6
+  close-out per the #07 amendment, after the step-6 quality gate
+  passes and steps 7–9 complete.
+- **No agent-prompt edits** (judgement above). The implementer must
+  *not* add re-entry-routing prose to `orchestrator.md`,
+  `implementer.md`, `code-reviewer.md`, `product-manager.md`, or any
+  other agent file; the Rules block is the single source.
+- **No CI workflow, no new detector, no new test suite** (judgement
+  above; Spec Non-goals and AC-7/AC-8). The existing seven detectors
+  and eight test suites continue to pass unchanged.
+- **No `progress-template.md` edit in this amendment.** Spec R-02
+  identifies a natural extension of the template's `## Notes` field to
+  record loop state when a quality-gate loop crosses a session
+  boundary; that is an `implementer`-step-5 detail when authoring a
+  progress file in that exact scenario, not a template change this
+  amendment performs. The current template already permits free-form
+  notes; encoding loop state as a `## Notes` entry uses the existing
+  surface unchanged.
+- The Japanese counterpart of this ADR
+  (`014-roadmap-index-single-entry-point.ja.md`) must receive the
+  mirrored amendment, and the Japanese counterpart of CLAUDE.md (if
+  present) the mirrored Rules-block bullet — a `technical-writer`
+  task, **not** part of this change. **This amendment creates a
+  transient EN/JA heading mismatch on ADR-014 until `technical-writer`
+  mirrors it; the #06 bilingual-parity detector
+  (`check-bilingual-parity.sh`) will FAIL on ADR-014 until the mirror
+  lands. This is the expected, queued `technical-writer` task — not a
+  reason to omit this EN amendment.** (The same transient was accepted
+  for the #07, #08, #09, #10, #11, #19, #20 amendments in turn.)
+- `specs/21-quality-gate-row-anchor.ja.md` is authored by
+  `technical-writer` at step 7 per Roadmap #06 heading-tree parity
+  ownership; not part of this amendment.
+- `CHANGELOG.md` entry under `## [Unreleased]` recording the
+  quality-gate loop re-entry formalization is authored by
+  `technical-writer` at step 7 (Spec AC-10); not part of this
+  amendment.
+
+### Counter-proposal
+
+The serious counter-position is **new ADR-023 — formalize the <!-- ref-allow: ADR-023 is the deliberately-rejected counter-proposal, intentionally never created -->
+quality-gate loop re-entry rule as a standalone ADR rather than an
+ADR-014 amendment**. It is recorded here per the
+ADR-012 / ADR-014 / ADR-015 / ADR-016 / ADR-017 / ADR-018 convention of
+taking a rejected alternative seriously rather than as a strawman. The
+argument:
+
+1. The Spec hands `architect` an explicit (b) choice ("a new ADR-023 <!-- ref-allow: ADR-023 is the deliberately-rejected counter-proposal, intentionally never created -->
+   exists … or an existing ADR receives an amendment") — Spec AC-6
+   names ADR-023 as the first branch, suggesting parity with milestones <!-- ref-allow: ADR-023 is the deliberately-rejected counter-proposal, intentionally never created -->
+   #03 / #04 / #05 / #06 / #12 / #13 that received new ADRs.
+2. A re-entry routing rule that constrains the orchestrator's failure-
+   path routing is a first-class, citable contract; burying it as the
+   seventh amendment in a long ADR-014 trail makes it less discoverable
+   than a dedicated ADR-023 a reader can cite as "the quality-gate <!-- ref-allow: ADR-023 is the deliberately-rejected counter-proposal, intentionally never created -->
+   loop ADR."
+3. The re-entry path interacts with multiple ADRs (ADR-016 via the
+   progress-file boundary, the #07 matrix via the `◐→☑` converse, #08
+   via the routing-trigger MECE boundary, #13 via the degraded-review
+   compatibility). A standalone ADR could own the four-way boundary
+   statement explicitly, rather than appending another section to a
+   2400+-line ADR-014.
+
+**Why the counter was not adopted:**
+
+- ADR-017, ADR-018, ADR-019, ADR-020, ADR-021, and ADR-022 each
+  self-classified as new-ADR-worthy on the ADR-018 Alternative-B
+  triad with a 2/3 or 3/3 score. #21 scores **0/3** — the strongest
+  amendment case in the family (no new contract boundary, no new
+  keying/mechanism, no new structural artifact). The sibling-symmetry
+  argument inverts on inspection: applying the same triad
+  discriminator the #03/#04/#05/#06/#12/#13 ADRs used to themselves
+  yields "amendment" for #21, because the structural half that
+  dominated for them is wholly absent for #21 — the rule is the
+  failure-path converse of a success-path trigger ADR-014 itself
+  already states (in the very amendment this one extends). This is
+  the exact reasoning the #07/#08/#09/#10/#11 amendments used to
+  refuse separate ADR-019 numbers, and which the #19/#20 amendments
+  re-applied at 1/3.
+- Discoverability is *better*, not worse, as an ADR-014 amendment:
+  the four-row Status-Transition Matrix and its converse-statement
+  (the row-anchor invariant) belong in one file, not two. The
+  canonical place a reader looks for "what governs a Roadmap row's
+  Status during step 6" is the ADR that defined the Roadmap and
+  already states the success-direction trigger; a separate ADR-023 <!-- ref-allow: ADR-023 is the deliberately-rejected counter-proposal, intentionally never created -->
+  would *fragment* the matrix across two ADRs — the orchestrator
+  would have to read ADR-014 *and* ADR-023 to know the full <!-- ref-allow: ADR-023 is the deliberately-rejected counter-proposal, intentionally never created -->
+  `◐→☑` picture, reintroducing exactly the "which document is
+  authoritative" rediscovery ADR-014 exists to remove.
+- The bidirectional-back-link argument is satisfied without a new
+  ADR: this amendment populates row #21's `adr:` link with the
+  `(amended 2026-05-20)` annotation in the #19/#20 shape, giving the
+  row the citation surface AC-9 requires. ADR-014 has no milestone
+  row of its own, so the back-link is correctly one-directional
+  (row → amendment), consistent with the #07/#08/#09/#10/#11
+  precedents.
+- The four-way boundary argument is *better*, not worse, as an
+  ADR-014 amendment: #08 (the routing-trigger MECE boundary partner)
+  is itself an ADR-014 amendment, and the #07 matrix (the
+  success-direction partner) is itself an ADR-014 amendment. Stating
+  the four-way boundary in ADR-014 keeps all four boundary partners
+  in one file; in a separate ADR-023 the boundary would have to <!-- ref-allow: ADR-023 is the deliberately-rejected counter-proposal, intentionally never created -->
+  cross-cite three sections of ADR-014 by line range — the locality
+  argument runs strictly toward the amendment.
+
+**Trigger conditions for re-evaluating this counter-proposal (i.e.
+when ADR-023 would become warranted):** <!-- ref-allow: ADR-023 is the deliberately-rejected counter-proposal, intentionally never created -->
+
+- A future milestone adds a **CI detector** that statically audits
+  quality-gate loop compliance — for example, an audit-log mechanism
+  that records each sub-agent's findings and the commits that
+  followed, and a detector that flags a `◐→☑` flip whose commit
+  predates an unresolved CRITICAL/HIGH finding. That detector + its
+  MECE boundary against #05's glyph-value check + its keying rule
+  would meet the triad and warrant its own ADR (with this amendment's
+  process rule as its inherited baseline).
+- The quality-gate loop is found to require a **new structural
+  mechanism** beyond a process bullet — e.g. a machine-readable
+  per-milestone gate-status manifest the orchestrator parses at
+  re-entry, or a quality-gate state machine with named sub-states
+  inside `◐`. Such a mechanism would introduce a new keying rule and
+  a new artifact, satisfying the triad.
+- The four-way boundary statement (#21 vs #07, #08, #04, #05,
+  ADR-016, #13) is found to require divergent re-entry semantics per
+  fork profile (e.g. forks that drop one or more quality-gate agents
+  need a different routing rule) such that a single rule in ADR-014
+  can no longer express it — at which point a dedicated ADR with
+  per-profile routing matrices may be warranted.
+
+The counter-proposal stays in this amendment as the historical record
+of the decision's most serious objection, per the
+ADR-012 / ADR-014 / ADR-015 / ADR-016 / ADR-017 / ADR-018 convention.
+
+The original Status line (`Accepted — 2026-05-15`) is unchanged; this
+amendment records the failure-path converse of an ownership rule the
+2026-05-17 status-transition amendment above already sanctioned for
+the success path, and does not reopen the Decision.
