@@ -62,6 +62,23 @@ file via `@path`.
 **Source.** `https://code.claude.com/docs/en/context-window` —
 compaction behaviour for path-scoped and subdirectory CLAUDE.md files.
 
+**Note — 2026-05-20 Roadmap relocation (ADR-014 amendment).** The
+Roadmap *index* relocated from `.claude/CLAUDE.md` `## Roadmap` to
+`.claude/ROADMAP.md` on 2026-05-20. `.claude/ROADMAP.md` is a
+regular markdown file under `.claude/` — it is NOT a subdirectory
+`CLAUDE.md` (the auto-load mechanism keys on the literal filename
+`CLAUDE.md`, not on location under `.claude/`). The file is therefore
+**not Invariant-2-protected**: it is loaded only when an agent
+explicitly Reads it. The compensating mechanism is the orchestrator's
+explicit Read instruction at session start
+(`.claude/agents/orchestrator.md` Analyze step). This trade-off was
+weighed by the Agent Team on 2026-05-20: CLAUDE.md becomes
+write-quiet across worktrees in exchange for the loss of Invariant-2
+auto-load on the Roadmap. The Invariant 2 **statement** is unchanged;
+what changed is which content is now governed by it. See
+`.claude/meta/adr/014-roadmap-index-single-entry-point.md` (Amendment
+2026-05-20 second) for the full rationale.
+
 ---
 
 ## Invariant 3 — Code is not prose

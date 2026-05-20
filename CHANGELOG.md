@@ -9,6 +9,82 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Milestone #22 — CLAUDE.md invariant-only refactor + Roadmap relocation +
+  subagent-dispatch / worktree-advisory protocols** (single session; Agent Team
+  consultation on 2026-05-20 producing two new ADRs each at triad 3/3 and one
+  ADR-014 amendment at triad 1.5/3). Eleven artifacts:
+  (1) **`.claude/ROADMAP.md`** — new file holding the Roadmap *index* (21
+  historical rows + new rows #22 ☑ done and #23 ☐ todo) plus the Rules block
+  co-located with the data it governs. English-only by design (#06 bilingual-
+  parity contract exempt; per-pair keying auto-excludes).
+  (2) **`.claude/CLAUDE.md`** — trimmed to invariant-only content. `## Roadmap`
+  section reduced to a 1-paragraph pointer + write-ownership summary; the 21-row
+  table and Rules block removed (now in ROADMAP.md). Two new sections added:
+  `## Subagent dispatch contract` (5-slot prompt template + delegate-and-stop
+  rule, ≤ 30 lines) and `## Worktree advisory protocol` (6-question rubric +
+  Roadmap-owner-worktree designation + SAFE/UNSAFE write-zone summary, ≤ 25
+  lines). The 2026-05-16 line-budget exception paragraph is removed from
+  `## CLAUDE.md authoring guidance` (its premise no longer holds — see ADR-014
+  second 2026-05-20 amendment).
+  (3) **`.claude/meta/references/dispatch-contract.md`** — new canonical
+  reference. 5-slot template, MUST/MAY/MUST NOT information-density rules,
+  delegate-and-stop tool restrictions, pre-dispatch checklist (4 questions),
+  worked 614→174-word before/after example.
+  (4) **`.claude/meta/references/worktree-advisory.md`** — new canonical
+  reference. 6-question suitability rubric (file-disjoint / Roadmap-disjoint /
+  state-disjoint / mergeable / reversible / net-faster), advisory output
+  template with two worked examples, per-worktree shared-header + slice-block
+  dispatch format, Roadmap-owner-worktree designation rule, full SAFE / UNSAFE
+  write-zone list.
+  (5) **ADR-024** (`Accepted — 2026-05-20`) — subagent dispatch contract;
+  triad 3/3 (new contract boundary + new keying/mechanism + new structural
+  artifact); back-links Roadmap row #22.
+  (6) **ADR-025** (`Accepted — 2026-05-20`) — worktree advisory protocol;
+  triad 3/3; back-links Roadmap row #22. (ADR-023 is reserved as the
+  deliberately-rejected counter-proposal per ADR-014's first 2026-05-20
+  amendment; the new ADRs skip to 024 and 025.)
+  (7) **ADR-014 second 2026-05-20 amendment** — "Roadmap relocation to
+  `.claude/ROADMAP.md`; line-budget exception withdrawn"; triad 1.5/3
+  (refinement of an existing boundary + new file artifact) → amendment, not
+  new ADR. Documents the Invariant 2 trade-off, the English-only bilingual
+  posture, and the CI check script updates. ADR-014 JA sibling receives the
+  corresponding amendment preserving EN ↔ JA heading-tree parity (#06).
+  (8) **`.claude/skills/claude-md-authoring/invariants.md` Invariant 2 Note**
+  — 2026-05-20 Note documenting the trade-off: the Invariant 2 *statement*
+  is unchanged; what changes is which content is governed by it.
+  `.claude/ROADMAP.md` is **not** Invariant-2-protected; the compensating
+  mechanism is the orchestrator's explicit Read at session start.
+  (9) **`.claude/agents/orchestrator.md`** — Analyze step now reads
+  `.claude/ROADMAP.md` (not CLAUDE.md `## Roadmap`); a mandatory
+  `## Worktree Recommendation` block fires after G1–G3 and before any
+  dispatch; a new `## Subagent dispatch contract` subsection summarizes both
+  layers (5-slot template + delegate-and-stop) inline.
+  (10) **CI check scripts updated**:
+  `.claude/meta/scripts/check-roadmap-drift.sh` parses `.claude/ROADMAP.md`
+  (variable renamed `CLAUDE_MD` → `ROADMAP_MD`, section guard removed);
+  `.claude/meta/scripts/check-dangling-refs.sh` adds `.claude/ROADMAP.md` to
+  Check 1 and Check 2 scan sets;
+  `.claude/meta/scripts/check-bilingual-parity.sh` requires no change
+  (per-pair keying auto-excludes EN-only files).
+  (11) Spec **`specs/22-claude-md-invariant-refactor.md`** (Approved) — twelve
+  acceptance criteria covering ROADMAP.md content, CLAUDE.md trim, new
+  references, two new ADRs, ADR-014 amendment, invariants.md note,
+  orchestrator update, and CI script updates.
+
+  **Why two new ADRs and one amendment.** Both ADR-024 and ADR-025 score
+  triad 3/3 on ADR-018 Alternative-B's discriminator (new contract boundary +
+  new keying/mechanism + new structural artifact) and correctly are new ADRs.
+  The Roadmap relocation scores 1.5/3 (a refinement of ADR-014's existing
+  entry-point decision plus one new file) and correctly is an ADR-014
+  amendment, following the ECC convention recorded in the eight prior ADR-014
+  amendments.
+
+  **Roadmap row #23 (Phase B placeholder).** `☐ todo` row added for the
+  template / fork structural separation work (`main` payload-only + `develop`
+  template-dev branch split). Spec reserved at
+  `specs/23-template-fork-branch-separation.md`, file not yet authored on
+  disk per ADR-014 reservation rule. Will be picked up in a future session.
+
 - **Milestone #18 — now IMPLEMENTED** (single session; **ADR-022** — the
   ADR-018 Alternative-B triad scored 3/3: new contract boundary [AC-10 (c)
   technical-writer step-7 review responsibility], new keying/mechanism

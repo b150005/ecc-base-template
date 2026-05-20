@@ -321,8 +321,29 @@ echo "No-scope-bleed — four existing detector scripts + 3 test suites unchange
     ".claude/meta/scripts/test-check-roadmap-drift.sh"
     ".claude/meta/scripts/test-check-bilingual-parity.sh"
   )
+  # Per-file exemptions added for Roadmap row #22 (CLAUDE.md invariant
+  # refactor + Roadmap relocation, ADR-014 second 2026-05-20 amendment):
+  # the relocation legitimately switches parse/scan targets from
+  # .claude/CLAUDE.md to .claude/ROADMAP.md in these shared detector
+  # scripts. The scope-bleed guard continues to apply to the remaining
+  # guarded files (check-skill-invariants.sh, check-bilingual-parity.sh,
+  # test-check-dangling-refs.sh, test-check-bilingual-parity.sh — all
+  # unchanged by #22).
+  exempt_post_22=(
+    ".claude/meta/scripts/check-dangling-refs.sh"
+    ".claude/meta/scripts/check-roadmap-drift.sh"
+    ".claude/meta/scripts/test-check-roadmap-drift.sh"
+  )
+  is_exempt_22() {
+    local q="$1" e
+    for e in "${exempt_post_22[@]}"; do
+      [[ "$e" == "$q" ]] && return 0
+    done
+    return 1
+  }
   bleed=0
   for f in "${guarded[@]}"; do
+    if is_exempt_22 "$f"; then continue; fi
     if ! git -C "$REPO_ROOT" diff --quiet "$base" -- "$f" 2>/dev/null; then
       red "    scope bleed: $f changed since $base"
       bleed=1

@@ -394,6 +394,9 @@ shopt -s nullglob
 # CLAUDE.md
 [ -f ".claude/CLAUDE.md" ] && check_adr_refs_in_file ".claude/CLAUDE.md"
 
+# ROADMAP.md (relocated 2026-05-20 per ADR-014 second amendment)
+[ -f ".claude/ROADMAP.md" ] && check_adr_refs_in_file ".claude/ROADMAP.md"
+
 # ADR files (including .ja.md)
 for f in .claude/meta/adr/*.md; do
   [ -f "$f" ] && check_adr_refs_in_file "$f"
@@ -427,6 +430,12 @@ path_fail_before="$fail"
 shopt -s nullglob
 
 [ -f ".claude/CLAUDE.md" ] && check_path_refs_in_file ".claude/CLAUDE.md"
+
+# ROADMAP.md (relocated 2026-05-20 per ADR-014 second amendment); the
+# ADR-014 reservation carve-out (is_reservation_link) requires no change:
+# it is keyed on the line containing "|" and "spec:", which holds in
+# ROADMAP.md table rows identically.
+[ -f ".claude/ROADMAP.md" ] && check_path_refs_in_file ".claude/ROADMAP.md"
 
 # ADR files excluded from Check 2 (historical records; see scope decision in script header).
 

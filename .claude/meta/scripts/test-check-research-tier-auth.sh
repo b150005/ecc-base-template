@@ -373,8 +373,31 @@ echo "  lines 49-53, five existing detectors + suites NOT in the diff"
     ".claude/meta/scripts/test-check-bilingual-parity.sh"
     ".claude/meta/scripts/test-check-ecc-delegation-consistency.sh"
   )
+  # Per-file exemptions added for Roadmap row #22 (CLAUDE.md invariant
+  # refactor + Roadmap relocation + subagent-dispatch / worktree-advisory
+  # protocols, ADR-014 second 2026-05-20 amendment + ADR-024 + ADR-025):
+  # the relocation legitimately switches detector parse targets, the
+  # orchestrator gains a Worktree Recommendation step + dispatch contract
+  # subsection, and test-check-ecc-delegation-consistency.sh gains an
+  # exempt_post_22 mechanism for the same reason. The byte-unchanged
+  # guard continues to apply to all other guarded files.
+  exempt_post_22=(
+    ".claude/agents/orchestrator.md"
+    ".claude/meta/scripts/check-dangling-refs.sh"
+    ".claude/meta/scripts/check-roadmap-drift.sh"
+    ".claude/meta/scripts/test-check-roadmap-drift.sh"
+    ".claude/meta/scripts/test-check-ecc-delegation-consistency.sh"
+  )
+  is_exempt_22() {
+    local q="$1" e
+    for e in "${exempt_post_22[@]}"; do
+      [[ "$e" == "$q" ]] && return 0
+    done
+    return 1
+  }
   bleed=0
   for f in "${guarded[@]}"; do
+    if is_exempt_22 "$f"; then continue; fi
     if ! git -C "$REPO_ROOT" diff --quiet "$base" -- "$f" 2>/dev/null; then
       red "    byte-changed (VIOLATION): $f changed since $base"
       bleed=1

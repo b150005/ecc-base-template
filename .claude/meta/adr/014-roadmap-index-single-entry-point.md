@@ -2931,3 +2931,208 @@ The original Status line (`Accepted — 2026-05-15`) is unchanged; this
 amendment records the failure-path converse of an ownership rule the
 2026-05-17 status-transition amendment above already sanctioned for
 the success path, and does not reopen the Decision.
+
+## Amendment — 2026-05-20 (Roadmap relocation to `.claude/ROADMAP.md`; line-budget exception withdrawn)
+
+This amendment relocates the Roadmap **index** (the row table + Rules
+block) from `.claude/CLAUDE.md` to a new dedicated file
+`.claude/ROADMAP.md`, and withdraws the 2026-05-16 (CLAUDE.md
+line-budget vs. the Roadmap) amendment that exempted the Roadmap
+section from CLAUDE.md's ~200-line guideline.
+
+The decision was reached by an Agent Team consultation (architect,
+product-manager, orchestrator, technical-writer) on 2026-05-20 after
+the user surfaced three concerns spanning template-fitness: (1)
+subagent dispatch prompt bloat, (2) CLAUDE.md as a worktree write-
+contention surface, and (3) template-internal artifacts leaking into
+fork repositories. This amendment addresses concern (2); concerns
+(1) and (3) are addressed in ADR-024 (Subagent dispatch contract)
+and the deferred Phase B branch-separation work (Roadmap row #23)
+respectively. The full Plan that orchestrated the change is at
+`/Users/b150005/.claude/plans/roadmap-agent-team-explore-shimmering-nygaard.md`
+(plan file, outside the repo); the per-row Spec for this amendment
+is `specs/22-claude-md-invariant-refactor.md`.
+
+### What relocates
+
+- **Roadmap row table** (21 historical rows + 2 newly-added rows for
+  #22 and #23) moves from CLAUDE.md `## Roadmap` to
+  `.claude/ROADMAP.md` `## Index`.
+- **Rules block** (the bulleted protocol rules — spec reservation,
+  filename convention, status-glyph transitions, quality-gate
+  re-entry, write-ownership, phase-split convention) moves to
+  `.claude/ROADMAP.md` `## Rules`, co-located with the data it
+  governs.
+- **Spec reservation rule paragraph** moves into the new file's
+  header narrative.
+
+### What stays in CLAUDE.md
+
+- `## Roadmap` heading with a short pointer paragraph naming
+  `.claude/ROADMAP.md` as the canonical index location.
+- A one-paragraph **Write-ownership summary** preserving the most
+  load-bearing rule (who flips which glyph at what step) so that an
+  agent reading only CLAUDE.md has the essential governance reminder
+  without needing to open ROADMAP.md.
+
+### The two new rows added in `.claude/ROADMAP.md`
+
+- **#22 — CLAUDE.md invariant-only refactor + Roadmap relocation +
+  subagent-dispatch/worktree-advisory protocols.** Status `☑ done`
+  on this amendment landing. Design source includes this amendment,
+  ADR-024, ADR-025, and `specs/22-claude-md-invariant-refactor.md`.
+- **#23 — Template / fork structural separation (`main` payload-only
+  + `develop` template-dev branch split).** Status `☐ todo`,
+  deferred Phase B. Spec `specs/23-template-fork-branch-separation.md`
+  reserved per ADR-014 reservation rule, not yet authored on disk.
+
+### Why an amendment and not a new ADR
+
+Triad classification (per ADR-018 Alternative-B discriminator):
+
+- **New contract boundary? Partial — REFINEMENT of an existing
+  boundary.** ADR-014's core decision is "the Roadmap is the single
+  always-read entry point." This amendment refines *where* that
+  entry point physically lives (CLAUDE.md → `.claude/ROADMAP.md`) and
+  *how* it is accessed (orchestrator explicit Read at session start,
+  rather than auto-load via Invariant 2). The "single always-read
+  entry point" claim itself is preserved — just split across two
+  files (CLAUDE.md pointer + ROADMAP.md content).
+- **New keying / mechanism? Partial — REFINEMENT.** Orchestrator now
+  reads two files at session start instead of one. No new YAML key,
+  no new regex, no new file format, no new short-circuit.
+- **New structural artifact? Yes — one new file (`.claude/ROADMAP.md`).**
+
+Triad effective: **1.5/3**. The same discriminator threshold (3/3 →
+new ADR) applies. ADR-019's amendment (CHANGELOG-ADR sync) and the
+preceding 2026-05-17 ×5 amendments to this ADR all landed as
+amendments at lower triad scores; this amendment continues that
+pattern. The new files ADR-024 and ADR-025, by contrast, each score
+3/3 and correctly are new ADRs.
+
+The decision aligns with the ECC convention recorded in the prior
+amendments above: "consequence-clarifications fold into amendments;
+new ADR numbers are reserved for new structural decisions" — and
+"where the Roadmap physically lives" is the clearest possible
+consequence-clarification of ADR-014's "single always-read entry
+point" decision.
+
+### Withdrawal of the 2026-05-16 line-budget exception
+
+The 2026-05-16 (CLAUDE.md line-budget vs. the Roadmap) amendment
+above declared the `## Roadmap` section exempt from CLAUDE.md's
+~200-line guideline because the table could not be relocated without
+defeating its Invariant-2-protected always-loaded status. With the
+relocation now landing, the exception's premise no longer holds: the
+Roadmap content lives in a separate file, CLAUDE.md is free to fit
+the ~200-line guideline again, and the exception paragraph is
+removed from CLAUDE.md's `## CLAUDE.md authoring guidance` section.
+
+The exception is **withdrawn**, not deprecated by supersession — the
+2026-05-16 amendment's reasoning was correct at the time it was
+made and would still be correct if the relocation had not happened.
+The amendment remains in this ADR's history as the record of why
+CLAUDE.md was permitted to exceed ~200 lines between 2026-05-16 and
+2026-05-20.
+
+### Trade-off: Invariant 2 protection
+
+ADR-014's original decision relied on Invariant 2 (compaction
+durability for `.claude/CLAUDE.md` root content; defined in
+`.claude/skills/claude-md-authoring/invariants.md`). The Roadmap
+table, by virtue of living inside CLAUDE.md, inherited Invariant 2
+protection: it survived compaction without an explicit re-Read.
+
+`.claude/ROADMAP.md` is NOT covered by Invariant 2 — it is a
+regular markdown file, not a subdirectory `CLAUDE.md`, and it is
+not auto-loaded by Anthropic's nested-CLAUDE-md mechanism. The
+compensating mechanism is the explicit instruction in CLAUDE.md
+that `orchestrator` reads `.claude/ROADMAP.md` at session start.
+This is a behavioural compensation, not a structural guarantee:
+if a session compacts and the orchestrator skips the Read, the
+Roadmap state is lost from working memory.
+
+The Agent Team weighed this trade-off explicitly:
+
+- **What is lost.** Always-on Invariant-2 compaction durability for
+  the Roadmap row data.
+- **What is gained.** CLAUDE.md becomes write-quiet across
+  worktrees (the user's stated primary concern). Roadmap mutations
+  no longer collide with CLAUDE.md authoring work. Two distinct
+  files = two distinct write surfaces.
+- **Compensation.** Explicit orchestrator Read at session start,
+  recorded in `.claude/agents/orchestrator.md` Analyze step.
+- **Backstop.** If a session compacts and the read is dropped,
+  ADR-016's `specs/NN-progress.md` (cross-session progress
+  persistence) is the in-flight state backstop. For non-in-flight
+  rows, the orchestrator re-reads ROADMAP.md on the next Analyze
+  step before any new dispatch.
+
+A note documenting this Invariant 2 trade-off is added to
+`.claude/skills/claude-md-authoring/invariants.md`. The Invariant 2
+*statement* is unchanged; what changes is which content is now
+governed by it.
+
+### Bilingual posture
+
+`.claude/ROADMAP.md` is **English-only**. No `.claude/ROADMAP.ja.md`
+sibling is shipped. This is explicit exemption from the Roadmap #06
+EN ↔ JA heading-tree parity contract, justified by:
+
+- The file is overwhelmingly a structured table of identifiers
+  (row numbers, status glyphs, file paths) plus a bullet-list of
+  rules. Almost no natural-language prose that would benefit from
+  translation.
+- Roadmap mutations are **frequent** (every status flip).
+  Maintaining EN ↔ JA parity on every flip is high mechanical cost
+  for low signal.
+- The bilingual-parity detector (`.claude/meta/scripts/check-bilingual-parity.sh`)
+  is keyed per-pair on `.ja.md` presence: a file with no `.ja.md`
+  sibling is structurally out of scope. No allowlist entry is
+  needed to exempt this file — the exemption is the absence of the
+  sibling.
+
+This is consistent with the existing EN-only specs (#01–#04) and
+with `workarounds/` (which the bilingual-parity detector also
+excludes per Spec Non-goals). The Roadmap #06 contract continues
+to apply to every other paired artifact.
+
+### Updates to CI check scripts
+
+Three check scripts are updated to reflect the relocation:
+
+- `.claude/meta/scripts/check-roadmap-drift.sh` — parse target
+  changes from `.claude/CLAUDE.md` to `.claude/ROADMAP.md`; awk
+  table-row detection is simplified (no longer needs section
+  guard, since the entire file is the Roadmap).
+- `.claude/meta/scripts/check-dangling-refs.sh` — Check 1 (ADR-NNN
+  refs) and Check 2 (`.claude/-rooted` / `specs/` paths) both add
+  `.claude/ROADMAP.md` to the scan set. The ADR-014 reservation
+  carve-out (`is_reservation_link`) requires no change because it
+  is keyed on the line containing `|` and `spec:`, which holds in
+  ROADMAP.md table rows identically.
+- `.claude/meta/scripts/check-bilingual-parity.sh` — no change
+  needed. The per-pair keying automatically excludes
+  `.claude/ROADMAP.md` because no `.claude/ROADMAP.ja.md` sibling
+  exists.
+
+The 2026-05-17 (orchestrator Analyze row-guard) amendment is
+updated implicitly: G1 (row exists) now reads `.claude/ROADMAP.md`
+instead of CLAUDE.md, but the guard's three-condition structure
+and the orchestrator's read-only posture are unchanged.
+
+### Triad-classification update for the 2026-05-16 line-budget exception
+
+The withdrawn 2026-05-16 amendment scored as a procedural amendment
+at the time it was made (no triad applied; ADR-018's discriminator
+post-dates it). With the relocation now landing, the question
+"would the line-budget exception have warranted a new ADR?" is
+moot: the exception was always intended as a transitional rule,
+and ECC's discriminator would have classified it at 0/3 (no new
+boundary, no new mechanism, no new artifact).
+
+The original Status line (`Accepted — 2026-05-15`) is unchanged.
+This amendment is the second 2026-05-20 amendment to ADR-014 (the
+first being the quality-gate loop re-entry amendment immediately
+above). Both amendments are dated the same day because both
+emerged from the same Agent Team consultation on 2026-05-20.

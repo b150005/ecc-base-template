@@ -87,8 +87,6 @@ small edits (typo, single bullet, version bump) do not need the Skill.
 See `.claude/meta/adr/007-claude-md-authoring-skill.md` for the design
 rationale.
 
-**Sanctioned line-budget exception (per ADR-014 amendment 2026-05-16).** The `## Roadmap` section is exempt from the ~200-line CLAUDE.md guidance. The Roadmap is the single always-read entry point for design artifacts and must survive compaction (Invariant 2), so it cannot be relocated to a subdirectory `CLAUDE.md` or a Skill without defeating its purpose. The "around 200" rule is a volatile guideline, never a hard CI failure; it yields to the Roadmap by design. Reclaim budget by compressing Roadmap row text (index-only) and trimming non-compaction-durable sections elsewhere — not by moving the Roadmap.
-
 ## Developer Learning Mode
 
 Default-off learning layer with two orthogonal pillars: the **knowledge pillar**
@@ -134,45 +132,40 @@ design rationale is in `.claude/meta/adr/004-coaching-pillar.md`.
 
 ## Roadmap
 
-Single entry point mapping each milestone to its authoritative design source. Each row is one milestone; the linked Spec/ADR is the source of truth for content — this table is an index only, never duplicating acceptance criteria or rationale. See `.claude/meta/adr/014-roadmap-index-single-entry-point.md` for the rationale.
+The Roadmap **index** — the row-by-row state of each milestone, plus the protocol rules that govern it — lives at `.claude/ROADMAP.md`. `orchestrator` reads that file at session start, **before** the Analyze-step row-guard (G1–G3). See `.claude/meta/adr/014-roadmap-index-single-entry-point.md` and its 2026-05-20 second amendment for the relocation rationale and the trade-off against Invariant 2 protection.
 
-**Spec reservation rule:** Every row carries a `spec:` link at row-creation time using the deterministic path `specs/NN-slug.md`. The Spec *file* is authored by `product-manager` when the milestone is picked up (status moves to `◐ in-progress`). The reserved link satisfies ADR-014's 1:1 mandatory mapping without requiring all 21 Spec files to exist upfront; the `implementer`/`test-runner` contract is triggered only after the file is authored.
+**Write-ownership summary** (full rules in `.claude/ROADMAP.md`): `product-manager` creates rows and flips status glyphs (`☐→◐` at Spec authoring, `◐→☑` after step-6 quality-gate pass); `architect` adds `adr:` links; `orchestrator` is read-only.
 
-| # | Milestone | Status | Design source |
-|---|-----------|--------|---------------|
-| 01 | Commit `verification.yml` as active default | ☑ done | spec: `specs/01-ship-verification-yml-committed.md` |
-| 02 | CodeQL single-switch activation via repository variable | ☑ done | spec: `specs/02-codeql-single-switch-activation.md` |
-| 03 | Cross-session milestone progress persistence | ☑ done | spec: `specs/03-cross-session-progress-persistence.md`<br>adr: `.claude/meta/adr/016-cross-session-progress-persistence.md` |
-| 04 | CI detector for dangling ADR/skill cross-references | ☑ done | spec: `specs/04-dangling-reference-detector.md`<br>adr: `.claude/meta/adr/015-dangling-reference-detector.md` |
-| 05 | Roadmap drift-detection CI | ☑ done | spec: `specs/05-roadmap-drift-detection-ci.md`<br>adr: `.claude/meta/adr/017-roadmap-drift-detector.md` |
-| 06 | EN/JA bilingual parity detector | ☑ done | spec: `specs/06-bilingual-parity-detector.md`<br>adr: `.claude/meta/adr/018-bilingual-parity-detector.md` |
-| 07 | Roadmap status-transition ownership assignment | ☑ done | spec: `specs/07-roadmap-status-transitions.md` |
-| 08 | Orchestrator Analyze row-guard | ☑ done | spec: `specs/08-orchestrator-row-guard.md` |
-| 09 | Spec filename convention alignment (`NN-slug.md`) | ☑ done | spec: `specs/09-spec-filename-convention.md` |
-| 10 | Spec/ADR directory location pin in CLAUDE.md | ☑ done | spec: `specs/10-spec-adr-directory-pinning.md` |
-| 11 | Opt-in trigger guidance for implementation/design verification domains | ☑ done | spec: `specs/11-verification-domain-opt-in-guidance.md` |
-| 12 | CI coverage gate (80% hard check) | ☑ done | spec: `specs/12-coverage-ci-gate.md`<br>adr: `.claude/meta/adr/019-coverage-ci-gate.md` |
-| 13 | ECC-absent degraded-review signal | ☑ done | spec: `specs/13-ecc-absent-signal.md`<br>adr: `.claude/meta/adr/020-ecc-absent-signal.md` |
-| 14 | Research-tier validation for auth→T2 mis-classifications | ☑ done | spec: `specs/14-research-tier-validation.md`<br>adr: `.claude/meta/adr/021-research-tier-auth-validation.md` |
-| 15 | `init.sh` Roadmap placeholder cleanup at fork time | ☑ done | spec: `specs/15-init-sh-roadmap-cleanup.md` |
-| 16 | ADR-001 "Proposed (stabilized)" status resolution | ☑ done | spec: `specs/16-adr-001-status-resolution.md` |
-| 17 | CHANGELOG↔ADR-acceptance sync and ADR-001–005 back-fill | ☑ done | spec: `specs/17-changelog-adr-sync.md` |
-| 18 | CI exemption allowlist expiry/review mechanism | ☑ done | spec: `specs/18-ci-exemption-allowlist-expiry.md`<br>adr: `.claude/meta/adr/022-ci-exemption-expiry.md` |
-| 19 | Workaround tracking default-on | ☑ done | spec: `specs/19-workaround-tracking-default-on.md`<br>adr: `.claude/meta/adr/006-upstream-workaround-tracking.md` (amended 2026-05-20) |
-| 20 | Commit `compliance.yml` as active default | ☑ done | spec: `specs/20-ship-compliance-yml-committed.md`<br>adr: `.claude/meta/adr/011-compliance-checklist-skill.md` (amended 2026-05-20) |
-| 21 | Quality-gate loop re-entry anchored to Roadmap row | ☑ done | spec: `specs/21-quality-gate-row-anchor.md`<br>adr: `.claude/meta/adr/014-roadmap-index-single-entry-point.md` (amended 2026-05-20) |
+## Subagent dispatch contract
 
-**Rules:**
-- One row per milestone; row number stable, never reused (follows ADR-number convention). A split = new row + note on old row.
-- `Design source` names the type explicitly: `spec:` and/or `adr:` links. `spec:` paths are reserved at row-creation even if the file does not yet exist on disk.
-- Spec filename convention: a Spec file is `specs/NN-slug.md` where `NN` is the row number zero-padded to a two-digit minimum (`1→01`; rows ≥100 written without extra padding) and `slug` is the kebab-case slug already fixed in the row's reserved `spec:` path (copy it from the row, do not re-derive). The JA sibling is `specs/NN-slug.ja.md` (same `NN`/`slug`, `.ja` before `.md`); its heading-tree parity is owned by #06. `specs/NN-progress.md` is excluded — `progress` is ADR-016's reserved suffix, governed by ADR-016's lifecycle, not by this convention. #10 pins the directory; #09 pins the filename — MECE; see `## Document Templates` for the pinned `specs/` and `.claude/meta/adr/` directories.
-- Milestone ↔ Spec is 1:1 mandatory; Milestone → ADR is 0:1 or 1:N (only when a structural decision occurred; the ADR's `## References` back-links the row number).
-- Status = implementation state: ☐ todo / ◐ in-progress / ☑ done / ✗ dropped. Dropped rows stay (history not rewritten).
-- Index only — never duplicate acceptance criteria or rationale; the linked Spec/ADR is the source of truth.
-- Write-ownership: `product-manager` creates/updates the row + `spec:` link; `architect` adds the `adr:` link; `orchestrator` only reads.
-- Status glyph transitions: `product-manager` flips `☐→◐` atomically with authoring the Spec at pickup, and `◐→☑` after the step-6 quality gate passes (deleting `specs/NN-progress.md` in the same change per ADR-016); drops (`◐→✗`, `☑→✗`) are decided by `orchestrator` at Analyze and written by `product-manager`, row retained (history not rewritten). #05 checks glyph *value* well-formedness; #07 governs *who* flips and *when* — no CI enforces #07.
-- Quality-gate loop re-entry (#21): while a row is `◐ in-progress` and one or more CRITICAL/HIGH findings from any step-6 quality-gate agent (code-reviewer, linter, security-reviewer, performance-engineer) remain open, `orchestrator` routes the fix task back to `implementer` and the row stays `◐` for the full loop duration. The `◐→☑` flip per #07 fires only after every quality-gate agent passes for that milestone — the loop's exit condition, not a mid-loop action. ADR-016 progress files apply only when the loop crosses a session or compaction boundary; an in-session loop creates no progress file. #08 G1–G3 govern initial dispatch (pre-dispatch); #21 governs re-entry after a quality-gate agent has returned findings (post-review) — non-overlapping triggers, same `orchestrator` router. No CI enforces #21 (process rule; #05 owns glyph-value well-formedness, the orthogonal check axis).
-- At 100+ milestones, split into `### Phase N` sub-tables under `## Roadmap`.
+All subagent dispatch (any `Agent` tool call from `orchestrator` or main Claude) follows a fixed 5-slot prompt template and a delegate-and-stop rule. Full protocol with worked before/after examples in `.claude/meta/references/dispatch-contract.md`; rationale in `.claude/meta/adr/024-subagent-dispatch-contract.md`. Applies to ALL parent→subagent dispatches, including verification-layer Generator/Critic routing (ADR-008 / ADR-010).
+
+**5-slot prompt structure** (every dispatch prompt fits this shape):
+
+- `ROLE:` — agent name + posture (1 line)
+- `CONTEXT:` — ≤ 3 bullets — the decision this informs, Roadmap row if any
+- `TASK:` — imperative verb + object (1 sentence)
+- `CONSTRAINTS:` — ≤ 5 bullets — what to skip, scope boundary, stop condition
+- `OUTPUT:` — exact shape the parent will consume — format + max length
+
+**Delegate-and-stop rule.** After writing an `Agent` dispatch, the parent agent may only call `Agent`, `AskUserQuestion`, or `ScheduleWakeup` until the subagent returns. No `Read`, `Bash`, `Edit`, `WebFetch`, no Skill invocations. This is the forcing function that prevents the parent from re-absorbing the delegated task between dispatch and return.
+
+## Worktree advisory protocol
+
+Before dispatching any multi-step plan, `orchestrator` evaluates worktree-parallelism suitability and emits a `## Worktree Recommendation` block **ahead of** the implementation plan. Full rubric, per-worktree dispatch templates, and the SAFE / UNSAFE write-zone list in `.claude/meta/references/worktree-advisory.md`; rationale in `.claude/meta/adr/025-worktree-advisory-protocol.md`.
+
+**6-question suitability rubric** (answered in Analyze):
+
+1. **File-disjoint?** Subtasks touch disjoint file sets.
+2. **Roadmap-disjoint?** Subtasks affect different Roadmap rows.
+3. **State-disjoint?** Subtasks don't share mutable shared state.
+4. **Mergeable?** Outputs are trivially mergeable (no integration work).
+5. **Reversible?** Rejecting one slice leaves the others useful.
+6. **Net-faster?** Parallelism wins wall-clock once review costs count.
+
+Yes on all 6 → recommend multi-worktree. No on any of 1–3 → single-worktree (forced — shared-state risk). No on 4–6 → single-worktree (recommended — parallelism does not pay).
+
+**Write-zone rule.** UNSAFE for any non-owner worktree: `.claude/CLAUDE.md`, `.claude/ROADMAP.md`, `CHANGELOG.md`, `specs/NN-progress.md`, lockfiles. In multi-worktree mode, `orchestrator` designates **one Roadmap-owner worktree** that exclusively handles those files; other worktrees produce hand-off artifacts only.
 
 ## Development Workflow
 

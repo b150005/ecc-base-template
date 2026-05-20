@@ -2371,3 +2371,192 @@ ADR-012 / ADR-014 / ADR-015 / ADR-016 / ADR-017 / ADR-018 の、却下された
 元のステータス行 (`Accepted — 2026-05-15`) は変更しない; 本 amendment は
 2026-05-17 status-transition amendment が成功パスですでに認可した所有権ルールの
 失敗パス逆命題を記録するものであり、決定を再開するものではない。
+
+## Amendment — 2026-05-20 (ロードマップを `.claude/ROADMAP.md` に移設; 行予算例外を撤回)
+
+本 amendment はロードマップ **index** (行テーブル + Rules ブロック) を
+`.claude/CLAUDE.md` から新規専用ファイル `.claude/ROADMAP.md` に
+移設し、`## Roadmap` セクションを CLAUDE.md の ~200 行ガイドラインから
+免除した 2026-05-16 (CLAUDE.md 行予算 vs ロードマップ) amendment を
+撤回する。
+
+決定は 2026-05-20 のエージェントチーム協議 (architect、product-manager、
+orchestrator、technical-writer) で到達した。ユーザーが浮上させた
+テンプレート適合性に関する 3 つの懸念: (1) subagent dispatch プロンプトの
+肥大化、(2) worktree 書き込み競合面としての CLAUDE.md、(3) テンプレート
+内部アーティファクトの fork リポジトリへの流入。本 amendment は懸念 (2)
+に対処; 懸念 (1) は ADR-024 (Subagent dispatch contract)、懸念 (3) は
+Phase B のブランチ分離作業 (Roadmap 行 #23) に延期。変更を orchestrate した
+完全な Plan は
+`/Users/b150005/.claude/plans/roadmap-agent-team-explore-shimmering-nygaard.md`
+(plan ファイル、リポジトリ外); 本 amendment の per-row Spec は
+`specs/22-claude-md-invariant-refactor.md`。
+
+### 移設対象
+
+- **ロードマップ行テーブル** (21 行の歴史的行 + #22 と #23 の新規 2 行)
+  を CLAUDE.md `## Roadmap` から `.claude/ROADMAP.md` `## Index` に移設。
+- **Rules ブロック** (Spec reservation、filename convention、status-glyph
+  遷移、品質ゲート再エントリ、write-ownership、phase-split 規約の
+  bullet 形式プロトコルルール) を `.claude/ROADMAP.md` `## Rules` に
+  移設、それが統治するデータと co-located。
+- **Spec reservation rule 段落** は新規ファイルのヘッダー説明に統合。
+
+### CLAUDE.md に残るもの
+
+- `## Roadmap` 見出しと `.claude/ROADMAP.md` を canonical index 場所として
+  名付ける短いポインタ段落。
+- 最も load-bearing なルール (どのエージェントがどのステップでどの glyph を
+  flip するか) を保持する 1 段落の **Write-ownership summary**。CLAUDE.md
+  のみを読むエージェントが ROADMAP.md を開かずに必須統治リマインダーを
+  持てる。
+
+### `.claude/ROADMAP.md` に追加される 2 つの新規行
+
+- **#22 — CLAUDE.md invariant-only refactor + ロードマップ移設 +
+  subagent-dispatch/worktree-advisory プロトコル。** 本 amendment 着地で
+  ステータス `☑ done`。Design source: 本 amendment、ADR-024、ADR-025、
+  `specs/22-claude-md-invariant-refactor.md` を含む。
+- **#23 — テンプレート / fork 構造分離 (`main` payload-only + `develop`
+  template-dev branch split)。** ステータス `☐ todo`、Phase B 延期。
+  Spec `specs/23-template-fork-branch-separation.md` を ADR-014 reservation
+  rule に従って予約、disk 上未作成。
+
+### なぜ新規 ADR ではなく amendment か
+
+トライアド分類 (ADR-018 Alternative-B 判別子に従う):
+
+- **新しい contract 境界? 部分的 ── 既存境界の REFINEMENT。** ADR-014 の
+  core decision は「ロードマップは単一の always-read エントリポイント」。
+  本 amendment はそのエントリポイントが物理的にどこに住むか
+  (CLAUDE.md → `.claude/ROADMAP.md`) と、それがどうアクセスされるか
+  (Invariant 2 経由の auto-load ではなく orchestrator がセッション開始時に
+  明示的に Read) を refine する。「単一 always-read エントリポイント」
+  主張自体は保持 ── 2 ファイル (CLAUDE.md ポインタ + ROADMAP.md コンテンツ)
+  に分割されただけ。
+- **新しい keying / メカニズム? 部分的 ── REFINEMENT。** orchestrator が
+  セッション開始時に 1 ファイルではなく 2 ファイルを read する。新しい
+  YAML キーなし、新しい正規表現なし、新しいファイルフォーマットなし、
+  新しい short-circuit なし。
+- **新しい構造的アーティファクト? Yes ── 1 つの新規ファイル
+  (`.claude/ROADMAP.md`)。**
+
+トライアド実効値: **1.5/3**。同じ判別子しきい値 (3/3 → 新規 ADR) を適用。
+ADR-019 の amendment (CHANGELOG-ADR sync) と直前の 2026-05-17 ×5 amendments
+はすべて低いトライアドスコアで amendment として着地; 本 amendment は
+そのパターンを継続する。これに対し新規ファイル ADR-024 と ADR-025 は
+各々 3/3 スコアで正しく新規 ADR となる。
+
+決定は前段の amendments に記録された ECC 慣例と整合: 「consequence-
+clarifications は amendment に折り込む; 新規 ADR 番号は新しい構造的決定の
+ために予約する」── そして「ロードマップが物理的にどこに住むか」は
+ADR-014 の「単一 always-read エントリポイント」決定の最も明確な可能な
+consequence-clarification である。
+
+### 2026-05-16 行予算例外の撤回
+
+前段の 2026-05-16 (CLAUDE.md 行予算 vs ロードマップ) amendment は、
+Invariant 2 保護される always-loaded ステータスを defeat せずに
+テーブルを再配置できないため、`## Roadmap` セクションを CLAUDE.md の
+~200 行ガイドラインから免除すると宣言した。移設が現在着地することで、
+例外の前提はもはや成立しない: ロードマップコンテンツは別ファイルに住み、
+CLAUDE.md は再び ~200 行ガイドラインに収まることを許され、例外段落は
+CLAUDE.md の `## CLAUDE.md authoring guidance` セクションから削除される。
+
+例外は **撤回** され、supersession による deprecation ではない ── 2026-05-16
+amendment の推論は当時正しく、移設が起こっていなければ今でも正しい。
+amendment は 2026-05-16 から 2026-05-20 までの間に CLAUDE.md が ~200 行を
+超えることが許された理由の記録として本 ADR の歴史に残る。
+
+### Trade-off: Invariant 2 保護
+
+ADR-014 の元の決定は Invariant 2 (`.claude/CLAUDE.md` ルートコンテンツの
+compaction durability;
+`.claude/skills/claude-md-authoring/invariants.md` で定義) に依存していた。
+ロードマップテーブルは CLAUDE.md 内部に住むことで Invariant 2 保護を
+継承していた: 明示的な re-Read なしに compaction を生き延びた。
+
+`.claude/ROADMAP.md` は Invariant 2 でカバーされない ── 通常の markdown
+ファイルであり、subdirectory `CLAUDE.md` ではなく、Anthropic の
+nested-CLAUDE-md メカニズムで auto-load されない。補償メカニズムは
+CLAUDE.md 内の `orchestrator` がセッション開始時に
+`.claude/ROADMAP.md` を read する明示的指示。これは behavioural な補償で
+あり構造的保証ではない: セッションが compact し orchestrator が Read を
+skip すれば、ロードマップ状態はワーキングメモリから失われる。
+
+エージェントチームはこのトレードオフを明示的に weigh した:
+
+- **失うもの。** ロードマップ行データに対する always-on Invariant-2
+  compaction durability。
+- **得るもの。** CLAUDE.md が worktree 横断で write-quiet になる
+  (ユーザー stated primary concern)。ロードマップ mutations は CLAUDE.md
+  authoring 作業と衝突しなくなる。2 つの distinct ファイル = 2 つの
+  distinct write surface。
+- **補償。** `.claude/agents/orchestrator.md` Analyze ステップに記録された
+  セッション開始時の明示的 orchestrator Read。
+- **Backstop。** セッションが compact し read が drop された場合、ADR-016
+  の `specs/NN-progress.md` (cross-session progress persistence) が
+  in-flight 状態 backstop。in-flight 以外の行については、orchestrator が
+  新規 dispatch 前の次の Analyze ステップで ROADMAP.md を re-read する。
+
+この Invariant 2 トレードオフを文書化した note を
+`.claude/skills/claude-md-authoring/invariants.md` に追加する。Invariant 2
+*statement* は変更しない; 変わるのは現在 invariant 2 で governed される
+コンテンツである。
+
+### バイリンガル posture
+
+`.claude/ROADMAP.md` は **英語のみ**。`.claude/ROADMAP.ja.md` sibling は
+ship しない。これは Roadmap #06 EN ↔ JA heading-tree parity contract からの
+明示的免除であり、以下によって正当化:
+
+- このファイルは圧倒的に identifiers (行番号、status glyphs、ファイルパス)
+  の構造化テーブル + ルールの bullet-list である。翻訳から恩恵を受ける
+  natural-language prose はほとんどない。
+- ロードマップ mutations は **頻繁** (status flip ごと)。flip ごとに EN ↔ JA
+  parity を維持するのは低シグナルに対し高い機械的コスト。
+- バイリンガル parity ディテクター
+  (`.claude/meta/scripts/check-bilingual-parity.sh`) は `.ja.md` 存在を
+  per-pair でキーイング: `.ja.md` sibling のないファイルは構造的に
+  out-of-scope。このファイルを免除するために allowlist エントリは不要 ──
+  免除は sibling の不在そのもの。
+
+これは既存の EN-only specs (#01–#04) および `workarounds/` (Spec Non-goals
+に従ってバイリンガル parity ディテクターも除外) と整合。Roadmap #06
+contract は他のすべての paired アーティファクトに引き続き適用される。
+
+### CI チェックスクリプトの更新
+
+3 つのチェックスクリプトが移設を反映するように更新される:
+
+- `.claude/meta/scripts/check-roadmap-drift.sh` ── parse 対象が
+  `.claude/CLAUDE.md` から `.claude/ROADMAP.md` に変更; awk テーブル行
+  検出が簡素化 (ファイル全体がロードマップであるためセクション guard が
+  不要)。
+- `.claude/meta/scripts/check-dangling-refs.sh` ── Check 1 (ADR-NNN refs)
+  と Check 2 (`.claude/-rooted` / `specs/` パス) の両方が
+  `.claude/ROADMAP.md` をスキャンセットに追加。ADR-014 reservation
+  carve-out (`is_reservation_link`) は変更不要 ── `|` と `spec:` を含む行に
+  キーイングされており、これは ROADMAP.md テーブル行で同一に成立する
+  ため。
+- `.claude/meta/scripts/check-bilingual-parity.sh` ── 変更不要。per-pair
+  キーイングが自動的に `.claude/ROADMAP.md` を除外 ──
+  `.claude/ROADMAP.ja.md` sibling が存在しないため。
+
+2026-05-17 (orchestrator Analyze row-guard) amendment は暗黙的に更新:
+G1 (行存在) が CLAUDE.md ではなく `.claude/ROADMAP.md` を read するように
+なるが、guard の 3 条件構造と orchestrator の read-only posture は不変。
+
+### 2026-05-16 行予算例外のトライアド分類更新
+
+撤回された 2026-05-16 amendment は作成時 procedural amendment として
+スコアされた (トライアド未適用; ADR-018 の判別子はそれより後発)。移設が
+現在着地することで、「行予算例外は新規 ADR を正当化したか?」という質問は
+moot: 例外は常に transitional rule として意図されており、ECC の判別子は
+それを 0/3 (新しい境界なし、新しいメカニズムなし、新しいアーティファクト
+なし) で分類しただろう。
+
+元のステータス行 (`Accepted — 2026-05-15`) は変更しない。本 amendment は
+ADR-014 の 2 つ目の 2026-05-20 amendment である (1 つ目は直前の品質ゲート
+ループ再エントリ amendment)。両 amendment が同日付なのは、両方が
+2026-05-20 の同じエージェントチーム協議から生まれたためである。

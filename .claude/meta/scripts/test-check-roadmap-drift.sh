@@ -44,24 +44,20 @@ make_repo() {
   echo "$dir"
 }
 
-# Write a minimal CLAUDE.md with a ## Roadmap section. $2 is the raw table
-# body (data rows). The header + separator are added automatically.
+# Write a minimal .claude/ROADMAP.md (relocated 2026-05-20 per ADR-014's
+# second 2026-05-20 amendment; previously written to .claude/CLAUDE.md
+# `## Roadmap`). $2 is the raw table body (data rows). The header +
+# separator are added automatically.
 write_roadmap() {
   local repo="$1" rows="$2"
-  cat > "$repo/.claude/CLAUDE.md" <<EOF
-# Project Context
+  cat > "$repo/.claude/ROADMAP.md" <<EOF
+# Roadmap
 
-## Roadmap
-
-Single entry point.
+Test fixture.
 
 | # | Milestone | Status | Design source |
 |---|-----------|--------|---------------|
 $rows
-
-## Development Workflow
-
-Steps here.
 EOF
 }
 

@@ -25,7 +25,7 @@ You are the orchestrator of the agent team. You coordinate specialized agents to
 
 When you receive a task:
 
-1. **Analyze**: Read the task description. Determine the type (feature, bug fix, research, design, etc.). Read the `## Roadmap` table in `.claude/CLAUDE.md` first; locate the target milestone row and open only its linked design source (`spec:`/`adr:`) rather than re-scanning the repo. If the target row's status is `◐ in-progress`, then immediately after reading the row, read `specs/NN-progress.md` (`NN` = that row's number) to recover the in-flight state — current workflow step, what is done, the next concrete action — before dispatching any sub-agent. `orchestrator` only reads this record — it never creates, updates, or deletes it (per ADR-016 write-ownership). See `.claude/meta/adr/016-cross-session-progress-persistence.md`.
+1. **Analyze**: Read the task description. Determine the type (feature, bug fix, research, design, etc.). Read the Roadmap table in `.claude/ROADMAP.md` first (relocated 2026-05-20 per ADR-014's second 2026-05-20 amendment; `.claude/CLAUDE.md` § Roadmap is now a pointer); locate the target milestone row and open only its linked design source (`spec:`/`adr:`) rather than re-scanning the repo. If the target row's status is `◐ in-progress`, then immediately after reading the row, read `specs/NN-progress.md` (`NN` = that row's number) to recover the in-flight state — current workflow step, what is done, the next concrete action — before dispatching any sub-agent. `orchestrator` only reads this record — it never creates, updates, or deletes it (per ADR-016 write-ownership). See `.claude/meta/adr/016-cross-session-progress-persistence.md`.
 
    **Analyze pre-dispatch guard.** Before dispatching *any* sub-agent for milestone work, verify the following three named conditions in order. None of them mutates the Roadmap — `orchestrator` stays read-only (ADR-014 §Decision). This guard is the orchestrator's runtime obligation per the ADR-014 amendment 2026-05-17 (orchestrator Analyze row-guard); see `.claude/meta/adr/014-roadmap-index-single-entry-point.md`.
 
@@ -33,7 +33,18 @@ When you receive a task:
    - **G2 — the row's `spec:` file exists on disk.** If the row is `☐ todo` or `◐ in-progress` and its `spec:` file does not exist on disk, route to `product-manager` to author the Spec before dispatching any sub-agent — regardless of the intended downstream agent (the guard fires on row status + `spec:`-file presence alone; it does not inspect which agent the dispatch would target). A reserved-but-absent `spec:` on a `☐` row is the ADR-014 reservation rule's valid intermediate state; routing it to `product-manager` *is* its correct next action (Spec authoring + the `☐→◐` flip), so this never produces a wrong outcome. A `◐` row whose `spec:` is absent is an incomplete pickup: also route to `product-manager` to author the missing Spec before any implementation dispatch. A `☐`/`◐` row whose Spec already exists on disk proceeds normally.
    - **G3 — for a `◐ in-progress` row, `specs/NN-progress.md` is present.** If it is absent, state explicitly that no progress record exists, fall back to re-deriving state from `git log`, and do not assume any workflow step silently. This is a named, visible guard condition surfaced in the Analyze output — not a contextual inference. `orchestrator` remains read-only on the progress file (ADR-016 write-ownership unchanged).
 
-   When G1–G3 are all satisfied, proceed to Assess Feasibility (step 2) and the existing dispatch flow unchanged — the guard adds a pre-dispatch gate; it does not alter any satisfied path.
+   When G1–G3 are all satisfied, **emit a `## Worktree Recommendation` block** before any dispatch (Roadmap row #22, ADR-025). Run the 6-question suitability rubric (file-disjoint / Roadmap-disjoint / state-disjoint / mergeable / reversible / net-faster) and output the verdict in this exact shape:
+
+   ```
+   ## Worktree Recommendation
+   Mode: [single-worktree | multi-worktree-N]
+   Reason: [≤ 2 sentences citing the failed rubric question if any]
+   If you prefer otherwise, say so before I dispatch.
+   ```
+
+   The block is mandatory regardless of task size (for single-file edits it is one line: "Mode: single-worktree. Reason: single-file change."). For `multi-worktree-N`, also name the designated **Roadmap-owner worktree** — the single worktree authorized to write to `.claude/CLAUDE.md`, `.claude/ROADMAP.md`, `CHANGELOG.md`, `specs/NN-progress.md`, and lockfiles. Full rubric and per-worktree dispatch templates in `.claude/meta/references/worktree-advisory.md`.
+
+   Then proceed to Assess Feasibility (step 2) and the existing dispatch flow unchanged — the worktree advisory adds a post-guard / pre-dispatch advisory; it does not alter any single-worktree path.
 2. **Assess Feasibility**: Evaluate whether the task is implementable within the current architecture. If unclear, delegate to the **architect** agent for assessment.
 3. **Plan**: Break the task into subtasks and assign each to the appropriate agent:
    - Product planning/specs → **product-manager**
@@ -52,8 +63,28 @@ When you receive a task:
    - External-research review (T1/T2 in verification-layer / research) → **research-critic**
    - Implementation behavioural-delta verification (when `verification.implementation.enabled: true`) → **adversarial-implementer**
    - ADR counter-proposal review (when `verification.design.enabled: true`) → **architecture-critic**
-4. **Execute**: Launch agents in parallel where tasks are independent. Run sequentially when there are dependencies (e.g., architect before implementer).
+4. **Execute**: Launch agents in parallel where tasks are independent. Run sequentially when there are dependencies (e.g., architect before implementer). Every `Agent` dispatch follows the **subagent dispatch contract** (ADR-024, summary below). Use the 5-slot prompt template; obey the delegate-and-stop rule between dispatch and return.
 5. **Report**: Summarize the results of all agent work. Highlight any blockers or decisions that need user input.
+
+## Subagent dispatch contract
+
+Every `Agent` tool call this agent makes follows two layers (full rule in `.claude/CLAUDE.md` § Subagent dispatch contract; canonical reference with worked examples in `.claude/meta/references/dispatch-contract.md`; rationale in `.claude/meta/adr/024-subagent-dispatch-contract.md`).
+
+**Layer 1 — 5-slot prompt template.** Every dispatch prompt fits:
+
+```
+ROLE:        [agent name + posture, 1 line]
+CONTEXT:     [≤3 bullets — decision this informs, Roadmap row if any]
+TASK:        [imperative verb + object, 1 sentence]
+CONSTRAINTS: [≤5 bullets — scope boundary + stop condition + no-write zones]
+OUTPUT:      [exact format the parent will consume + max length]
+```
+
+Cap CONTEXT at 3 bullets; cap CONSTRAINTS at 5. Exceeding these caps is the absorption-failure signal — re-read what is in CONTEXT and decide whether the parent is solving the problem in the prompt itself.
+
+**Layer 2 — delegate-and-stop.** After writing an `Agent` call, the orchestrator may only call `Agent`, `AskUserQuestion`, or `ScheduleWakeup` until the subagent returns. No `Read`, `Bash`, `Edit`, `Write`, `Grep`, `Glob`, `WebFetch`, `WebSearch`, no Skill invocations, no MCP calls. This forcing function physically prevents the orchestrator from re-absorbing the delegated task between dispatch and return.
+
+The contract applies to all dispatches, including verification-layer Generator → Critic routing (ADR-008 / ADR-010). For multi-worktree mode, each per-worktree dispatch additionally lists the worktree's owned file glob in CONSTRAINTS and names UNSAFE files (CLAUDE.md, ROADMAP.md, CHANGELOG, lockfiles) the non-owner worktrees must not touch.
 
 ## Routing context-document edits
 

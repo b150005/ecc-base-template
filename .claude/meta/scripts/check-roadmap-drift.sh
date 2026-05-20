@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 # check-roadmap-drift.sh
 #
-# Enforces Roadmap *index consistency* for the template's single always-read
-# entry point: the `## Roadmap` table in .claude/CLAUDE.md (ADR-014) and the
-# ADR back-links under .claude/meta/adr/. This is milestone #05; the
-# authoritative scope is specs/05-roadmap-drift-detection-ci.md and the
-# structural keying/boundary/parsing decisions are ADR-017.
+# Enforces Roadmap *index consistency* for the template's Roadmap source
+# of truth: the table in .claude/ROADMAP.md (relocated 2026-05-20 per
+# ADR-014's second 2026-05-20 amendment; previously under the "## Roadmap"
+# heading in .claude/CLAUDE.md) and the ADR back-links under
+# .claude/meta/adr/. This is milestone #05; the authoritative scope is
+# specs/05-roadmap-drift-detection-ci.md and the structural keying/boundary/
+# parsing decisions are ADR-017.
 #
 # ─────────────────────────────────────────────────────────────────────────
 # THE THREE DRIFT CLASSES THIS SCRIPT FAILS ON (and ONLY these), per ADR-017 §1:
@@ -146,14 +148,17 @@ summary_finding() {
   summary_append "| $1 | $2 | \`$3\` |"
 }
 
-CLAUDE_MD=".claude/CLAUDE.md"
+ROADMAP_MD=".claude/ROADMAP.md"
 ADR_DIR=".claude/meta/adr"
 
 # ---------------------------------------------------------------------------
 # Roadmap table parsing
 # ---------------------------------------------------------------------------
-# The Roadmap table lives under the "## Roadmap" heading in CLAUDE.md. Rows
-# look like:
+# The Roadmap table lives in .claude/ROADMAP.md (relocated 2026-05-20 per
+# ADR-014's second 2026-05-20 amendment; previously under the "## Roadmap"
+# heading in CLAUDE.md). The whole ROADMAP.md file is the Roadmap, so this
+# parser scans every line for the table-data-row pattern without a section
+# guard. Rows look like:
 #   | 03 | Milestone text | ☑ done | spec: `specs/03-x.md`<br>adr: `.claude/meta/adr/016-x.md` |
 # We parse only rows whose first cell is a 1+ digit row number (data rows),
 # skipping the header row and the `|---|` separator. The Design-source cell
@@ -166,12 +171,6 @@ ADR_DIR=".claude/meta/adr"
 # escape-hatch contract, reused unmodified — Spec acceptance criterion).
 parse_roadmap_rows() {
   awk '
-    BEGIN { in_roadmap=0 }
-    /^## / {
-      in_roadmap = ($0 ~ /^## Roadmap[[:space:]]*$/) ? 1 : 0
-      next
-    }
-    !in_roadmap { next }
     /<!-- ref-allow:/ { next }
     # Data rows start with "| <digits> |"
     /^\|[[:space:]]*[0-9]+[[:space:]]*\|/ {
@@ -187,7 +186,7 @@ parse_roadmap_rows() {
       status = cell[last-1]
       print rownum "\t" status "\t" design
     }
-  ' "$CLAUDE_MD"
+  ' "$ROADMAP_MD"
 }
 
 # Extract every `adr:` target path from a Design-source cell value.
@@ -269,8 +268,8 @@ echo "===================="
 
 summary_header
 
-if [ ! -f "$CLAUDE_MD" ]; then
-  fail_check "no $CLAUDE_MD — cannot check Roadmap drift"
+if [ ! -f "$ROADMAP_MD" ]; then
+  fail_check "no $ROADMAP_MD — cannot check Roadmap drift"
   echo ""
   echo "Roadmap drift checks: FAIL"
   exit 1
