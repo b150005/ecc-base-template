@@ -52,5 +52,4 @@ CHANGELOG.md
 LICENSE
 .env.example
 .gitignore
-.gitignore.example
 .gitattributes
