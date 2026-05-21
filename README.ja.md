@@ -198,8 +198,7 @@ your-repo/
 ├── CHANGELOG.md               ← [Unreleased] から開始
 ├── LICENSE
 ├── .env.example
-├── .gitignore
-├── .gitignore.example
+├── .gitignore                ← Learning Mode の opt-in 反転をインラインで文書化 (ADR-027 参照)
 ├── .gitattributes
 ├── .claude/
 │   ├── CLAUDE.md              ← プロジェクト指示 (About セクションをまず編集)
