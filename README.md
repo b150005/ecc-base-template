@@ -211,7 +211,6 @@ your-repo/
 │   ├── templates/             ← copy-and-fill ADR/spec templates
 │   ├── meta/scripts/init.sh   ← interactive initializer
 │   └── settings.json          ← Claude Code settings
-├── .devcontainer/             ← VS Code Dev Containers scaffold
 └── .github/
     ├── workflows/.gitkeep     ← empty by design — add your CI here
     ├── CODEOWNERS

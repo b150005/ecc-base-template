@@ -206,7 +206,6 @@ your-repo/
 │   ├── templates/             ← コピーして使う ADR / Spec テンプレート
 │   ├── meta/scripts/init.sh   ← 対話型初期化スクリプト
 │   └── settings.json          ← Claude Code 設定
-├── .devcontainer/             ← VS Code Dev Containers スカフォールド
 └── .github/
     ├── workflows/.gitkeep     ← 設計上空 — CI はここに追加
     ├── CODEOWNERS
