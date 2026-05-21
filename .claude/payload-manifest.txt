@@ -27,16 +27,6 @@
 .claude/CLAUDE.md
 .claude/meta/scripts/init.sh
 
-# --- Temporary entries (to be removed after AC-2 cleanup PR merges) ---
-# These three template-internal files were left on `main` by an incomplete
-# Phase B purge (Roadmap #23). The cleanup PR deletes them from `main`; the
-# manifest needs to list them transiently so the payload-manifest gate
-# allows the deletion path in the PR's diff. These three entries will be
-# removed in a develop-only cleanup commit after the deletion PR merges.
-.claude/meta/CHANGELOG.legacy.md
-.claude/meta/CHANGELOG.md
-.claude/meta/citation-targets.txt
-
 # ---------------------------------------------------------------
 # .github/ — placeholder + single template-enforcement workflow +
 #            fork-reusable config
