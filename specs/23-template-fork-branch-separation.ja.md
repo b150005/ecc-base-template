@@ -40,6 +40,23 @@ ADR-026 の改訂 2026-05-21 を参照。
 
 ADR-026 の改訂 2026-05-21 (二回目) を参照。
 
+## 改訂 2026-05-21 (三回目)
+
+**きっかけ:** 二回目改訂の graceful-skip は正しさを保ったが不可視性は保たなかった、というユーザーフィードバック — フォークは依然として Actions タブにエントリを目にし、ランナー起動コストを支払い、オプトインしていない不透明なワークフローに対する cognitive tax を支払っていた。
+
+**変更点:**
+
+- AC-6 の検証をフォークコンテキスト模擬で拡張: upstream `b150005/ecc-base-template` 以外のリポジトリでは、ジョブレベル `if: github.repository == 'b150005/ecc-base-template'` ガードのおかげで `payload-manifest-check` ジョブが `skipped` と評価される(0 runner minutes、Actions タブには skip マーカー以外のノイズなし)。
+- `.claude/meta/scripts/init.sh` に `.github/workflows/payload-manifest-check.yml` の削除を提案する対話プロンプトを追加。`--non-interactive` と `--dry-run` モードは尊重される(静かに保持 / 書き込みなしでプレビュー)。
+- ワークフローのヘッダコメントが両層を文書化し、upstream リネーム依存を明示する。
+
+**検証済み:**
+
+- 層 (1): upstream の PR ではジョブが評価される(実行される)。フォークの PR(非 upstream リポジトリ、またはローカルリプレイで `github.repository` コンテキストを編集することで模擬)では `skipped` と評価される。
+- 層 (2): `bash .claude/meta/scripts/init.sh --dry-run` で削除プロンプトが表示され、`y` 回答で `[dry-run] would remove .github/workflows/payload-manifest-check.yml` が出力される。`--non-interactive` モードでは `keeping (non-interactive mode; safe no-op on forks)` を出力する。
+
+ADR-026 の改訂 2026-05-21 (三回目) を参照。
+
 **責任者:** product-manager / implementer
 **目標リリース:** template v3.12.0
 
@@ -104,7 +121,7 @@ ADR-026 の改訂 2026-05-21 (二回目) を参照。
 
 **AC-5.** `main` は設計上ワークフローを保持しない。フォーク CI は完全にオプトイン制である。CI が必要なフォーク(例: `ci-base.yml`、`security.yml`、`coverage-gate.yml`、`workaround-check.yml`)は `develop` から対象のワークフローファイルをコピーするか、独自に作成する — コピーも独自作成も、有効なフォークに必須ではない。`main` 上でのワークフロー個別の実行検証は不要(検証すべきワークフローが存在しない)。検証方法: `git ls-tree -r --name-only main .github/workflows/` が `.github/workflows/.gitkeep` のみを返す。
 
-**AC-6.** `.github/workflows/payload-manifest-check.yml` が `develop` 上に存在し、`base: main` の `pull_request` でトリガーされ、PR の diff に `.claude/payload-manifest.txt` に記載されていないファイルが含まれる場合に非ゼロで終了する。検証方法: develop-only パスを含むテスト PR を `main` に開くとチェックが失敗し、ペイロードパスのみを含む PR はパスする。 <!-- ref-allow: payload-manifest.txt is created in Phase B implementation - forward reference -->
+**AC-6.** `.github/workflows/payload-manifest-check.yml` が `develop` 上に存在し、`base: main` の `pull_request` でトリガーされ、PR の diff に `.claude/payload-manifest.txt` に記載されていないファイルが含まれる場合に非ゼロで終了する。検証方法: develop-only パスを含むテスト PR を `main` に開くとチェックが失敗し、ペイロードパスのみを含む PR はパスする。**フォークコンテキストの検証(改訂 2026-05-21 三回目に基づく):** 非 upstream リポジトリでは、ジョブレベル `if: github.repository == 'b150005/ecc-base-template'` ガードによって `payload-manifest-check` ジョブが `skipped` と評価される(ランナー割り当てなし、Actions タブには skip マーカー以外のエントリなし)。 <!-- ref-allow: payload-manifest.txt is created in Phase B implementation - forward reference -->
 
 **AC-7.** `main` 上の `CLAUDE.md` はペイロード向けに縮小されたバージョンである。エージェントチームテーブル、ドキュメントテンプレートセクション、開発ワークフロー概要、テスト要件、コード品質標準、このファイルを拡張するセクションを保持する。`## Developer Learning Mode`, `## Subagent dispatch contract`, `## Worktree advisory protocol`, `## Roadmap`, `## Plan-First & Learning-Aware Defaults` セクションは含まない(これらは develop-only のガイダンス)。検証方法: `git show main:.claude/CLAUDE.md` に文字列 `## Developer Learning Mode` が含まれない。
 

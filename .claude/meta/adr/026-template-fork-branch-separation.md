@@ -92,3 +92,28 @@ The `.claude/payload-manifest.txt` on `develop` now lists `.github/workflows/pay
 **Neutral.** No change to the fork-CI-opt-in intent: forks still get `.gitkeep` as the affordance for fork-CI scaffolding; the single workflow shipped is template infrastructure that is no-op for them.
 
 **Spec counterpart.** Spec `specs/23-template-fork-branch-separation.md` carries Amendment 2026-05-21 (second) with the matching AC-4 wording revision.
+
+## Amendment 2026-05-21 (third)
+
+**Trigger.** User feedback (2026-05-21): the second-amendment "graceful-skip on missing `develop`" guarantee covered *correctness* (no fork PR fails) but not *invisibility*. Forks that inherit the workflow file still see a "Payload Manifest Check" entry in their Actions tab on every PR (skipped or 6-second SUCCESS), consume billable runner-startup time, and pay a cognitive tax: the workflow's purpose is opaque without reading ADR-026 itself. The "fork CI is opt-in" principle established by Amendment 2026-05-21 (first) is violated in spirit — fork users must reverse-opt-out via `git rm` rather than receive an opt-in surface.
+
+**Decision revision.** Defense in depth via two orthogonal layers:
+
+1. **Job-level repository guard.** Add `if: github.repository == 'b150005/ecc-base-template'` to the `payload-manifest-check` job. On any non-upstream repository the job evaluates to `skipped` before runner allocation — 0 runner minutes, 0 Actions billing, no tab noise beyond the skip marker. Forks that take no action see the workflow file but never see it run.
+2. **Interactive removal in `init.sh`.** Add a prompt to `.claude/meta/scripts/init.sh` ("Remove template-internal payload-manifest-check.yml? (y/N)") so fork users who run `init.sh` can physically remove the file. `--non-interactive` mode preserves the file (safe no-op); `--dry-run` mode prints the intended removal without writing.
+
+The two layers are orthogonal: layer (1) protects users who do not run `init.sh`; layer (2) offers cleanup for users who do. Together they convert the workflow from "opt-out" to "ignorable by default, removable on request."
+
+**Eliminated tension.** The second-amendment graceful-skip mechanism preserved correctness but did not preserve the fork-clean-by-default UX intent of Amendment 2026-05-21 (first). Layer (1) re-aligns runtime visibility with the first-amendment intent; layer (2) re-aligns the fork-customization story with the `init.sh` ergonomic surface.
+
+**Trade-off accepted.** The hardcoded `b150005/ecc-base-template` guard becomes fail-silent if the upstream repository is renamed or transferred between accounts/orgs — upstream itself silently stops running the check. Mitigated by (a) the second-amendment graceful-skip remaining as a second-layer defense and (b) an inline comment in the workflow file flagging the rename dependency. The risk is upstream-only (forks are not affected); rename is a planned, infrequent operation where updating the guard is one of several mechanical steps.
+
+### Consequences addendum (third)
+
+**Positive.** Fork users see zero Actions-tab noise from this workflow by default. Users who run `init.sh` can additionally elect physical removal. The graceful-skip fallback remains for any path the guard might miss (legacy forks, name-collision repositories).
+
+**Negative.** The upstream repo name is hardcoded in the workflow; renaming requires a one-line edit (flagged by an inline comment). The init.sh prompt is one additional interactive question for fork users (mitigated by `--non-interactive` mode keeping the file silently).
+
+**Neutral.** No change to AC-2, AC-4, or AC-12 outcomes. AC-6 verification gains a fork-context check (job evaluates to `skipped` on non-upstream repos).
+
+**Spec counterpart.** `specs/23-template-fork-branch-separation.md` carries Amendment 2026-05-21 (third) with the matching AC-6 verification refinement.

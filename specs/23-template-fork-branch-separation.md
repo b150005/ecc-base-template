@@ -76,6 +76,38 @@ nested-glob cases.
 
 References ADR-026 amendment 2026-05-21 (second).
 
+## Amendment 2026-05-21 (third)
+
+**Trigger:** User feedback that the second-amendment graceful-skip preserved
+correctness but not invisibility — forks still saw an Actions-tab entry, paid
+runner-startup cost, and paid cognitive tax for an opaque workflow they did
+not opt into.
+
+**Changes:**
+
+- AC-6 verification extended with a fork-context simulation: on any
+  repository other than the upstream `b150005/ecc-base-template`, the
+  `payload-manifest-check` job evaluates to `skipped` (0 runner minutes,
+  no Actions-tab noise beyond the skip marker) thanks to a job-level
+  `if: github.repository == 'b150005/ecc-base-template'` guard.
+- `.claude/meta/scripts/init.sh` gains an interactive prompt offering
+  removal of `.github/workflows/payload-manifest-check.yml`. `--non-interactive`
+  and `--dry-run` modes are honored (keep silently / preview without writing).
+- The workflow header comment documents both layers and flags the upstream
+  rename dependency.
+
+**Verified:**
+
+- Layer (1): upstream PR evaluates job (executes); fork PR (simulated by
+  any non-upstream repository or by editing `github.repository` context in
+  a local replay) evaluates to `skipped`.
+- Layer (2): `bash .claude/meta/scripts/init.sh --dry-run` prints the
+  removal prompt; `y` answer outputs `[dry-run] would remove
+  .github/workflows/payload-manifest-check.yml`; `--non-interactive` mode
+  emits `keeping (non-interactive mode; safe no-op on forks)`.
+
+References ADR-026 amendment 2026-05-21 (third).
+
 **Owner:** product-manager / implementer
 **Target release:** template v3.12.0
 
@@ -200,7 +232,11 @@ returns only `.github/workflows/.gitkeep`.
 triggers on `pull_request` with `base: main`, and exits non-zero if any file in
 the PR diff is not listed in `.claude/payload-manifest.txt`. <!-- ref-allow: payload-manifest.txt is created in Phase B implementation - forward reference --> Verified by:
 opening a test PR to `main` that contains a develop-only path causes the check
-to fail; a PR containing only payload paths passes.
+to fail; a PR containing only payload paths passes. **Fork-context verification
+(per Amendment 2026-05-21 third):** on a non-upstream repository the
+`payload-manifest-check` job evaluates to `skipped` (no runner allocation,
+no Actions-tab entry beyond the skip marker) thanks to the job-level
+`if: github.repository == 'b150005/ecc-base-template'` guard.
 
 **AC-7.** `CLAUDE.md` on `main` is a reduced payload-facing version. It retains
 the Agent Team table, Document Templates section, Development Workflow overview,
