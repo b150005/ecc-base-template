@@ -39,6 +39,15 @@
 .github/dependabot.yml
 
 # ---------------------------------------------------------------
+# .devcontainer/ — TRANSITIONAL (removed per ADR-028). Entry kept
+# so the main-side deletion PR passes the manifest gate (the gate
+# treats deletions as off-manifest if the deleted path is not on
+# the allowlist — see ADR-027 sequencing note). Removed in a
+# follow-up develop-only PR after the main deletion lands.
+# ---------------------------------------------------------------
+.devcontainer/**
+
+# ---------------------------------------------------------------
 # Root-level — README, CHANGELOG, LICENSE, git/env examples
 # ---------------------------------------------------------------
 README.md
