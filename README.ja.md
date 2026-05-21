@@ -1,7 +1,8 @@
 # ecc-base-template
 
-Claude Code との高品質・高精度な協働を支える、フレームワーク非依存の GitHub
-テンプレート。18 のエージェントによる開発チームを標準装備しています。
+Claude Code との高品質・高精度な協働を支える、フレームワーク非依存の
+GitHub テンプレート。14 のエージェントによる開発チームを標準装備して
+います。
 
 [English README](README.md)
 
@@ -9,66 +10,53 @@ Claude Code との高品質・高精度な協働を支える、フレームワ�
 
 ## 前提条件
 
-このテンプレートは、ユーザーレベル (`~/.claude/`) に **ECC
-(Everything Claude Code)** を導入済みの開発者を対象としています。
-本テンプレートのエージェントは、実行時に ECC が提供するルールおよび
-Skill を参照します。言語別レビュアー、フレームワーク固有のパターン、
-共有の検証ワークフローはあなたの ECC インストール側に存在し、本リポジトリ
-には含まれません。
+このテンプレートは、**ECC (Everything Claude Code)** をユーザーレベル
+(`~/.claude/`) に既にインストール済みの開発者を想定して設計されています。
+本テンプレートのエージェントは、ECC 提供のルールや Skill を実行時に参照
+します — 言語別レビュアー、フレームワーク別パターン、共通の検証ワーク
+フローは、本リポジトリではなくお手元の ECC インストールに置かれます。
 
-ECC が無くてもテンプレートは起動しますが、エージェントの品質は低下します。
-ルール参照は何も解決せず、Skill 呼び出しは no-op となり、言語別コード
-レビュー経路 ([`code-reviewer`](.claude/agents/code-reviewer.md)
-を参照) は汎用レビューにフォールバックし、verdict 内で明示します。
+ECC なしでもテンプレートは動作しますが、エージェント品質は劣化します:
+ルール参照は何もないところを指し、Skill 呼び出しは no-op になり、
+言語特化のコードレビュー経路 (
+[`code-reviewer`](.claude/agents/code-reviewer.md) を参照) は汎用レビュー
+にフォールバックし、判定にもそう明記します。
 
-> **ECC をまだ導入していない場合は、**先にユーザーレベルでインストールして
-> から、本テンプレートでプロジェクトリポジトリを作成してください。
+> **ECC をお持ちでないですか?** まずユーザーレベルに ECC をインストール
+> してから、このテンプレートを使ってご自身のリポジトリを作成してください。
 
 ---
 
 ## 提供物
 
-- **18 の専門エージェント** で製品ライフサイクル全体をカバー — orchestrator、
-  product-manager、architect、implementer、test-runner、code-reviewer、
-  security-reviewer、performance-engineer、devops-engineer、technical-writer
-  ほか。全エージェントはエコシステム非依存で、言語・フレームワークを実行時に
-  検出します。
-- **クリーンなルートディレクトリ。** fork 後はあなたがリポジトリルートを
-  完全に所有します — テンプレートは `docs/`、`scripts/`、`learn/`、ADR/Spec
-  番号などを予約しません。
-- **ADR / プロダクト Spec 用ドキュメントテンプレート** が `.claude/templates/`
-  に同梱。英語版 `*.md` と日本語版 `*.ja.md` の両方を提供します。プロジェクト
-  の意思決定記録を置きたい場所にコピーして使用してください。
-- **空の CI スカフォールド** (`.github/workflows/.gitkeep`) を保持。CI を
-  追加する判断をした時のために枠は確保されています — [CI](#ci) セクションを
-  参照。
-
----
-
-## Forking について
-
-本リポジトリは **2 ブランチモデル** を採用しています:
-
-- **`main`** — fork ペイロード。「Use this template」で新しいリポジトリに
-  コピーされる対象です: agent 定義、ドキュメントテンプレート、fork 向け設定、
-  初期化スクリプトのみ。テンプレート内部成果物は含まれません。
-- **`develop`** — テンプレート開発ブランチ。Spec、ADR、PRD、内部 CI
-  ワークフロー、テンプレート自身の Roadmap を保持。**fork 向けではありません。**
-
-fork (「Use this template」または `git clone`) すると `main` で作業を開始し、
-fork ペイロードのみを受け取ります。テンプレート内部成果物を手動で削除する
-必要はありません。
+- **14 個の専門エージェント** が製品ライフサイクル全体を担当します —
+  orchestrator、product-manager、architect、implementer、test-runner、
+  code-reviewer、security-reviewer、performance-engineer、
+  devops-engineer、technical-writer など。すべてエコシステム非依存:
+  エージェントは実行時に言語とフレームワークを検出します。
+- **Plan Mode デフォルト。** 新しいセッションは Plan Mode で起動します
+  (`.claude/settings.json` の `permissions.defaultMode: "plan"` 設定) —
+  Claude はまずプランを提示し、書き込みやシェル実行の前に明示的な承認を
+  待ちます。
+- **クリーンなルートディレクトリ。** fork 後はリポジトリのルートはあなた
+  のものです — テンプレートは `docs/`、`scripts/`、ADR/spec 番号などを
+  予約しません。
+- **ドキュメントテンプレート** が `.claude/templates/` に配置されています。
+  ADR と製品 Spec の英語版 `*.md` と日本語版 `*.ja.md` の両方を用意。
+  プロジェクトの決定記録をどこに置きたいかに応じて、自由にコピーして
+  ください。
+- **空の CI スカフォールド** (`.github/workflows/.gitkeep`) があり、
+  CI を追加する準備が整っています。
 
 ---
 
 ## クイックスタート
 
-### 1. リポジトリを作成
+### 1. リポジトリの作成
 
 GitHub で
 [b150005/ecc-base-template](https://github.com/b150005/ecc-base-template)
-を開き、**Use this template** をクリック。(`main` ブランチを使用 — それが
-fork-clean のデフォルトです。)
+を開き、**Use this template** をクリック。
 
 ### 2. クローンして開く
 
@@ -80,112 +68,72 @@ cd <your-repo>
 ### 3. 初期化スクリプトを実行
 
 ```sh
-.claude/meta/scripts/init.sh
+.claude/init.sh
 ```
 
-プロジェクト名、1 行説明、技術スタックを尋ねた後、`.claude/CLAUDE.md` の
-`## About This Project` プレースホルダを置換し、`.env.example` を `.env`
-にコピーします。テンプレート内部の `payload-manifest-check.yml`
-ワークフローの削除も対話的に提案されます(デフォルトは残す。どちらでも
-安全 — このワークフローは upstream テンプレートリポジトリでのみ動くよう
-ガードされています)。再実行は安全です。
+プロジェクト名、概要、技術スタックを質問形式で受け取り、
+`.claude/CLAUDE.md` の `## About This Project` プレースホルダーを置換し、
+`.env.example` を `.env` にコピーします。再実行も安全です。
 
 非対話形式:
 
 ```sh
-.claude/meta/scripts/init.sh \
+.claude/init.sh \
   --project-name "TaskFlow" \
   --description "Team task management API" \
   --stack "Go / Gin / PostgreSQL"
 ```
 
-### 4. 作業開始
+### 4. 作業を開始
 
-Claude Code を repo root で開き (`claude`)、orchestrator に具体的なタスク
-を渡します。例:
+リポジトリのルートで Claude Code (`claude`) を開き、orchestrator に実
+タスクを渡してください。例:
 
-> Design and implement a REST endpoint `POST /tasks` that validates input,
-> persists to PostgreSQL, and returns the created resource. Use TDD.
+> POST /tasks REST エンドポイントを設計して実装してください。入力の
+> バリデーション、PostgreSQL への永続化、作成済みリソースの返却を
+> 行う形で。TDD で。
 
-orchestrator が product-manager (受け入れ基準) / architect (モジュール境界)
-/ implementer (コード) / 品質エージェント (レビュー) に委任します — ハンド
-オフはユーザーが舵を取ります。
-
----
-
-## CI
-
-本テンプレートは **`main` 上に fork 向け GitHub Actions ワークフローを
-含めません** (設計上の意図的判断)。`.github/workflows/` フォルダは
-`.gitkeep` で保持されており、ここに CI を追加できることを忘れないため
-の仕組みです。
-
-GitHub ワークフローは fork ごとの選択です — プロジェクトによって必要な
-CI 構成は異なります (lint、test、coverage gate、security scan、依存更新
-トリアージなど)。万人向けのセットを同梱して不要分を削除させる代わりに、
-枠だけ空のまま提供し、`develop` ブランチの参考ワークフローを紹介します:
-
-```sh
-git remote add template https://github.com/b150005/ecc-base-template.git
-git fetch template develop
-git checkout template/develop -- .github/workflows/<workflow>.yml
-```
-
-プロジェクトに合うワークフロー (例: `ci-base.yml`、`security.yml`、
-`coverage-gate.yml`、`workaround-check.yml`) を選ぶか、独自に作成してくだ
-さい。
-
-### `main` に同梱される唯一のワークフロー
-
-`.github/workflows/payload-manifest-check.yml` は、上流テンプレートが
-自身の `main` 宛 PR を `.claude/payload-manifest.txt` (develop 上に存在)
-に対して gate するためのテンプレート内部 boundary-enforcement
-ワークフローです。fork ではこの workflow は無害に動作します — `develop`
-ブランチの checkout を試み、存在しない場合は静かに SUCCESS で skip
-します。完全に空の `.github/workflows/` を望む fork はこの 1 ファイル
-を `git rm` で削除して問題ありません。残したままにすれば、PR ごとに
-no-op success が報告されるだけです。
+orchestrator が product-manager に受け入れ基準、architect にモジュール
+境界、implementer にコード、品質エージェントにレビューを委譲します —
+ハンドオフはあなたが舵を取ります。
 
 ---
 
-## 18 のエージェントチーム
+## 14 のエージェントチーム
 
-全エージェントはエコシステム非依存。`.claude/CLAUDE.md` とプロジェクトの
-マニフェストファイル (`package.json`、`pubspec.yaml`、`go.mod`、
-`Cargo.toml` など) を実行時に読み、言語・フレームワークを検出します。
-orchestrator がチームを調整し、専門エージェントは orchestrator または
-直接的に呼び出されます。
+すべてのエージェントはエコシステム非依存です。`.claude/CLAUDE.md` と
+プロジェクトのマニフェストファイル (`package.json`、`pubspec.yaml`、
+`go.mod`、`Cargo.toml` 等) を実行時に読んで、プロジェクトの言語と
+フレームワークを検出します。orchestrator がチームを統率し、専門
+エージェントは orchestrator または直接呼び出されます。
 
-| Agent | フェーズ | 役割 |
-|-------|---------|------|
-| **orchestrator** | 全般 | 課題分析、計画立案、専門家への委任 |
-| **product-manager** | 計画 | Spec 起草、ユーザーストーリー、受け入れ基準 |
-| **market-analyst** | 計画 | 市場調査、競合分析 |
-| **monetization-strategist** | 計画 | ビジネスモデル、価格戦略、収益分析 |
-| **ui-ux-designer** | 設計 | UI/UX 設計、ユーザビリティレビュー、アクセシビリティ |
-| **docs-researcher** | 調査 | API 検証、フレームワーク挙動の primary docs 照合 |
-| **research-critic** | 調査 | 調査出力の対立的レビュー (primary-source-only) |
-| **adversarial-implementer** | 構築 | 並列実装 Critic (opt-in) |
-| **architecture-critic** | 設計 | ADR への対案 Critic (opt-in) |
-| **architect** | 設計 | システムアーキテクチャ、技術判断、ADR 作成 |
-| **implementer** | 構築 | アーキテクチャ仕様と TDD に従う実装 |
-| **code-reviewer** | 品質 | コード品質、保守性、規約遵守 |
-| **test-runner** | 品質 | テスト実行、カバレッジ報告、TDD 支援 |
-| **linter** | 品質 | 静的解析、コードスタイル強制 |
-| **security-reviewer** | 品質 | 脆弱性検出、シークレット走査、OWASP Top 10 |
-| **performance-engineer** | 品質 | プロファイリング、ボトルネック特定、最適化 |
-| **devops-engineer** | リリース | CI/CD、デプロイ戦略、リリース管理 |
-| **technical-writer** | リリース | ドキュメント、CHANGELOG、バイリンガル文書 |
+| Agent | Phase | Role |
+|-------|-------|------|
+| **orchestrator** | All | Issue 解析、計画立案、専門エージェントへの委譲 |
+| **product-manager** | Planning | Spec 作成、ユーザーストーリー、受け入れ基準 |
+| **market-analyst** | Planning | 市場調査、競合分析 |
+| **monetization-strategist** | Planning | ビジネスモデル、価格戦略、収益分析 |
+| **ui-ux-designer** | Design | UI/UX 設計、ユーザビリティレビュー、アクセシビリティ |
+| **architect** | Design | システムアーキテクチャ、技術選定、ADR 作成 |
+| **implementer** | Build | アーキテクチャ仕様と TDD に従ったコード実装 |
+| **code-reviewer** | Quality | コード品質、保守性、規約準拠 |
+| **test-runner** | Quality | テスト実行、カバレッジ報告、TDD 支援 |
+| **linter** | Quality | 静的解析、コードスタイル強制 |
+| **security-reviewer** | Quality | 脆弱性検出、シークレットスキャン、OWASP Top 10 |
+| **performance-engineer** | Quality | プロファイリング、ボトルネック特定、最適化 |
+| **devops-engineer** | Release | CI/CD、デプロイ戦略、リリース管理 |
+| **technical-writer** | Release | ドキュメント、changelog、バイリンガル文書 |
 
-### モデルティア
+### モデル階層
 
-各 agent は frontmatter で Claude Code エイリアス (`opus` / `sonnet` /
-`haiku` / `inherit`) を宣言。最新版に解決されます。テンプレートは混成
-編成 — 一律ではなく仕事に合うモデルを選定。
+各エージェントは frontmatter でモデルエイリアス (`opus` / `sonnet` /
+`haiku` / `inherit`) を宣言し、Claude Code が各ファミリの最新バージョン
+に解決します。テンプレートはミックス艦隊を採用しています — 単一の下限
+ではなく、ジョブごとに適切なモデルを選ぶ方針です。
 
 現在のバージョン番号は
-[Anthropic model overview](https://docs.claude.com/en/docs/about-claude/models/overview)
-を参照。
+[Anthropic モデル概要](https://docs.claude.com/en/docs/about-claude/models/overview)
+を参照してください。
 
 ---
 
@@ -193,58 +141,56 @@ orchestrator がチームを調整し、専門エージェントは orchestrator
 
 ```
 your-repo/
-├── README.md                  ← プロジェクトの README に置換
-├── README.ja.md               ← バイリンガル README (任意)
-├── CHANGELOG.md               ← [Unreleased] から開始
+├── README.md                  ← プロジェクトの README (これを置き換えてください)
+├── README.ja.md               ← オプションのバイリンガル README
+├── CHANGELOG.md               ← [Unreleased] からスタート、リリースで成長
 ├── LICENSE
 ├── .env.example
-├── .gitignore                ← Learning Mode の opt-in 反転をインラインで文書化 (ADR-027 参照)
+├── .gitignore
 ├── .gitattributes
 ├── .claude/
-│   ├── CLAUDE.md              ← プロジェクト指示 (About セクションをまず編集)
-│   ├── agents/                ← 18 個の agent 定義ファイル
-│   ├── templates/             ← コピーして使う ADR / Spec テンプレート
-│   ├── meta/scripts/init.sh   ← 対話型初期化スクリプト
-│   └── settings.json          ← Claude Code 設定
+│   ├── CLAUDE.md              ← プロジェクト指示 (About セクションを最初に編集)
+│   ├── agents/                ← 14 個のエージェント定義
+│   ├── templates/             ← コピーして埋める ADR/spec テンプレート
+│   ├── init.sh                ← 対話型初期化スクリプト
+│   └── settings.json          ← Claude Code 設定 (Plan Mode デフォルト)
 └── .github/
-    ├── workflows/.gitkeep     ← 設計上空 — CI はここに追加
+    ├── workflows/.gitkeep     ← 設計上空 — ここに自前の CI を追加
     ├── CODEOWNERS
     ├── ISSUE_TEMPLATE/
     ├── PULL_REQUEST_TEMPLATE.md
     └── dependabot.yml
 ```
 
-すべての可視ルートファイルはあなたが所有します。テンプレートは `docs/`、
-`src/`、`scripts/` などのトップディレクトリ名を予約しません。
+ルート直下の可視ファイルはすべてあなたのものです。テンプレートは
+`docs/`、`src/`、`scripts/` などのトップレベルディレクトリ名を予約
+しません。
 
-### 独自の ADR / Spec の配置
+### 独自の ADR と Spec を配置する
 
-`.claude/templates/adr-template.md` をコピーして、ADR を置きたい場所に
-配置します。よくある選択肢:
+`.claude/templates/adr-template.md` を ADR を置きたい場所にコピーして
+ください。よくある選択肢:
 
-- `adr/001-use-postgresql.md` (repo root 直下)
-- `adr/en/001-use-postgresql.md` + `adr/ja/001-use-postgresql.md`
-  (バイリンガルプロジェクト)
-- `docs/adr/001-use-postgresql.md` (既に `docs/` ツリーがあれば)
+- リポジトリルートに `adr/001-use-postgresql.md`
+- バイリンガルプロジェクトなら `adr/en/001-use-postgresql.md` + `adr/ja/001-use-postgresql.md`
+- 既に `docs/` ツリーがあるなら `docs/adr/001-use-postgresql.md`
 
-`spec-template.md` も同様。場所の強制はありません。
+`spec-template.md` も同様です。配置場所は強制されません。
+
+### CI
+
+`.github/workflows/` は空 (`.gitkeep` のみ) で出荷されます。CI は
+fork ごとの選択 — プロジェクトごとに必要な CI スカフォールド (lint、
+test、coverage、セキュリティスキャン、依存バンプの triage) は異なる
+ためです。必要に応じて、スタックに合わせて自分で書いてください。
 
 ---
 
 ## テンプレート本体への貢献
 
-このセクションは **ecc-base-template 本体** で作業する人向けで、fork
-ユーザー向けではありません。
-
-- Issue と PR は `develop` ブランチに対して開いてください。
-- `main` はテンプレート maintainer が維持する payload-only ブランチで、
-  直接 PR は受け付けません。
-- `develop → main` のマージは develop 上の `payload-manifest-check` CI
-  でゲートされ、fork payload のクリーン性を担保します。
-
-テンプレート開発基盤一式 (Spec、ADR、内部 CI ワークフロー、Roadmap
-index) は `develop` 上にあります。テンプレート自身の設計と保守を確認
-するには `develop` ブランチを参照してください。
+このセクションは **ecc-base-template 本体** に取り組む人向けで、
+fork 利用者向けではありません。Issue と PR は `main` ブランチに対して
+作成してください。
 
 ---
 

@@ -40,13 +40,9 @@ This project uses an agent team for structured development. The **orchestrator**
 | market-analyst | Market research, competitor analysis |
 | monetization-strategist | Business model, pricing, revenue strategy |
 | ui-ux-designer | UI/UX design, accessibility, usability review |
-| docs-researcher | Documentation research, API verification |
-| research-critic | Adversarial review of external research with primary-source-only citation |
-| adversarial-implementer | Parallel-implementation Critic for behavioural-delta verification (opt-in) |
-| architecture-critic | Counter-proposal Critic that takes rejected ADR alternatives seriously (opt-in) |
 | architect | System architecture, technology decisions |
 | implementer | Code implementation following architecture and TDD |
-| code-reviewer | Meta-reviewer: delegates language depth to ECC `*-reviewer` agents |
+| code-reviewer | Meta-reviewer: delegates language depth to ECC `*-reviewer` agents; owns project-wide cross-cutting checks |
 | test-runner | Test execution, coverage reporting |
 | linter | Static analysis, code style enforcement |
 | security-reviewer | Vulnerability detection, OWASP Top 10 |
@@ -67,6 +63,57 @@ directory (e.g. `adr/001-foo.md`), a bilingual fork split by language (e.g.
 directory (e.g. `adr/001-foo.md` + `adr/001-foo.ja.md`). The template imposes
 no layout on forks — only the templates themselves.
 
+## Plan-First Default
+
+This template ships with `permissions.defaultMode: "plan"` in
+`.claude/settings.json`. New sessions therefore boot in **Plan Mode**:
+Claude proposes a plan and waits for explicit approval before any write
+or shell side effect. Toggle off for the current session with Shift+Tab,
+or override per developer in `.claude/settings.local.json`.
+
+## Subagent dispatch contract
+
+All subagent dispatch (any `Agent` tool call from `orchestrator` or main
+Claude) follows a fixed 5-slot prompt template and a delegate-and-stop
+rule. Applies to ALL parent→subagent dispatches.
+
+**5-slot prompt structure** (every dispatch prompt fits this shape):
+
+- `ROLE:` — agent name + posture (1 line)
+- `CONTEXT:` — ≤ 3 bullets — the decision this informs
+- `TASK:` — imperative verb + object (1 sentence)
+- `CONSTRAINTS:` — ≤ 5 bullets — what to skip, scope boundary, stop condition
+- `OUTPUT:` — exact shape the parent will consume — format + max length
+
+**Delegate-and-stop rule.** After writing an `Agent` dispatch, the parent
+agent may only call `Agent`, `AskUserQuestion`, or `ScheduleWakeup` until
+the subagent returns. No `Read`, `Bash`, `Edit`, `WebFetch`, no Skill
+invocations. This is the forcing function that prevents the parent from
+re-absorbing the delegated task between dispatch and return.
+
+## Worktree advisory protocol
+
+Before dispatching any multi-step plan, `orchestrator` evaluates
+worktree-parallelism suitability and emits a `## Worktree Recommendation`
+block **ahead of** the implementation plan.
+
+**5-question suitability rubric** (answered in Analyze):
+
+1. **File-disjoint?** Subtasks touch disjoint file sets.
+2. **State-disjoint?** Subtasks don't share mutable shared state.
+3. **Mergeable?** Outputs are trivially mergeable (no integration work).
+4. **Reversible?** Rejecting one slice leaves the others useful.
+5. **Net-faster?** Parallelism wins wall-clock once review costs count.
+
+Yes on all 5 → recommend multi-worktree. No on any of 1–2 → single-worktree
+(forced — shared-state risk). No on 3–5 → single-worktree (recommended —
+parallelism does not pay).
+
+**Write-zone rule.** UNSAFE for any non-owner worktree: `.claude/CLAUDE.md`,
+`CHANGELOG.md`, lockfiles. In multi-worktree mode, `orchestrator` designates
+**one owner worktree** that exclusively handles those files; other worktrees
+produce hand-off artifacts only.
+
 ## CLAUDE.md authoring guidance
 
 When creating or significantly restructuring this file (or `README.md` or
@@ -80,35 +127,20 @@ this discipline.
 ## Development Workflow
 
 1. **Issue Analysis**: Feed issues to the orchestrator via GitHub MCP or
-   copy-paste. For defect reports, the orchestrator may run an "ours vs.
-   upstream" triage via `docs-researcher` before deciding the workflow path.
+   copy-paste.
 2. **Product Planning**: The product-manager creates a spec, user stories,
    and acceptance criteria using `.claude/templates/spec-template.md`.
 3. **Research & Reuse**: Search GitHub, package registries, and docs before
-   writing new code. When the result will inform a decision (architecture,
-   library selection, API usage, version pin), apply an independent
-   verification pass — separate Generator (research) and Critic (review)
-   roles, with the Critic using a different tool family and primary-source-
-   only citation. Forks adopting this discipline at scale can opt in via
-   external GAN protocols or by writing their own verification rules.
+   writing new code. Prefer adopting or porting a proven approach over
+   net-new code when it meets the requirement.
 4. **Architecture**: The architect designs the solution; significant
    decisions are recorded as ADRs using `.claude/templates/adr-template.md`.
 5. **Implementation**: The implementer writes code following TDD (RED →
-   GREEN → IMPROVE). When the implementation is a workaround for an upstream
-   defect, the implementer places a `WORKAROUND-UPSTREAM(<owner>/<repo>#<issue>, fixed=>=<version>)`
-   marker and copies `.claude/templates/workaround-template.md` to
-   `workarounds/NNN-*.md` (or any equivalent directory the fork chooses).
+   GREEN → IMPROVE).
 6. **Quality Gate**: The code-reviewer (delegates language depth to the
    matching ECC `<lang>-reviewer` if available), linter, security-reviewer,
    and performance-engineer validate the implementation.
-   - **6a. Compliance check (opt-in)**: Forks subject to jurisdictional
-     compliance (chat, payments, PII collection, data egress) should run a
-     jurisdiction-specific checklist with primary-source citations. The
-     checklist must include a disclaimer and never auto-mark items as
-     "complied with" — only human reviewers can.
-7. **Documentation**: The technical-writer updates docs and changelog. When
-   a workaround is removed, the technical-writer maps `user_impact` to the
-   appropriate CHANGELOG category (`internal` / `changed` / `fixed`).
+7. **Documentation**: The technical-writer updates docs and changelog.
 8. **Release**: The devops-engineer manages deployment and release.
 9. **Commit**: Conventional commits format (feat, fix, refactor, docs, test,
    chore, perf, ci).
@@ -133,14 +165,11 @@ this discipline.
 Derived projects should:
 
 1. Replace the "About This Project" section with project-specific context.
-   The fastest way is to run `.claude/meta/scripts/init.sh` once after
-   forking; it interactively replaces the placeholder. Manual editing is
-   fine too.
+   The fastest way is to run `.claude/init.sh` once after forking; it
+   interactively replaces the placeholder. Manual editing is fine too.
 2. Add framework-specific architecture details (e.g., state management, routing).
 3. Add framework-specific testing tools (e.g., Jest, pytest, go test).
 4. Add framework-specific code style rules (e.g., Biome, Ruff, gofmt).
 5. Keep the universal sections (workflow, testing requirements, code quality).
 6. Add your own CI workflows under `.github/workflows/` (this template ships
-   the folder empty by design — fork CI is opt-in). The `develop` branch of
-   the upstream template carries reference workflows you can copy as a
-   starting point.
+   the folder empty by design — fork CI is opt-in).

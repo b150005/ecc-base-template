@@ -1,6 +1,6 @@
 # ecc-base-template
 
-A framework-agnostic GitHub template that ships an 18-agent development
+A framework-agnostic GitHub template that ships a 14-agent development
 team for high-quality, high-precision collaboration with Claude Code.
 
 [日本語版 README はこちら](README.ja.md)
@@ -28,39 +28,24 @@ generic review and says so in its verdict.
 
 ## What you get
 
-- **18 specialized agents** covering the full product lifecycle —
+- **14 specialized agents** covering the full product lifecycle —
   orchestrator, product-manager, architect, implementer, test-runner,
   code-reviewer, security-reviewer, performance-engineer, devops-engineer,
   technical-writer, and more. All ecosystem-agnostic: the agents detect
   your language and framework at runtime.
+- **Plan-First default.** New sessions boot in Plan Mode (per
+  `permissions.defaultMode: "plan"` in `.claude/settings.json`) — Claude
+  proposes a plan and waits for explicit approval before writing or
+  shelling out.
 - **Clean root directory.** After forking you own the repo root — the
-  template does not reserve `docs/`, `scripts/`, `learn/`, or any ADR/
-  spec numbers.
+  template does not reserve `docs/`, `scripts/`, or any ADR/spec
+  numbers.
 - **Document templates** for ADRs and product specs at
   `.claude/templates/`, with English-first `*.md` and Japanese `*.ja.md`
   counterparts. Copy them wherever your project wants its decision
   records to live.
 - **Empty CI scaffold** (`.github/workflows/.gitkeep`) so the folder is
-  there waiting when you decide to add CI — see the [CI](#ci) section
-  below.
-
----
-
-## Forking
-
-This repository uses a **two-branch model**:
-
-- **`main`** — the fork payload. This is what "Use this template"
-  copies into your new repository: agents, document templates,
-  fork-facing settings, and the initializer script. Nothing template-
-  internal.
-- **`develop`** — the template-development branch. This branch carries
-  Specs, ADRs, PRDs, internal CI workflows, and the template's own
-  Roadmap. **It is not intended for forks.**
-
-When you fork (via "Use this template" or `git clone`), you are
-working from `main` and you receive only the fork payload. You do
-not need to delete any template-internal artifacts.
+  there waiting when you decide to add CI.
 
 ---
 
@@ -70,8 +55,7 @@ not need to delete any template-internal artifacts.
 
 On GitHub, open
 [b150005/ecc-base-template](https://github.com/b150005/ecc-base-template)
-and click **Use this template**. (Use the `main` branch — that is the
-fork-clean default.)
+and click **Use this template**.
 
 ### 2. Clone and open
 
@@ -83,20 +67,18 @@ cd <your-repo>
 ### 3. Run the initializer
 
 ```sh
-.claude/meta/scripts/init.sh
+.claude/init.sh
 ```
 
 This prompts you for a project name, one-line description, and tech
 stack, then replaces the `## About This Project` placeholder in
-`.claude/CLAUDE.md` and copies `.env.example` to `.env`. It also
-offers to remove the template-internal `payload-manifest-check.yml`
-workflow (kept by default; safe either way — the workflow is guarded
-to run only on the upstream template repo). Re-running is safe.
+`.claude/CLAUDE.md` and copies `.env.example` to `.env`. Re-running is
+safe.
 
 Non-interactive form:
 
 ```sh
-.claude/meta/scripts/init.sh \
+.claude/init.sh \
   --project-name "TaskFlow" \
   --description "Team task management API" \
   --stack "Go / Gin / PostgreSQL"
@@ -117,43 +99,7 @@ quality agents for review — you steer the hand-offs.
 
 ---
 
-## CI
-
-This template ships with **no fork-facing GitHub Actions workflows on
-`main`** by design. The `.github/workflows/` folder is preserved with
-a `.gitkeep` file so you remember the slot exists.
-
-GitHub workflows are a per-fork choice — different projects want
-different CI scaffolding (lint, test, coverage gates, security
-scanning, dependency-bump triage). Rather than ship a one-size-fits-
-all set and ask you to delete what you do not want, the template
-leaves the slot empty and points you at reference workflows on the
-`develop` branch:
-
-```sh
-git remote add template https://github.com/b150005/ecc-base-template.git
-git fetch template develop
-git checkout template/develop -- .github/workflows/<workflow>.yml
-```
-
-Pick the workflows that fit your project (e.g. `ci-base.yml`,
-`security.yml`, `coverage-gate.yml`, `workaround-check.yml`) — or
-write your own.
-
-### The one workflow that does ship on `main`
-
-`.github/workflows/payload-manifest-check.yml` is a template-internal
-boundary-enforcement workflow used by the upstream template to gate
-PRs to its own `main` against `.claude/payload-manifest.txt` (which
-lives on `develop`). On forks, the workflow runs harmlessly — it
-tries to checkout a `develop` branch and silently skips with success
-when none exists. Forks that want a truly empty `.github/workflows/`
-can `git rm` this single file with no consequence; forks keeping it
-see a no-op success on every PR.
-
----
-
-## The 18-agent team
+## The 14-agent team
 
 All agents are ecosystem-agnostic. They detect the project's language
 and framework at runtime by reading `.claude/CLAUDE.md` and your
@@ -168,10 +114,6 @@ specialists are invoked by the orchestrator or directly.
 | **market-analyst** | Planning | Market research, competitor analysis |
 | **monetization-strategist** | Planning | Business model, pricing, revenue analysis |
 | **ui-ux-designer** | Design | UI/UX design, usability review, accessibility |
-| **docs-researcher** | Research | API verification, framework behavior vs. primary docs |
-| **research-critic** | Research | Adversarial review of research outputs (primary-source-only) |
-| **adversarial-implementer** | Build | Parallel-implementation Critic (opt-in) |
-| **architecture-critic** | Design | Counter-proposal Critic for ADRs (opt-in) |
 | **architect** | Design | System architecture, technology decisions, ADR creation |
 | **implementer** | Build | Code implementation following architecture specs and TDD |
 | **code-reviewer** | Quality | Code quality, maintainability, standards adherence |
@@ -203,14 +145,14 @@ your-repo/
 ├── CHANGELOG.md               ← starts at [Unreleased]; grows with your releases
 ├── LICENSE
 ├── .env.example
-├── .gitignore                ← Learning Mode opt-in inversion documented inline (see ADR-027)
+├── .gitignore
 ├── .gitattributes
 ├── .claude/
 │   ├── CLAUDE.md              ← project instructions (edit the About section first)
-│   ├── agents/                ← 18 agent definition files
+│   ├── agents/                ← 14 agent definition files
 │   ├── templates/             ← copy-and-fill ADR/spec templates
-│   ├── meta/scripts/init.sh   ← interactive initializer
-│   └── settings.json          ← Claude Code settings
+│   ├── init.sh                ← interactive initializer
+│   └── settings.json          ← Claude Code settings (Plan Mode default)
 └── .github/
     ├── workflows/.gitkeep     ← empty by design — add your CI here
     ├── CODEOWNERS
@@ -233,22 +175,19 @@ ADRs to live. Common choices:
 
 The same applies to `spec-template.md`. There is no forced location.
 
+### CI
+
+`.github/workflows/` ships empty (just a `.gitkeep`). CI is a per-fork
+choice — different projects want different CI scaffolding (lint, test,
+coverage gates, security scanning, dependency-bump triage). Write
+your own workflows when you are ready, sized to your stack.
+
 ---
 
 ## Contributing to the template
 
 This section is for people working on **ecc-base-template itself**,
-not for fork users.
-
-- Open issues and PRs against the `develop` branch.
-- `main` is a payload-only branch maintained by template maintainers;
-  it does not accept direct PRs.
-- A `payload-manifest-check` CI workflow on `develop` gates every
-  `develop → main` merge to ensure the fork payload stays clean.
-
-The full template-development infrastructure (Specs, ADRs, internal
-CI workflows, the Roadmap index) lives on `develop`. Check out that
-branch to see how the template itself is designed and maintained.
+not for fork users. Open issues and PRs against the `main` branch.
 
 ---
 

@@ -4,7 +4,6 @@
 # Run this once after forking from ecc-base-template. It localizes the
 # template's generic scaffolding to your project:
 #   - Replace the `## About This Project` placeholder in .claude/CLAUDE.md
-#   - Offer to remove the template-internal payload-manifest-check workflow
 #   - Copy .env.example to .env (if .env does not exist)
 #   - Print a next-steps checklist
 #
@@ -57,7 +56,7 @@ done
 if repo_root="$(git rev-parse --show-toplevel 2>/dev/null)"; then
   :
 else
-  repo_root="$(cd "$(dirname "$0")/../../.." && pwd)"
+  repo_root="$(cd "$(dirname "$0")/.." && pwd)"
 fi
 cd "$repo_root"
 
@@ -186,35 +185,6 @@ if [[ $has_placeholder -eq 1 ]]; then
 fi
 
 # ---------------------------------------------------------------------------
-# 2c. Optional: remove template-internal payload-manifest-check workflow
-#
-# This workflow guards the upstream template's main/develop payload
-# boundary. On forks it is doubly safe — the job-level `if:` guard skips
-# it on non-upstream repos, and the legacy graceful-skip fallback handles
-# absence of `develop` — so keeping the file is harmless. Some fork
-# operators still prefer zero inherited workflows; this prompt lets them
-# remove it interactively.
-# ---------------------------------------------------------------------------
-workflow_path=".github/workflows/payload-manifest-check.yml"
-if [[ -f "$workflow_path" ]]; then
-  if [[ $non_interactive -eq 1 ]]; then
-    ok "$workflow_path: keeping (non-interactive mode; safe no-op on forks)"
-  else
-    read -r -p "Remove template-internal payload-manifest-check.yml? (y/N): " ans
-    if [[ "$ans" =~ ^[Yy]$ ]]; then
-      if [[ $dry_run -eq 1 ]]; then
-        say "[dry-run] would remove $workflow_path"
-      else
-        rm "$workflow_path"
-        ok "Removed $workflow_path"
-      fi
-    else
-      ok "Kept $workflow_path (safe — guarded for upstream-only execution)"
-    fi
-  fi
-fi
-
-# ---------------------------------------------------------------------------
 # 3. Copy .env.example -> .env (only if .env does not yet exist)
 # ---------------------------------------------------------------------------
 if [[ -f ".env.example" && ! -f ".env" ]]; then
@@ -250,12 +220,10 @@ say "     The shipped README describes the template, not your project."
 say "  2. Skim $claude_md and tune the 'Architecture Principles' and"
 say "     'Code Quality Standards' sections to your project."
 say "  3. Edit .env with real secrets. Never commit it."
-say "  4. Customize .devcontainer/devcontainer.json for your stack."
-say "  5. Extend .gitignore with stack-specific patterns (see the commented"
+say "  4. Extend .gitignore with stack-specific patterns (see the commented"
 say "     references near the end of the file)."
-say "  6. Add CI workflows to .github/workflows/ — the folder is empty by"
-say "     design. Pull reference workflows from the template's develop"
-say "     branch or write your own (see README §CI)."
-say "  7. Commit: 'chore: initialize from ecc-base-template'."
+say "  5. Add CI workflows to .github/workflows/ — the folder is empty by"
+say "     design. Write your own based on your stack and project needs."
+say "  6. Commit: 'chore: initialize from ecc-base-template'."
 say
 say "Ready. Open Claude Code at the repo root and give the orchestrator a real task."
