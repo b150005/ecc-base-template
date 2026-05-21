@@ -6,6 +6,19 @@
 
 Approved
 
+## 改訂 2026-05-21
+
+**きっかけ:** Roadmap #23 の実装中にユーザーからフォーク CI オーナーシップ境界について明確化を受けた。元の仕様書は、テンプレート `main` ブランチが4つのフォーク再利用可能な CI ワークフロー(`ci-base.yml`、`security.yml`、`coverage-gate.yml`、`workaround-check.yml`)を保持するという前提に立っていた。改訂後の方針では、フォーク CI は完全にオプトイン制とする: フォークは `develop` からワークフローをコピーするか、独自に作成する。テンプレート `main` はワークフローを **ゼロ** 件保持する設計とする。
+
+**元の仕様書からの変更点:**
+
+- AC-2 の「`main` に存在しない」リストを拡張し、`.github/workflows/*.yml` の全ファイル、`.github/` 配下の5つのトラッカー YAML、および `init.sh` を除く `.claude/meta/scripts/` サブツリーを明示的に追加した。
+- AC-4 のワークフローインベントリを改訂: 以前は keep-on-main だった4ワークフロー(`ci-base`、`security`、`coverage-gate`、`workaround-check`)を `main` から削除する。`.github/workflows/` フォルダーは `.gitkeep` ファイルを置いて保持する。これにより、コントリビューターがフォルダーが意図的に空であることに気づかずワークフローファイルを誤って追加してしまうことを防ぐ。
+- AC-5 を改訂: `main` 上でのワークフロー個別の実行検証は不要(検証すべきワークフローが存在しない)。フォーク CI は `develop` からのコピーまたは独自作成によるオプトイン制とする。
+- **設計上の競合を解消:** 元の設計では `coverage-gate.yml`(threshold を `main` に強制する予定)と `coverage-threshold.sh`(同じ値を管理する develop-only メタスクリプト)の間に潜在的な競合が生じていた。`coverage-gate.yml` を `main` から削除することで、その競合を完全に解消した。
+
+ADR-026 の改訂 2026-05-21 を参照。
+
 **責任者:** product-manager / implementer
 **目標リリース:** template v3.12.0
 
@@ -43,17 +56,15 @@ Approved
 
 **AC-1.** テンプレートリポジトリに `develop` ブランチが存在し、開発作業のデフォルトブランチとして設定されている。`main` はフォーク用デフォルト(`git clone` および GitHub の「Use this template」が参照するブランチ)のまま。検証方法: `git branch -r` に `origin/develop` が含まれる。リポジトリのデフォルトブランチ設定は ADR-026 の Decision に従う。
 
-**AC-2.** すべてのテンプレート内部アーティファクトが `develop` に存在し、`main` には存在しない。具体的に: `specs/`, `.claude/meta/`, `.claude/ROADMAP.md`, `.claude/learn/`, `.claude/output-styles/`, `.claude/skills/`, `.claude/hooks/`, `workarounds/`(空でない場合)、および `.github/workflows/` の develop-only ワークフローファイルが `main` に存在しない。検証方法: `git ls-tree --name-only main` にそれらのパスが含まれない。 <!-- ref-allow: .claude/learn/ is intentionally absent (opt-in/default-off per ADR-015 amendment) -->
+**AC-2.** すべてのテンプレート内部アーティファクトが `develop` に存在し、`main` には存在しない。具体的に: `specs/`, `.claude/meta/`, `.claude/ROADMAP.md`, `.claude/learn/`, `.claude/output-styles/`, `.claude/skills/`, `.claude/hooks/`, <!-- ref-allow: .claude/learn/ is intentionally absent (opt-in/default-off per ADR-015 amendment) -->
+`workarounds/`(空でない場合)、`.github/workflows/*.yml`(全ワークフローファイル — `main` は設計上ワークフローを保持しない。フォルダー自体は `.gitkeep` を置いて保持する)、`.github/coverage-tracker.yml`、`.github/docs-freshness-tracker.yml`、`.github/ecc-delegation-tracker.yml`、`.github/research-tier-auth-tracker.yml`、`.github/workaround-tracker.yml`、および `init.sh` 以外の `.claude/meta/scripts/` エントリ(具体的には全 `check-*.sh`、`test-check-*.sh` スクリプトおよび `lib/` サブディレクトリ)が `main` に存在しない。検証方法: `git ls-tree --name-only main` にそれらのパスが含まれない。`git ls-tree -r --name-only main .github/workflows/` が `.github/workflows/.gitkeep` のみを返す。
 
 **AC-3.** ペイロードマニフェストファイルが `develop` 上の `.claude/payload-manifest.txt` に存在する。`main` で許可されるすべてのファイルおよびディレクトリが1行ずつ列挙されている。検証方法: ファイルが少なくとも1エントリを持って存在し、現在の keep-on-main ファイルがすべて記載されている。 <!-- ref-allow: payload-manifest.txt is created in Phase B implementation - forward reference -->
 
-**AC-4.** ワークフローインベントリが以下のように分類され、ADR-026 の分類と一致している:
+**AC-4.** ワークフローインベントリが以下のように分類され、ADR-026 の分類(2026-05-21 の改訂を含む)と一致している:
 
-- **`main` に残す**(フォーク再利用可能な4ワークフロー):
-  - `.github/workflows/ci-base.yml`
-  - `.github/workflows/security.yml`
-  - `.github/workflows/coverage-gate.yml`
-  - `.github/workflows/workaround-check.yml`
+- **`main` に残す**(0ワークフロー — フォルダーは `.gitkeep` で保持):
+  - *(なし — フォーク CI はオプトイン制。フォークは `develop` からワークフローをコピーするか、独自に作成する)*
 - **`develop` に残し、`main` 宛 PR に対して実行する**(1強制ワークフロー):
   - `.github/workflows/payload-manifest-check.yml`
 - **develop-only**(`main` に存在しないテンプレート内部8ワークフロー):
@@ -66,9 +77,11 @@ Approved
   - `.github/workflows/roadmap-drift-check.yml`
   - `.github/workflows/skill-invariants.yml`
 
-検証方法: `git ls-tree --name-only main .github/workflows/` に keep-on-main の4ワークフローのみが列挙される(payload-manifest-check は `develop` にのみ存在)。
+以前は keep-on-main だった4ワークフロー(`ci-base.yml`、`security.yml`、`coverage-gate.yml`、`workaround-check.yml`)はテンプレート `main` から削除される。これらを必要とするフォークは `develop` からコピーするか独自に作成する。
 
-**AC-5.** `main` には4つの keep-on-main ワークフローが変更なく含まれ、それぞれがクリーンなフォーク上で自身の実行パスをパスする(`uses:` や `run:` のステップに develop-only パスへの参照がない)。検証方法: `act` ドライランまたはテストフォーク上の CI 実行で4つすべてがパスする。
+検証方法: `git ls-tree -r --name-only main .github/workflows/` が `.github/workflows/.gitkeep` のみを返す(`main` 上に `.yml` ファイルはゼロ件)。
+
+**AC-5.** `main` は設計上ワークフローを保持しない。フォーク CI は完全にオプトイン制である。CI が必要なフォーク(例: `ci-base.yml`、`security.yml`、`coverage-gate.yml`、`workaround-check.yml`)は `develop` から対象のワークフローファイルをコピーするか、独自に作成する — コピーも独自作成も、有効なフォークに必須ではない。`main` 上でのワークフロー個別の実行検証は不要(検証すべきワークフローが存在しない)。検証方法: `git ls-tree -r --name-only main .github/workflows/` が `.github/workflows/.gitkeep` のみを返す。
 
 **AC-6.** `.github/workflows/payload-manifest-check.yml` が `develop` 上に存在し、`base: main` の `pull_request` でトリガーされ、PR の diff に `.claude/payload-manifest.txt` に記載されていないファイルが含まれる場合に非ゼロで終了する。検証方法: develop-only パスを含むテスト PR を `main` に開くとチェックが失敗し、ペイロードパスのみを含む PR はパスする。 <!-- ref-allow: payload-manifest.txt is created in Phase B implementation - forward reference -->
 

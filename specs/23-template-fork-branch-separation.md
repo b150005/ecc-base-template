@@ -4,6 +4,34 @@
 
 Approved
 
+## Amendment 2026-05-21
+
+**Trigger:** User clarification of fork CI ownership boundary during Roadmap #23
+implementation. The original spec assumed the template `main` branch would carry
+four fork-reusable CI workflows (`ci-base.yml`, `security.yml`,
+`coverage-gate.yml`, `workaround-check.yml`). The revised position is that
+fork CI is entirely opt-in: forks copy workflows from `develop` or write their
+own. The template `main` carries **zero** workflows by design.
+
+**Changes from original spec:**
+
+- AC-2 absent-from-main list expanded to explicitly include all
+  `.github/workflows/*.yml`, the five tracker YAMLs under `.github/`, and the
+  `.claude/meta/scripts/` subtree except `init.sh`.
+- AC-4 workflow inventory revised: the four formerly keep-on-main workflows
+  (`ci-base`, `security`, `coverage-gate`, `workaround-check`) are removed from
+  `main`; the `.github/workflows/` folder is preserved with a `.gitkeep` file so
+  that contributors do not accidentally re-add workflow files without noticing
+  that the folder is intentionally empty.
+- AC-5 revised: no per-workflow execution validation on `main` (no workflows to
+  validate). Fork CI is opt-in by copy-from-develop or custom authoring.
+- **Eliminated design conflict:** The original design created a latent competition
+  between `coverage-gate.yml` (which was to enforce a threshold on `main`) and
+  `coverage-threshold.sh` (a develop-only meta-script managing the same value).
+  Removing `coverage-gate.yml` from `main` eliminates that competition entirely.
+
+References ADR-026 amendment 2026-05-21.
+
 **Owner:** product-manager / implementer
 **Target release:** template v3.12.0
 
@@ -76,9 +104,15 @@ is `develop` (or `main`, per the chosen convention — ADR-026 Decision governs)
 **AC-2.** All template-internal artifacts are present on `develop` and absent
 from `main`. Specifically: `specs/`, `.claude/meta/`, `.claude/ROADMAP.md`,
 `.claude/learn/`, `.claude/output-styles/`, `.claude/skills/`, `.claude/hooks/`, <!-- ref-allow: .claude/learn/ is intentionally absent (opt-in/default-off per ADR-015 amendment) -->
-`workarounds/` (if non-empty), and `.github/workflows/` develop-only workflow
-files are not present on `main`. Verified by: `git ls-tree --name-only main`
-does not list those paths.
+`workarounds/` (if non-empty), `.github/workflows/*.yml` (all workflow files —
+`main` carries no workflows by design; the folder itself is present with a
+`.gitkeep`), `.github/coverage-tracker.yml`, `.github/docs-freshness-tracker.yml`,
+`.github/ecc-delegation-tracker.yml`, `.github/research-tier-auth-tracker.yml`,
+`.github/workaround-tracker.yml`, `.claude/meta/scripts/` entries other than
+`init.sh` (specifically: all `check-*.sh`, `test-check-*.sh` scripts and the
+`lib/` subdirectory) are not present on `main`. Verified by: `git ls-tree
+--name-only main` does not list those paths; `git ls-tree -r --name-only main
+.github/workflows/` returns only `.github/workflows/.gitkeep`.
 
 **AC-3.** The payload manifest file exists at `.claude/payload-manifest.txt` <!-- ref-allow: payload-manifest.txt is created in Phase B implementation - forward reference -->
 on `develop`. It enumerates every file and directory that is allowed on `main`,
@@ -86,13 +120,10 @@ one entry per line. Verified by: the file exists with at least one entry and
 all currently keep-on-main files are listed.
 
 **AC-4.** The workflow inventory is partitioned as follows and matches the
-classification in ADR-026:
+classification in ADR-026 (as amended 2026-05-21):
 
-- **Keep on `main`** (4 fork-reusable workflows):
-  - `.github/workflows/ci-base.yml`
-  - `.github/workflows/security.yml`
-  - `.github/workflows/coverage-gate.yml`
-  - `.github/workflows/workaround-check.yml`
+- **Keep on `main`** (0 workflows — folder preserved with `.gitkeep`):
+  - *(none — fork CI is opt-in; forks copy workflows from `develop` or write their own)*
 - **Keep on `develop`, runs against `main`-bound PRs** (1 enforcement workflow):
   - `.github/workflows/payload-manifest-check.yml`
 - **Develop-only** (8 template-internal workflows, not present on `main`):
@@ -105,13 +136,21 @@ classification in ADR-026:
   - `.github/workflows/roadmap-drift-check.yml`
   - `.github/workflows/skill-invariants.yml`
 
-Verified by: `git ls-tree --name-only main .github/workflows/` lists exactly
-the 4 keep-on-main workflows (payload-manifest-check lives only on `develop`).
+The four formerly keep-on-main workflows (`ci-base.yml`, `security.yml`,
+`coverage-gate.yml`, `workaround-check.yml`) are removed from the template
+`main` branch. Forks that want these adopt them by copying from `develop` or
+authoring their own.
 
-**AC-5.** `main` carries the 4 keep-on-main workflows unmodified and each
-passes its own execution path on a clean fork (no references to develop-only
-paths in their `uses:` or `run:` steps). Verified by: `act` dry-run or a CI
-run on a test fork shows all 4 passing.
+Verified by: `git ls-tree -r --name-only main .github/workflows/` returns only
+`.github/workflows/.gitkeep` (zero `.yml` files on `main`).
+
+**AC-5.** `main` carries no workflows by design; fork CI is entirely opt-in.
+Forks that want CI (e.g., `ci-base.yml`, `security.yml`, `coverage-gate.yml`,
+`workaround-check.yml`) copy the relevant workflow files from `develop` or write
+their own — neither copying nor custom authoring is required for a valid fork.
+There is no per-workflow execution validation on `main` (there are no workflows
+to validate). Verified by: `git ls-tree -r --name-only main .github/workflows/`
+returns only `.github/workflows/.gitkeep`.
 
 **AC-6.** `.github/workflows/payload-manifest-check.yml` exists on `develop`,
 triggers on `pull_request` with `base: main`, and exits non-zero if any file in
