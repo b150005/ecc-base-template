@@ -63,3 +63,32 @@ Adopt a two-branch model. `main` becomes the **fork-clean payload**: only the fi
 **Neutral.** Branch protection on `main` still requires `payload-manifest-check` (per AC-12 of the Spec). That workflow runs on the PR head ref (`develop` or feature branches off `develop`), where the workflow file does live. `main`-side workflow absence therefore does not break the gate: GitHub evaluates required status checks against the PR's head commit, not the base branch's file tree. The enforcement mechanism is unaffected by the leaner-main decision.
 
 **Spec counterpart.** Spec AC-2 / AC-4 / AC-5 carry the matching amendment on the requirements side: AC-2 reasserts `.claude/meta/` absence (now unambiguous, no script-dependency carve-out), AC-4 lists `.github/workflows/.gitkeep` as the sole expected payload under that directory, and AC-5 names `init.sh` as the only expected file under `.claude/meta/scripts/` on `main`.
+
+## Amendment 2026-05-21 (second)
+
+**Trigger.** Empirical discovery during AC-6/AC-12 verification: GitHub Actions resolves `pull_request` workflow files from the **PR head ref**, not the base ref. The original "Neutral" Consequence above asserted that `payload-manifest-check.yml` could live exclusively on `develop` because "branch protection on `main` still requires `payload-manifest-check`... that workflow runs on the PR head ref (`develop` or feature branches off `develop`)". This is only true for PRs whose head ref *includes the workflow file*. A feature branch created from `main` (the standard cherry-pick flow for landing payload updates) has only `main`'s file tree — no workflow file — so the check never triggers. Test PR #10 (head: feature branch off `main`, no workflow file in head) confirmed: after 128 seconds only the external GitGuardian status posted; `payload-manifest-check` never ran, leaving the required-check ruleset permanently unsatisfied.
+
+**Decision revision.** `main` carries **one** workflow: `.github/workflows/payload-manifest-check.yml`. This is the single deliberate exception to "0 fork-facing workflows on `main`" — it is template-internal infrastructure (a boundary-enforcement gate), not fork CI. The "fork CI is opt-in" intent is preserved because the workflow:
+
+1. Uses a dual-checkout pattern: it tries to checkout the `develop` branch to fetch the manifest from its canonical location (`.claude/payload-manifest.txt` on `develop`).
+2. Gracefully skips with a Notice (conclusion: SUCCESS) when no `develop` branch exists — which is the default state for any fork that has not opted in to the leaner-main pattern. Forks that delete the workflow file see no behavior change; forks that keep it see a no-op success on every PR.
+3. Validates each changed path against the manifest's glob patterns when active, failing the PR's required status check on any mismatch.
+
+The `.claude/payload-manifest.txt` on `develop` now lists `.github/workflows/payload-manifest-check.yml` as an allowed payload path so future PRs touching the workflow itself can land. Manifest stays single-source on `develop`; the workflow on `main` fetches it at runtime.
+
+**Eliminated tension.** The original "Neutral" claim about workflow-on-develop sufficiency was wrong — fixed by relocating the workflow file to `main` (with the fork-gracefully-skipping checkout pattern preserving the no-fork-cost invariant). The leaner-main intent ("fork CI is opt-in") survives because the file is template-enforcement, not fork-scaffolding CI.
+
+**Also fixed under this amendment.** The original workflow's sed pipeline converted `**` (recursive glob) as if it were `*` (single-segment), breaking nested-path matches like `.claude/agents/nested/foo.md`. Replaced with a placeholder-protect approach (`**` → marker → single `*` substitution → restore marker as `.*`); unit-tested with 20 paths covering nested cases.
+
+### Consequences addendum (second)
+
+**Negative.** `main` now ships one workflow file. Forks that want zero workflows must delete `.github/workflows/payload-manifest-check.yml` (the file is harmless if kept — it skips on absent `develop`). This is a one-line `git rm` for the fork maintainer.
+
+**Positive.** AC-12 ruleset enforcement actually works. Verified end-to-end:
+- Positive test (PR #11 / merge `d287480`): payload-only diff → check SUCCESS → merge unblocked.
+- Negative test (PR #12, closed without merge): diff including `specs/test-manifest-negative.md` → check FAILURE with offending path named → merge blocked by ruleset.
+- Both checks completed in ~6 seconds.
+
+**Neutral.** No change to the fork-CI-opt-in intent: forks still get `.gitkeep` as the affordance for fork-CI scaffolding; the single workflow shipped is template infrastructure that is no-op for them.
+
+**Spec counterpart.** Spec `specs/23-template-fork-branch-separation.md` carries Amendment 2026-05-21 (second) with the matching AC-4 wording revision.

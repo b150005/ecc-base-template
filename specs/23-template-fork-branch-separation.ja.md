@@ -19,6 +19,27 @@ Approved
 
 ADR-026 の改訂 2026-05-21 を参照。
 
+## 改訂 2026-05-21 (二回目)
+
+**きっかけ:** AC-6 / AC-12 の検証中に発覚。GitHub Actions は `pull_request` ワークフローファイルを **PR の head ref** から解決し、base ref からは解決しない。main 派生のフィーチャーブランチは main のファイルツリーしか持たないため、`develop` にしか存在しない `payload-manifest-check` ワークフローは main 宛 PR でトリガーされない — 必須ステータスチェックが永遠に満たされず、すべての main 宛 PR がブロックされてしまう。
+
+**変更点:**
+
+- AC-4 の表現を改訂: `main` は `.github/workflows/.gitkeep` に加えて **`.github/workflows/payload-manifest-check.yml`** を保持する — テンプレート内部の強制ワークフローとして `main` に搭載される唯一のワークフロー(0件ではなく1件)。その他の CI はフォークオプトイン制のままであり(元の意図を維持 — フォーク CI スキャフォールディングはオプトイン制で `.gitkeep` のみとして出荷される)。
+- 出荷されるワークフローはデュアルチェックアウトパターンを使用する: マニフェストを取得するために `develop` ブランチのチェックアウトを試み、`develop` ブランチが存在しない場合(フォーク)は Notice を出して gracefully スキップする(結論: SUCCESS)。これによりワークフローはフォーク CI に対して無害となる — フォーク上でのコストは実質ゼロで、テンプレートリポジトリでのみ実質的に動作する。
+- AC-2 の `.github/workflows/*.yml` エントリを明確化: 不在リストから `.gitkeep` および `payload-manifest-check.yml` を除外する(この2ファイルはペイロードであり、他のワークフロー YAML はすべて不在のまま)。
+- `develop` 上の `.claude/payload-manifest.txt` を拡張し、`.github/workflows/payload-manifest-check.yml` を許可する(ワークフロー自体を変更する将来の PR がランディングできるようにするため)。
+
+**検証済み:**
+
+- 正常テスト: ペイロードのみの変更を含む PR → `payload-manifest-check` = SUCCESS、マージアンブロック(PR #11、マージコミット `d287480`)。
+- 異常テスト: `specs/test-manifest-negative.md`(マニフェスト未記載)を含む PR → `payload-manifest-check` = FAILURE、エラーメッセージに問題のパスが表示、ルールセットによりマージブロック(PR #12、マージせずクローズ)。 <!-- ref-allow: specs/test-manifest-negative.md was a transient test file in PR #12 (closed without merge); intentional historical reference for verification trace -->
+- 両チェックとも約6秒で完了。
+
+**本改訂で同時修正:** ワークフロー元来の sed ベース glob パターンが `**` を `*`(単一セグメント)として扱っていたため、置換順序の問題で再帰的なパスのマッチが壊れていた。プレースホルダー保護アプローチ(`**` → `__GG_RECURSIVE__` → 単一 `*` 置換 → `.*` に復元)で修正し、ネスト glob ケースを含む20パスでユニットテスト済み。
+
+ADR-026 の改訂 2026-05-21 (二回目) を参照。
+
 **責任者:** product-manager / implementer
 **目標リリース:** template v3.12.0
 

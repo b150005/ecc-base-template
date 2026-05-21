@@ -32,6 +32,50 @@ own. The template `main` carries **zero** workflows by design.
 
 References ADR-026 amendment 2026-05-21.
 
+## Amendment 2026-05-21 (second)
+
+**Trigger:** Discovery during AC-6/AC-12 verification. GitHub Actions resolves
+`pull_request` workflow files from the **PR head ref** (not the base ref). Since
+main-derived feature branches inherit only main's tree, a `payload-manifest-check`
+workflow that lives only on `develop` never triggers on PRs to `main` — making
+the required status check unsatisfiable and blocking all PRs to `main` indefinitely.
+
+**Changes:**
+
+- AC-4 wording refined: `main` carries `.github/workflows/.gitkeep` **plus
+  `.github/workflows/payload-manifest-check.yml`** — the single template-internal
+  enforcement workflow shipped on `main` (1 workflow, not 0). All other CI is
+  fork-opt-in (the original intent is preserved — fork CI scaffolding is opt-in
+  and ships as `.gitkeep` only).
+- The shipped workflow uses a dual-checkout pattern: it tries to checkout the
+  `develop` branch to fetch the manifest, and gracefully skips with a Notice
+  (conclusion: SUCCESS) when no `develop` branch exists (forks). This means the
+  workflow is harmless to fork CI — it costs essentially zero on forks and runs
+  effectively only in the template repository.
+- AC-2 entry for `.github/workflows/*.yml` clarified: the absent list excludes
+  `.gitkeep` AND `payload-manifest-check.yml` (these two files are payload, all
+  other workflow YAMLs remain absent).
+- `.claude/payload-manifest.txt` extended on `develop` to allow
+  `.github/workflows/payload-manifest-check.yml` (so future PRs touching the
+  workflow itself can land).
+
+**Verified:**
+
+- Positive test: PR with payload-only changes → `payload-manifest-check` =
+  SUCCESS, merge unblocked (PR #11, merge `d287480`).
+- Negative test: PR with `specs/test-manifest-negative.md` (not on manifest) → <!-- ref-allow: specs/test-manifest-negative.md was a transient test file in PR #12 (closed without merge); intentional historical reference for verification trace -->
+  `payload-manifest-check` = FAILURE with the offending path named in the error
+  message, merge blocked by ruleset (PR #12, closed without merge).
+- Both checks completed in ~6 seconds.
+
+**Also fixed under this amendment:** the workflow's original sed-based glob
+pattern treated `**` as `*` (single-segment) due to ordering of substitutions.
+Fixed via a placeholder-protect approach (`**` → `__GG_RECURSIVE__` → single
+`*` substitution → restore as `.*`); unit-tested with 20 paths covering
+nested-glob cases.
+
+References ADR-026 amendment 2026-05-21 (second).
+
 **Owner:** product-manager / implementer
 **Target release:** template v3.12.0
 

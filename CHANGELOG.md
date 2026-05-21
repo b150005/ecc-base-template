@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Milestone #23 follow-up — `payload-manifest-check` architecture +
+  `**` glob bug** (2026-05-21, post-ship). Two issues discovered during
+  AC-6/AC-12 verification:
+  - **Workflow location**: GitHub Actions resolves `pull_request` workflow
+    files from the PR head ref, not base ref. A workflow living only on
+    `develop` never triggered for main-derived feature branches, making
+    the required `payload-manifest-check` status unsatisfiable and blocking
+    all PRs to `main` indefinitely. **Fix**: workflow now ships on both
+    `main` and `develop` with a dual-checkout pattern that fetches the
+    manifest from `develop` at runtime and gracefully skips (SUCCESS) when
+    `develop` is absent (so forks are unaffected). The single permitted
+    workflow on `main` is documented in payload-manifest as an explicit
+    payload path. PR #11 (merge `d287480`) shipped the workflow to `main`.
+  - **`**` recursive glob**: the original sed pipeline treated `**` as `*`
+    (single-segment), breaking nested paths like `.claude/agents/nested/foo.md`.
+    **Fix**: placeholder-protect pattern (`**` → marker → single-`*`
+    substitution → restore marker as `.*`); unit-tested with 20 paths
+    covering nested cases.
+  - **End-to-end verified**: positive test (PR #11) → SUCCESS in 6 sec;
+    negative test (PR #12, `specs/test-manifest-negative.md`) → FAILURE
+    in 6 sec with the offending path named.
+  - Spec `specs/23-template-fork-branch-separation.md` + ADR-026 carry
+    "Amendment 2026-05-21 (second)" documenting the discovery and fix.
+
 ### Added
 
 - **Milestone #23 — SHIPPED: Template / fork structural separation — `main`
