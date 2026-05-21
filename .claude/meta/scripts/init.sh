@@ -4,7 +4,6 @@
 # Run this once after forking from ecc-base-template. It localizes the
 # template's generic scaffolding to your project:
 #   - Replace the `## About This Project` placeholder in .claude/CLAUDE.md
-#   - Clean up the `## Roadmap` section (remove 21 template rows, insert stub)
 #   - Copy .env.example to .env (if .env does not exist)
 #   - Print a next-steps checklist
 #
@@ -29,7 +28,7 @@ non_interactive=0
 dry_run=0
 
 usage() {
-  sed -n '2,22p' "$0" | sed 's/^# \{0,1\}//'
+  sed -n '2,21p' "$0" | sed 's/^# \{0,1\}//'
 }
 
 while [[ $# -gt 0 ]]; do
@@ -93,70 +92,6 @@ prompt() {
     done
   fi
   printf -v "$var_name" '%s' "$answer"
-}
-
-# clean_roadmap_section <claude_md> <tmp_out> <dry_run>
-#
-# Rewrites the ## Roadmap section of <claude_md> (using a temp-file + mv for
-# atomicity) to strip the 21 template dogfooding rows and the **Spec
-# reservation rule:** paragraph, then inserts one placeholder data row.
-# Everything else in the section (heading, intro sentence, table header+sep,
-# **Rules:** block, remaining content) is preserved unmodified.
-#
-# When <dry_run>=1, prints a [dry-run] message and returns without writing.
-#
-# Implementation uses a single awk pass — no line-by-line bash loop (AC-8).
-# Section boundary: ^## Roadmap$ → next ^## line (same pattern as the About
-# block replacement above).
-clean_roadmap_section() {
-  local file="$1" tmp_out="$2" dry_run_flag="$3"
-  # Placeholder row: em-dash in # cell (invisible to check-roadmap-drift.sh
-  # digit parser), ☐ todo glyph (sanctioned), no spec:/adr: in design source.
-  local placeholder_row='| — | [Add your first milestone here] | ☐ todo | (none yet) |'
-
-  if [[ "$dry_run_flag" -eq 1 ]]; then
-    say "[dry-run] would clean up the ## Roadmap section (remove 21 template rows and Spec reservation rule paragraph)"
-    return 0
-  fi
-
-  awk -v placeholder="$placeholder_row" '
-    BEGIN { state = "before"; in_spec_rule = 0; placeholder_injected = 0 }
-
-    # Entry into ## Roadmap section.
-    state == "before" && /^## Roadmap[[:space:]]*$/ {
-      print; state = "in_section"; next
-    }
-    # Exit from ## Roadmap section at next ## heading.
-    state == "in_section" && /^## / { state = "done" }
-
-    state == "in_section" {
-      # Track **Spec reservation rule:** paragraph (suppress until blank line or
-      # pipe-delimited table line — guards against no-trailing-blank edge case).
-      if (/^\*\*Spec reservation rule:\*\*/) { in_spec_rule = 1 }
-      if (in_spec_rule) {
-        if (/^[[:space:]]*$/ || /^\|/) { in_spec_rule = 0 }
-        if (!/^\|/) { next }  # suppress paragraph lines but not table lines
-      }
-      # Suppress template data rows (digit in # cell).
-      if (/^\|[[:space:]]*[0-9]+[[:space:]]*\|/) { next }
-      # After the first separator row, inject the placeholder row exactly once.
-      if (!placeholder_injected && /^\|---/) {
-        print; print placeholder; placeholder_injected = 1; next
-      }
-      print; next
-    }
-
-    { print }
-  ' "$file" > "$tmp_out"
-
-  local byte_count
-  byte_count=$(wc -c < "$tmp_out")
-  if [[ "$byte_count" -lt 100 ]]; then
-    warn "Roadmap cleanup produced unexpectedly small output ($byte_count bytes) — aborting (CLAUDE.md left unchanged)"
-    return 1
-  fi
-  mv "$tmp_out" "$file"
-  ok "Updated $file (Roadmap section cleaned)"
 }
 
 # ---------------------------------------------------------------------------
@@ -247,13 +182,6 @@ if [[ $has_placeholder -eq 1 ]]; then
     mv "$tmp_out" "$claude_md"
     ok "Updated $claude_md"
   fi
-
-  # -------------------------------------------------------------------------
-  # 2b. Clean up the ## Roadmap section: remove the 21 template dogfooding
-  #     rows and the **Spec reservation rule:** paragraph; insert one
-  #     placeholder data row so the table is valid but empty of template rows.
-  # -------------------------------------------------------------------------
-  clean_roadmap_section "$claude_md" "$tmp_out" "$dry_run"
 fi
 
 # ---------------------------------------------------------------------------
@@ -295,8 +223,9 @@ say "  3. Edit .env with real secrets. Never commit it."
 say "  4. Customize .devcontainer/devcontainer.json for your stack."
 say "  5. Extend .gitignore with stack-specific patterns (see the commented"
 say "     references near the end of the file)."
-say "  6. If you do not plan to use Developer Learning Mode, delete"
-say "     .claude/meta/ and .github/workflows/learn-invariants.yml."
+say "  6. Add CI workflows to .github/workflows/ — the folder is empty by"
+say "     design. Pull reference workflows from the template's develop"
+say "     branch or write your own (see README §CI)."
 say "  7. Commit: 'chore: initialize from ecc-base-template'."
 say
 say "Ready. Open Claude Code at the repo root and give the orchestrator a real task."
