@@ -70,7 +70,10 @@ cd <your-repo>
 
 This will prompt you for a project name, one-line description, and tech stack,
 then replace the `## About This Project` placeholder in `.claude/CLAUDE.md`
-and copy `.env.example` to `.env`. Re-running is safe.
+and copy `.env.example` to `.env`. It also offers to remove the
+template-internal `payload-manifest-check.yml` workflow (kept by default;
+safe either way — the workflow is guarded to run only on the upstream
+template repo). Re-running is safe.
 
 Non-interactive form:
 
