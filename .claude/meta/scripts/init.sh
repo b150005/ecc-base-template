@@ -4,6 +4,7 @@
 # Run this once after forking from ecc-base-template. It localizes the
 # template's generic scaffolding to your project:
 #   - Replace the `## About This Project` placeholder in .claude/CLAUDE.md
+#   - Offer to remove the template-internal payload-manifest-check workflow
 #   - Copy .env.example to .env (if .env does not exist)
 #   - Print a next-steps checklist
 #
@@ -181,6 +182,35 @@ if [[ $has_placeholder -eq 1 ]]; then
     ' "$claude_md" > "$tmp_out"
     mv "$tmp_out" "$claude_md"
     ok "Updated $claude_md"
+  fi
+fi
+
+# ---------------------------------------------------------------------------
+# 2c. Optional: remove template-internal payload-manifest-check workflow
+#
+# This workflow guards the upstream template's main/develop payload
+# boundary. On forks it is doubly safe — the job-level `if:` guard skips
+# it on non-upstream repos, and the legacy graceful-skip fallback handles
+# absence of `develop` — so keeping the file is harmless. Some fork
+# operators still prefer zero inherited workflows; this prompt lets them
+# remove it interactively.
+# ---------------------------------------------------------------------------
+workflow_path=".github/workflows/payload-manifest-check.yml"
+if [[ -f "$workflow_path" ]]; then
+  if [[ $non_interactive -eq 1 ]]; then
+    ok "$workflow_path: keeping (non-interactive mode; safe no-op on forks)"
+  else
+    read -r -p "Remove template-internal payload-manifest-check.yml? (y/N): " ans
+    if [[ "$ans" =~ ^[Yy]$ ]]; then
+      if [[ $dry_run -eq 1 ]]; then
+        say "[dry-run] would remove $workflow_path"
+      else
+        rm "$workflow_path"
+        ok "Removed $workflow_path"
+      fi
+    else
+      ok "Kept $workflow_path (safe — guarded for upstream-only execution)"
+    fi
   fi
 fi
 
