@@ -127,3 +127,16 @@ jobs:
 
           echo "PASS: all changed paths are on the payload manifest."
           printf '  - %s\n' "$CHANGED" | sed '/^  - $/d'
+
+  # TEMPORARY VERIFICATION JOB (PR will be closed without merge).
+  # Confirms the `if: github.repository == '...'` guard pattern correctly
+  # evaluates to `skipped` when the repository does NOT match. The
+  # condition below is a deliberately impossible match — this job MUST
+  # appear as `skipped` in the PR's checks tab. If it appears as
+  # `success`/`failure` instead, the guard pattern is broken.
+  verify-guard-skip-evaluation:
+    name: verify-guard-skip-evaluation (must be skipped)
+    runs-on: ubuntu-latest
+    if: github.repository == 'this-org-does-not-exist/never-matches'
+    steps:
+      - run: echo "If you see this output the guard is BROKEN."
