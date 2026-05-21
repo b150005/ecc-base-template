@@ -4,10 +4,33 @@
 # User-specific Claude Code permissions (never shared)
 .claude/settings.local.json
 
-# Developer Learning Mode runtime state (private by default).
-# See .gitignore.example if your team wants to share the knowledge base.
+# Developer Learning Mode runtime state — private by default (see below for opt-in).
+# Knowledge files contain a learner's mistakes, prior understanding, and revision
+# history. That is private learning material by default. config.json stores per-
+# developer level/focus preferences and stays private even when knowledge is shared.
 .claude/learn/knowledge/
 .claude/learn/config.json
+
+# ── Optional: opt-in to a shared team knowledge base ─────────────────────────
+# If your team wants a shared, domain-organized knowledge base that accumulates
+# across everyone's sessions, REMOVE the `.claude/learn/knowledge/` line above
+# AND uncomment the two inversion lines below. The config.json line stays as-is
+# (level and focus are per-developer preferences, not team state).
+#
+# !.claude/learn/knowledge/
+# !.claude/learn/knowledge/**
+#
+# Considerations before opting in:
+#   - Knowledge files will contain revision history ("Superseded 2026-05-14: ...")
+#     visible to the team.
+#   - A junior's foundational entries and a senior's trade-off entries will
+#     coexist. That is the point of the layered knowledge base, but the team
+#     should be ready for it.
+#   - Knowledge files reveal the team's mistakes over time. Psychological safety
+#     matters.
+# See ADR-027 for the design rationale of integrating this opt-in block into
+# .gitignore (it lived in a separate .gitignore.example file before 2026-05-21).
+# ─────────────────────────────────────────────────────────────────────────────
 
 # ─────────────────────────────────────────────────────────────
 # OS

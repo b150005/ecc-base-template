@@ -203,8 +203,7 @@ your-repo/
 ├── CHANGELOG.md               ← starts at [Unreleased]; grows with your releases
 ├── LICENSE
 ├── .env.example
-├── .gitignore
-├── .gitignore.example
+├── .gitignore                ← Learning Mode opt-in inversion documented inline (see ADR-027)
 ├── .gitattributes
 ├── .claude/
 │   ├── CLAUDE.md              ← project instructions (edit the About section first)
