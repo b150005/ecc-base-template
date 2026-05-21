@@ -8,9 +8,13 @@
 # Enforced by .github/workflows/payload-manifest-check.yml
 # (runs on pull_request to main).
 #
-# NOTE: main carries 0 workflows by design (per ADR-026 amendment
-# 2026-05-21). The .github/workflows/.gitkeep entry preserves the
-# folder so forks remember to add their own CI if desired. The
+# NOTE: main carries 0 fork-facing CI workflows by design (per ADR-026
+# amendment 2026-05-21). The .github/workflows/.gitkeep entry preserves
+# the folder so forks remember to add their own CI if desired. The
+# single .github/workflows/payload-manifest-check.yml is the template-
+# internal boundary-enforcement workflow — it must live on main because
+# GitHub Actions resolves pull_request workflows from the PR head ref;
+# forks without a develop branch graceful-skip the check. The
 # .claude/meta/scripts/init.sh entry is the fork-facing initializer
 # (the only file kept under .claude/meta/scripts/).
 
@@ -24,9 +28,11 @@
 .claude/meta/scripts/init.sh
 
 # ---------------------------------------------------------------
-# .github/ — empty workflows folder placeholder + fork-reusable config
+# .github/ — placeholder + single template-enforcement workflow +
+#            fork-reusable config
 # ---------------------------------------------------------------
 .github/workflows/.gitkeep
+.github/workflows/payload-manifest-check.yml
 .github/CODEOWNERS
 .github/ISSUE_TEMPLATE/**
 .github/PULL_REQUEST_TEMPLATE.md
