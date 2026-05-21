@@ -197,7 +197,6 @@ your-repo/
 │   ├── meta/                  ← template-internal ADRs, references, init script
 │   ├── settings.json          ← Plan Mode default + hook registration
 │   └── settings.local.json    ← gitignored, user-specific
-├── .devcontainer/             ← VS Code Dev Containers scaffold
 └── .github/                   ← CI, dependabot, issue/PR templates
 ```
 

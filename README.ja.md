@@ -195,7 +195,6 @@ your-repo/
 │   ├── meta/                  ← テンプレ自身の ADR、参考資料、init スクリプト
 │   ├── settings.json          ← Plan Mode デフォルト + hook 登録
 │   └── settings.local.json    ← gitignored、利用者固有
-├── .devcontainer/             ← VS Code Dev Containers 雛形
 └── .github/                   ← CI、dependabot、Issue/PR テンプレート
 ```
 

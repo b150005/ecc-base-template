@@ -11,6 +11,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- **`.devcontainer/devcontainer.json` scaffold** (2026-05-21, ADR-028).
+  The fully-commented-out Dev Containers scaffold introduced in v3.0.0
+  (commit `c25140d`, ADR-less) is removed from both `main` and
+  `develop`. The file's only live keys were `"name"` and `"remoteUser"`;
+  every meaningful key (`image`, `features`, extensions, lifecycle
+  commands, ports, environment) was commented out, and its header
+  comment pointed at `.claude/meta/references/devcontainer.md` which
+  did not exist on either branch. The "fork-reusable scaffold"
+  rationale recorded in the payload manifest was hypothetical: a fork
+  that genuinely adopts Dev Containers picks a base image and writes
+  ~10 lines anyway, so the empty scaffold added nothing beyond what
+  one README sentence covers. Removing it eliminates 4 downstream
+  surfaces (README.md tree row, README.ja.md tree row, init.sh
+  next-step 4, `payload-manifest.txt` section). See ADR-028 for the
+  full reasoning and the four alternatives considered.
+
 ### Changed
 
 - **Integrated `.gitignore.example` into `.gitignore` as a comment block**
@@ -37,6 +55,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **`main:.claude/settings.json` dead hook reference** (2026-05-21,
+  ADR-028 Consequences). Commit `b9256c7`
+  (`refactor(template): remove develop-only skills, hooks, output-styles
+  from main (Roadmap #23)`) deleted `.claude/hooks/coaching-context.sh`
+  from `main` as part of AC-2 cleanup but did not update
+  `settings.json`'s `hooks.UserPromptSubmit` block, which still
+  registered the now-missing hook. Fork users starting Claude Code saw
+  a hook-resolution warning on the first user prompt of every session.
+  The block is removed; `"hooks": {}` is left in place as a documented
+  extension point. `develop`'s `settings.json` is intentionally
+  untouched — the hook is functional on `develop` because
+  `coaching-context.sh` is present there (maintainer-facing Learning
+  Mode coaching depends on it). The `main`/`develop` divergence in
+  `settings.json` is now load-bearing (ADR-026 amendment 2026-05-21
+  precedent: `main` and `develop` settings legitimately differ).
 - **Realigned root `/CHANGELOG.md` with ADR-005** (2026-05-21). The root
   `CHANGELOG.md` had drifted from its design intent: while ADR-005 and this
   file's own header explicitly designate the root file as "for derived

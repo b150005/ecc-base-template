@@ -39,11 +39,6 @@
 .github/dependabot.yml
 
 # ---------------------------------------------------------------
-# .devcontainer/ — fork-reusable dev environment scaffold
-# ---------------------------------------------------------------
-.devcontainer/**
-
-# ---------------------------------------------------------------
 # Root-level — README, CHANGELOG, LICENSE, git/env examples
 # ---------------------------------------------------------------
 README.md
