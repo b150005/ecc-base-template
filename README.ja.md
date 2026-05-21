@@ -112,9 +112,10 @@ orchestrator が product-manager (受け入れ基準) / architect (モジュー�
 
 ## CI
 
-本テンプレートは **`main` 上に GitHub Actions ワークフローを含めません**
-(設計上の意図的判断)。`.github/workflows/` フォルダは `.gitkeep` のみで
-保持されており、ここに CI を追加できることを忘れないための仕組みです。
+本テンプレートは **`main` 上に fork 向け GitHub Actions ワークフローを
+含めません** (設計上の意図的判断)。`.github/workflows/` フォルダは
+`.gitkeep` で保持されており、ここに CI を追加できることを忘れないため
+の仕組みです。
 
 GitHub ワークフローは fork ごとの選択です — プロジェクトによって必要な
 CI 構成は異なります (lint、test、coverage gate、security scan、依存更新
@@ -130,6 +131,17 @@ git checkout template/develop -- .github/workflows/<workflow>.yml
 プロジェクトに合うワークフロー (例: `ci-base.yml`、`security.yml`、
 `coverage-gate.yml`、`workaround-check.yml`) を選ぶか、独自に作成してくだ
 さい。
+
+### `main` に同梱される唯一のワークフロー
+
+`.github/workflows/payload-manifest-check.yml` は、上流テンプレートが
+自身の `main` 宛 PR を `.claude/payload-manifest.txt` (develop 上に存在)
+に対して gate するためのテンプレート内部 boundary-enforcement
+ワークフローです。fork ではこの workflow は無害に動作します — `develop`
+ブランチの checkout を試み、存在しない場合は静かに SUCCESS で skip
+します。完全に空の `.github/workflows/` を望む fork はこの 1 ファイル
+を `git rm` で削除して問題ありません。残したままにすれば、PR ごとに
+no-op success が報告されるだけです。
 
 ---
 

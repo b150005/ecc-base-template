@@ -117,9 +117,9 @@ quality agents for review — you steer the hand-offs.
 
 ## CI
 
-This template ships with **no GitHub Actions workflows on `main`** by
-design. The `.github/workflows/` folder is preserved with a single
-`.gitkeep` file so you remember the slot exists.
+This template ships with **no fork-facing GitHub Actions workflows on
+`main`** by design. The `.github/workflows/` folder is preserved with
+a `.gitkeep` file so you remember the slot exists.
 
 GitHub workflows are a per-fork choice — different projects want
 different CI scaffolding (lint, test, coverage gates, security
@@ -137,6 +137,17 @@ git checkout template/develop -- .github/workflows/<workflow>.yml
 Pick the workflows that fit your project (e.g. `ci-base.yml`,
 `security.yml`, `coverage-gate.yml`, `workaround-check.yml`) — or
 write your own.
+
+### The one workflow that does ship on `main`
+
+`.github/workflows/payload-manifest-check.yml` is a template-internal
+boundary-enforcement workflow used by the upstream template to gate
+PRs to its own `main` against `.claude/payload-manifest.txt` (which
+lives on `develop`). On forks, the workflow runs harmlessly — it
+tries to checkout a `develop` branch and silently skips with success
+when none exists. Forks that want a truly empty `.github/workflows/`
+can `git rm` this single file with no consequence; forks keeping it
+see a no-op success on every PR.
 
 ---
 
