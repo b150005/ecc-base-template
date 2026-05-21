@@ -183,8 +183,7 @@ your-repo/
 ├── LICENSE
 ├── .env.example               ← 環境変数のテンプレート
 ├── .env                       ← initializer が作成、コミット禁止
-├── .gitignore
-├── .gitignore.example
+├── .gitignore                ← Learning Mode の opt-in 反転をインラインで文書化 (ADR-027 参照)
 ├── .gitattributes
 ├── .claude/                   ← Claude Code 機構
 │   ├── CLAUDE.md              ← プロジェクト指示(About セクションを最初に編集)

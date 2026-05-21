@@ -185,8 +185,7 @@ your-repo/
 ├── LICENSE
 ├── .env.example               ← template for environment variables
 ├── .env                       ← created by the initializer; never committed
-├── .gitignore
-├── .gitignore.example
+├── .gitignore                ← Learning Mode opt-in inversion documented inline (see ADR-027)
 ├── .gitattributes
 ├── .claude/                   ← Claude Code machinery
 │   ├── CLAUDE.md              ← project instructions (edit the About section first)
