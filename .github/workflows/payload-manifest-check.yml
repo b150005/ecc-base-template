@@ -7,12 +7,18 @@ name: Payload Manifest Check
 # This workflow ships on BOTH main and develop. It MUST live on main
 # because GitHub Actions resolves `pull_request` workflow files from the
 # PR head ref — and main-derived feature branches have only main's tree.
-# Forks (which inherit this file via main) skip the check automatically
-# when no `develop` branch exists, so the check is harmless for them.
+# Forks (which inherit this file via main) are doubly protected:
+#   (1) the job-level `if:` guard below skips the workflow on any
+#       repository other than the upstream template, so the job is
+#       not executed and consumes 0 runner minutes.
+#   (2) when `develop` is absent, the `gate` step short-circuits with
+#       SUCCESS so legacy forks without the guard still see no failure.
+# Fork users may also remove this file via `.claude/meta/scripts/init.sh`
+# if they prefer zero inherited workflows.
 #
-# Per ADR-026 amendment 2026-05-21 (further revised on workflow-trigger
-# discovery), this is the single permitted workflow on main; all other
-# CI is fork-opt-in via `.github/workflows/.gitkeep`.
+# Per ADR-026 amendment 2026-05-21 (third revision adds the repository
+# guard + init.sh prompt), this is the single permitted workflow on
+# main; all other CI is fork-opt-in via `.github/workflows/.gitkeep`.
 #
 # References:
 # - pull_request event (workflow-file resolution rules):
@@ -29,6 +35,13 @@ jobs:
   payload-manifest-check:
     name: payload-manifest-check
     runs-on: ubuntu-latest
+    # Guard: run only on the upstream template repo. Forks see this
+    # file but the job evaluates to `skipped` (0 runner minutes,
+    # 0 Actions billing, no tab noise beyond the skip marker).
+    # ⚠ Update this condition if the upstream repo is renamed or
+    #   transferred between accounts/orgs — otherwise the boundary
+    #   check silently stops running on upstream as well.
+    if: github.repository == 'b150005/ecc-base-template'
     timeout-minutes: 5
     steps:
       - name: Try to checkout develop branch (manifest source)
