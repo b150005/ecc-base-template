@@ -9,6 +9,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Milestone #23 — SHIPPED: Template / fork structural separation — `main`
+  payload-only + `develop` template-dev branch split** (Phase B implementation
+  complete 2026-05-21; all 12 AC of Spec `specs/23-template-fork-branch-separation.md`
+  satisfied locally; AC-12 branch-protection requires user GitHub UI action).
+  Nine commits across `develop` and `main` branches:
+  - **Two-branch model adopted**: `main` carries only fork-facing payload;
+    `develop` is the template-development branch (Spec, ADRs, CI, skills, etc.).
+  - **`main` purged of template-internal artifacts**: 12 workflows, 5 trackers,
+    meta-scripts (`init.sh` kept), `specs/`, `meta/{adr,prd,references}/`,
+    `ROADMAP.md`, opt-in yml configs (`.claude/{skills,hooks,output-styles}/`).
+    A `.gitkeep` placeholder marks the empty `.github/workflows/` directory;
+    fork CI is opt-in, zero workflows by default.
+  - **Payload manifest** (`develop`): `.claude/payload-manifest.txt` lists every
+    path that should be present on `main`; `payload-manifest-check.yml` CI gate
+    enforces the allowlist on PRs targeting `main`.
+  - **Reduced `CLAUDE.md` + `orchestrator.md`** on `main`: fork-compatible
+    stubs only; template-internal references removed.
+  - **`README.md` rewritten** on `main`: Forking, CI, and Contributing-to-template
+    sections added; fork audience oriented.
+  - **`init.sh` shrunk** on `main`: reduced from 303 to 231 lines (-72 / -24%)
+    by removing `clean_roadmap_section()` and related awk machinery;
+    `bash` syntax check passes, no `.claude/meta/` or `specs/` path
+    references remain.
+  - **Spec `specs/23-template-fork-branch-separation.md` + ADR-026 amended
+    2026-05-21** for leaner-main scope (Phase B scope shift documented).
+  - Restore point: local tag `pre-phase-b` pinned to `9d2b00d` (Phase A ship).
+  - Reference: ADR-026 (`.claude/meta/adr/026-template-fork-branch-separation.md`).
+  (Roadmap #23)
+
 - **Milestone #23 — ACTIVATED (Spec authored, ADR-026 accepted; implementation
   deferred to follow-up session)** (Agent Team consultation on 2026-05-21
   producing one new ADR at triad 3/3 and a Spec with 12 acceptance criteria;

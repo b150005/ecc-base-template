@@ -43,7 +43,7 @@ Analyze-step row-guard (G1–G3). See
 | 20 | Commit `compliance.yml` as active default | ☑ done | spec: `specs/20-ship-compliance-yml-committed.md`<br>adr: `.claude/meta/adr/011-compliance-checklist-skill.md` (amended 2026-05-20) |
 | 21 | Quality-gate loop re-entry anchored to Roadmap row | ☑ done | spec: `specs/21-quality-gate-row-anchor.md`<br>adr: `.claude/meta/adr/014-roadmap-index-single-entry-point.md` (amended 2026-05-20) |
 | 22 | CLAUDE.md invariant-only refactor + Roadmap relocation + subagent-dispatch/worktree-advisory protocols | ☑ done | spec: `specs/22-claude-md-invariant-refactor.md`<br>adr: `.claude/meta/adr/024-subagent-dispatch-contract.md`<br>adr: `.claude/meta/adr/025-worktree-advisory-protocol.md` |
-| 23 | Template / fork structural separation (`main` payload-only + `develop` template-dev branch split) | ◐ in-progress | spec: `specs/23-template-fork-branch-separation.md`<br>adr: `.claude/meta/adr/026-template-fork-branch-separation.md` |
+| 23 | Template / fork structural separation (`main` payload-only + `develop` template-dev branch split) | ☑ done | spec: `specs/23-template-fork-branch-separation.md`<br>adr: `.claude/meta/adr/026-template-fork-branch-separation.md` |
 
 ## Rules
 
