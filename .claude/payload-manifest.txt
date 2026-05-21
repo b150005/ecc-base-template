@@ -1,0 +1,50 @@
+# Payload manifest — files/globs allowed on the main branch.
+#
+# One entry per line. Lines starting with '#' are comments;
+# blank lines are ignored. Globs use ** for recursive match
+# and * for single-segment match.
+#
+# Maintained manually by template maintainers on develop.
+# Enforced by .github/workflows/payload-manifest-check.yml
+# (runs on pull_request to main).
+#
+# NOTE: main carries 0 workflows by design (per ADR-026 amendment
+# 2026-05-21). The .github/workflows/.gitkeep entry preserves the
+# folder so forks remember to add their own CI if desired. The
+# .claude/meta/scripts/init.sh entry is the fork-facing initializer
+# (the only file kept under .claude/meta/scripts/).
+
+# ---------------------------------------------------------------
+# .claude/ — agent definitions, templates, settings, payload CLAUDE.md
+# ---------------------------------------------------------------
+.claude/agents/**
+.claude/templates/**
+.claude/settings.json
+.claude/CLAUDE.md
+.claude/meta/scripts/init.sh
+
+# ---------------------------------------------------------------
+# .github/ — empty workflows folder placeholder + fork-reusable config
+# ---------------------------------------------------------------
+.github/workflows/.gitkeep
+.github/CODEOWNERS
+.github/ISSUE_TEMPLATE/**
+.github/PULL_REQUEST_TEMPLATE.md
+.github/dependabot.yml
+
+# ---------------------------------------------------------------
+# .devcontainer/ — fork-reusable dev environment scaffold
+# ---------------------------------------------------------------
+.devcontainer/**
+
+# ---------------------------------------------------------------
+# Root-level — README, CHANGELOG, LICENSE, git/env examples
+# ---------------------------------------------------------------
+README.md
+README.ja.md
+CHANGELOG.md
+LICENSE
+.env.example
+.gitignore
+.gitignore.example
+.gitattributes

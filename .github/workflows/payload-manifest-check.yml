@@ -1,0 +1,94 @@
+name: Payload Manifest Check
+
+# Triggers on PRs targeting main and validates that every changed
+# file is permitted by .claude/payload-manifest.txt.
+#
+# This workflow lives on develop only. GitHub Actions evaluates
+# pull_request workflows from the PR head ref, so a PR from
+# develop (or a feature branch of develop) to main runs this
+# workflow's YAML from the head ref's tree — even though main
+# itself carries 0 workflows.
+#
+# Per ADR-026 amendment 2026-05-21, main is fork-clean payload
+# only; this check is the structural enforcement of that boundary.
+#
+# Reference (pull_request event):
+# https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#pull_request
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  payload-manifest-check:
+    name: payload-manifest-check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout PR head (where the manifest lives)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Validate changed files against payload manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          MANIFEST=".claude/payload-manifest.txt"
+          if [[ ! -f "$MANIFEST" ]]; then
+            echo "::error::$MANIFEST not found on PR head."
+            echo "The payload-manifest.txt file is required on develop to gate PRs to main."
+            exit 1
+          fi
+
+          # Build ERE pattern from manifest:
+          #   - strip comments (#...) and blank lines
+          #   - convert glob '**' → '.*' (any chars including /)
+          #   - convert glob '*' → '[^/]*' (any chars except /)
+          #   - escape '.' to '\.' so literal dots are not wildcards
+          PATTERN=$(grep -v '^[[:space:]]*#' "$MANIFEST" \
+            | grep -v '^[[:space:]]*$' \
+            | sed -E 's/[[:space:]]+$//' \
+            | sed -E 's/\./\\./g' \
+            | sed -E 's|/\*\*|/.*|g' \
+            | sed -E 's|\*\*|.*|g' \
+            | sed -E 's/\*/[^\/]*/g' \
+            | paste -sd '|' -)
+
+          if [[ -z "$PATTERN" ]]; then
+            echo "::error::Manifest produced no patterns (file empty or all comments)."
+            exit 1
+          fi
+
+          CHANGED=$(git diff --name-only \
+            "${{ github.event.pull_request.base.sha }}" \
+            "${{ github.event.pull_request.head.sha }}")
+
+          OFFENDERS=()
+          while IFS= read -r path; do
+            [[ -z "$path" ]] && continue
+            if ! echo "$path" | grep -qE "^($PATTERN)$"; then
+              OFFENDERS+=("$path")
+            fi
+          done <<< "$CHANGED"
+
+          if [[ ${#OFFENDERS[@]} -gt 0 ]]; then
+            echo "::error::The following paths are not allowed by $MANIFEST:"
+            for p in "${OFFENDERS[@]}"; do
+              echo "  - $p"
+            done
+            echo ""
+            echo "Resolution: either (a) keep these paths off main and land"
+            echo "them on develop only, or (b) extend .claude/payload-manifest.txt"
+            echo "on develop to allow them, then update this PR."
+            exit 1
+          fi
+
+          echo "PASS: all ${#OFFENDERS[@]} changed paths are on the payload manifest."
+          git diff --name-only "${{ github.event.pull_request.base.sha }}" \
+            "${{ github.event.pull_request.head.sha }}" | sed 's/^/  - /'
