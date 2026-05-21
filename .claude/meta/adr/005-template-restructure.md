@@ -167,3 +167,7 @@ In-place edits across the codebase (not file moves but path-string updates):
 - [ADR-004: Coaching pillar](004-coaching-pillar.md)
 - User discussion recorded in the v3.0.0 planning session (2026-04-25):
   "ルート直下の可視ディレクトリは0にするのが望ましいです。"
+
+## Amendment 2026-05-21 — `.gitignore` / `.gitignore.example` consequence superseded by ADR-027
+
+The §Consequences bullet about `.gitignore` and `.gitignore.example` pointing at `.claude/learn/knowledge/` and `.claude/learn/config.json` is partially superseded: `.gitignore.example` no longer exists as a separate file (deleted by ADR-027), and the opt-in inversion now lives as a commented block inside `.gitignore`. The default-ignore lines for `.claude/learn/knowledge/` and `.claude/learn/config.json` are unchanged. See [ADR-027](027-gitignore-example-integration.md) for the rationale.

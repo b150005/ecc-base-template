@@ -142,7 +142,7 @@ bash .claude/meta/scripts/check-learn-invariants.sh
 
 1. `/learn` Skill が `disable-model-invocation: true` を持つこと。
 2. `## Learning Domains` を宣言しているすべてのエージェントに、`.claude/learn/config.json` を読み込むガード分岐のテキストが含まれていること。
-3. `.claude/learn/knowledge/` が `.gitignore`(または `.gitignore.example`)に記載されていること。
+3. `.claude/learn/knowledge/` が `.gitignore` に記載されていること(同ファイルには ADR-027 によるコメントアウトされたオプトイン反転ブロックも含まれる — 2026-05-21 以前は別ファイル `.gitignore.example` だった)。
 
 3 つのチェックがすべてパスしてからマージしてください。
 

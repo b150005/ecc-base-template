@@ -84,7 +84,6 @@ printf "\n"
 # ---------------------------------------------------------------------------
 printf "Check 3: Gitignore posture\n"
 gitignore=".gitignore"
-example=".gitignore.example"
 
 check_ignore_line() {
   local pattern="$1"
@@ -100,14 +99,17 @@ if [[ ! -f "$gitignore" ]]; then
 else
   check_ignore_line ".claude/learn/knowledge/"
   check_ignore_line ".claude/learn/config.json"
-fi
-
-if [[ ! -f "$example" ]]; then
-  fail_check "$example not found"
-elif grep -Fq "!.claude/learn/knowledge/" "$example"; then
-  pass "$example documents the opt-in inversion"
-else
-  fail_check "$example missing opt-in inversion pattern"
+  # Per ADR-027 (2026-05-21), the opt-in inversion lives as a commented
+  # block inside .gitignore itself (it lived in a separate .gitignore.example
+  # file before that ADR). Both the inversion line and the recursive-glob
+  # inversion must be present as commented-out hints for the team-share
+  # opt-in path.
+  if grep -Fq "# !.claude/learn/knowledge/" "$gitignore" \
+      && grep -Fq "# !.claude/learn/knowledge/**" "$gitignore"; then
+    pass "$gitignore documents the opt-in inversion (commented block)"
+  else
+    fail_check "$gitignore missing opt-in inversion comment block (expected '# !.claude/learn/knowledge/' and '# !.claude/learn/knowledge/**' as comments — see ADR-027)"
+  fi
 fi
 printf "\n"
 

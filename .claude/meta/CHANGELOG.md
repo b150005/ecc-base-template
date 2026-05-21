@@ -11,6 +11,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Integrated `.gitignore.example` into `.gitignore` as a comment block**
+  (2026-05-21, ADR-027). The Learning Mode opt-in inversion pattern now
+  lives as a commented-out block inside `.gitignore` itself; the separate
+  `.gitignore.example` file is deleted. Rationale: the `.example` suffix
+  misled fork operators into reading it as "a sample `.gitignore` to copy
+  wholesale" rather than "documentation of an opt-in inversion to splice
+  into your existing `.gitignore`." Consolidating the posture into one
+  file cuts the synchronization debt (20+ references → ~5) and improves
+  discoverability — anyone editing `.gitignore` sees the opt-in path
+  immediately. The design intent of ADR-001 Decision 4 (knowledge files
+  gitignored by default; opt-in is the only allowed sharing mechanism)
+  is preserved; only the documentation mechanism changes. Related
+  amendments added to ADR-001, ADR-003, ADR-005, PRD developer-learning-
+  mode, references (domain-taxonomy / learning-mode-explained EN+JA /
+  v1-to-v2 migration EN+JA), and `.claude/skills/learn/SKILL.md`. The
+  `check-learn-invariants.sh` Check 3 logic and `learn-invariants.yml`
+  triggers updated to the new shape; Check 3 still passes (13 PASS / 0
+  FAIL). The manifest entry for `.gitignore.example` remains in
+  `payload-manifest.txt` during the payload PR (so the deletion passes
+  the manifest gate) and is removed in a separate develop-only cleanup
+  commit after the payload PR merges — sequencing detailed in ADR-027.
+
 ### Fixed
 
 - **Realigned root `/CHANGELOG.md` with ADR-005** (2026-05-21). The root

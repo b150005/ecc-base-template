@@ -120,7 +120,9 @@ Field semantics:
 
 The file is created on first `/learn on` invocation. It does not exist in the repository
 before first use. Both `config.json` and `.claude/learn/knowledge/` are gitignored by default;
-see `.gitignore.example` for the opt-in inversion if you want to commit notes.
+see the commented-out opt-in inversion block inside `.gitignore` itself (per ADR-027 —
+previously in a separate `.gitignore.example` file before 2026-05-21) for the lines to
+uncomment if you want to commit notes.
 
 ---
 

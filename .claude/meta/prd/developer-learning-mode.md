@@ -405,7 +405,7 @@ Agents discover the knowledge directory and config path from this block on sessi
 `learn/knowledge/` is gitignored by default. The repository ships:
 
 1. A `.gitignore` entry that excludes `learn/knowledge/` and `learn/config.json` from version control.
-2. A `.gitignore.example` file (or a comment block in the existing `.gitignore`) that shows the exact lines to comment out or remove if the developer chooses to commit their knowledge files.
+2. A commented-out opt-in inversion block inside `.gitignore` itself (per ADR-027 — previously a separate `.gitignore.example` file before 2026-05-21) that shows the exact lines to uncomment if the developer chooses to commit their knowledge files.
 
 The rationale for gitignore-by-default: domain knowledge files contain the developer's mistakes, superseded understandings, and revision history. That is private learning data. A developer who wants to share their knowledge base — for example, as a team learning commitment or a public study journal — makes that choice explicitly by editing `.gitignore`. The repository does not make it for them.
 
@@ -572,7 +572,7 @@ Three deterministic preconditions enforce the invariant. All three are checked b
 
 2. **Agent guard-branch check.** Every file under `.claude/agents/` that declares a `## Learning Domains` section also contains the guard-branch text — reading `config.json`, skipping all learning steps when absent or disabled. One regex per agent file.
 
-3. **Gitignore posture check.** `.gitignore` ignores `learn/knowledge/` and `learn/config.json`. `.gitignore.example` contains the opt-in inversion comment block. Two greps.
+3. **Gitignore posture check.** `.gitignore` ignores `learn/knowledge/` and `learn/config.json`, and contains the commented-out opt-in inversion block (per ADR-027 — previously a separate `.gitignore.example` file before 2026-05-21). Three greps in a single file.
 
 If any of the three fails, the CI job fails and the PR cannot merge.
 
@@ -675,7 +675,7 @@ All criteria must be satisfied for this feature to be considered shippable. The 
 ### Git and Privacy
 
 - [ ] `.gitignore` includes entries that exclude `learn/knowledge/` and `learn/config.json`.
-- [ ] The repository includes a `.gitignore.example` or comment block showing the lines to modify to opt in to committing knowledge files.
+- [ ] `.gitignore` contains the commented-out opt-in inversion block showing the lines to uncomment to opt in to committing knowledge files (per ADR-027).
 - [ ] The README documents the default-private and opt-in-shared paths without editorializing.
 
 ### CLAUDE.md
@@ -721,7 +721,7 @@ The following questions are not decided by this PRD. Each is a candidate for a f
 
 2. **Should market-analyst and monetization-strategist write to `market-reasoning.md` and `business-modeling.md`?** `[CLOSED]` Resolved in favor of full participation. Both the taxonomy (ownership matrix, ✓ on their respective primary domains) and ADR-001 (Decision 1: all fifteen agents are learning-aware from release; per-agent table assigns market-analyst → `market-reasoning` primary and monetization-strategist → `business-modeling` primary) confirm these agents write to their matching domains. FR-006 reflects this. No further escalation needed.
 
-3. **Should the knowledge directory be committed by default or gitignored by default?** `[CLOSED]` Resolved as gitignore-by-default. ADR-001 Decision 4 and ADR-003 both state this unambiguously. FR-009 of this PRD reflects the same stance. The `.gitignore.example` opt-in path is the mechanism for teams that want shared knowledge files. No further escalation needed.
+3. **Should the knowledge directory be committed by default or gitignored by default?** `[CLOSED]` Resolved as gitignore-by-default. ADR-001 Decision 4 and ADR-003 both state this unambiguously. FR-009 of this PRD reflects the same stance. The commented-out opt-in inversion block inside `.gitignore` (per ADR-027 — previously a separate `.gitignore.example` file before 2026-05-21) is the mechanism for teams that want shared knowledge files. No further escalation needed.
 
 4. **How does level change mid-project affect existing domain knowledge files?** `[ADR-scope]` Tentative position per ADR: new contributions follow the new level; existing entries are not rewritten. The foundational scaffolding from `junior` sessions remains and is layered by `senior` refinements. This PRD inherits that position.
 

@@ -154,3 +154,7 @@ This is PR #1 of the v2.0.0 release. The coaching pillar (Output Styles–compat
 - **Coaching pillar.** Output Styles–compatible in-session behavior modes (`hints`, `socratic`, `pair`, `review-only`, `silent`) are deferred to ADR-004 and PR #2 (v2.1.0). The current decision leaves room for the `coach` subtree in `learn/config.json` to be added without a second breaking change.
 - **Structural changes to the taxonomy or enrichment contract.** Those remain governed by ADR-001. ADR-003 moves and renames; it does not restructure the protocol itself.
 - **Automated migration script.** The maintainer explicitly chose prose-only migration instructions over a shipped shell script. The template's fork population is small and the migration is mechanical.
+
+## Amendment 2026-05-21 — Documentation mechanism superseded by ADR-027
+
+Decision 6 (Learning Mode's gitignore posture — default ignore for `learn/knowledge/` and `learn/config.json` with an opt-in inversion pattern) is preserved. The *documentation mechanism* — keeping the opt-in inversion in a separate `.gitignore.example` file — is superseded by ADR-027: the opt-in pattern now lives as a commented block inside `.gitignore` itself. References to `.gitignore.example` in this ADR's body are historical record (see [ADR-027](027-gitignore-example-integration.md) for the rationale).

@@ -156,3 +156,7 @@ v1.x は `.claude/growth/notes/*.md` に 19 個のプレースホルダーファ
 - **コーチング柱。** Output Styles 互換のセッション内行動モード(`hints`、`socratic`、`pair`、`review-only`、`silent`)は ADR-004 および PR #2(v2.1.0)に延期されます。現在の決定は、2 度目の破壊的変更なしに `learn/config.json` に `coach` サブツリーを追加できる余地を残しています。
 - **分類体系や enrichment 契約の構造的変更。** それらは引き続き ADR-001 が管理します。ADR-003 は移動と改名を行うものであり、プロトコルそのものを再構築するものではありません。
 - **自動化されたマイグレーションスクリプト。** メンテナーはスクリプト提供ではなく散文のみのマイグレーション手順を明示的に選択しました。テンプレートのフォーク数は少なく、操作は機械的です。
+
+## 改訂 2026-05-21 — 文書化手段は ADR-027 により supersede
+
+Decision 6 (Learning Mode の gitignore 姿勢 — `learn/knowledge/` と `learn/config.json` のデフォルト ignore + オプトイン反転パターン) は維持される。*文書化手段* — オプトイン反転を別ファイル `.gitignore.example` に保持すること — は ADR-027 によって supersede される: オプトインパターンは `.gitignore` 自身の中のコメントブロックとして存在する。本 ADR 本文中の `.gitignore.example` への参照は歴史的記録である (根拠は [ADR-027](027-gitignore-example-integration.ja.md) を参照)。

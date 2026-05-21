@@ -824,7 +824,7 @@ This taxonomy document is the **reference**. Alongside it exist:
 
 - **`.claude/learn/config.json`** — User's active level and per-agent scope. Not a knowledge file. Gitignored by default.
 - **`.claude/skills/learn/preamble.md`** — The enrichment contract shared by all 15 learning-aware agents. It references this taxonomy.
-- **`.claude/learn/knowledge/<domain>.md`** — The 19 canonical domain files plus any learner-opened custom domains. Created lazily on first teaching moment; enriched, deepened, and refined by agents over time. Gitignored by default; opt-in to share via `.gitignore.example`.
+- **`.claude/learn/knowledge/<domain>.md`** — The 19 canonical domain files plus any learner-opened custom domains. Created lazily on first teaching moment; enriched, deepened, and refined by agents over time. Gitignored by default; opt-in to share by uncommenting the inversion block inside `.gitignore` itself (per ADR-027 — previously a separate `.gitignore.example` file before 2026-05-21).
 
 The flow is: **Agent encounters a teaching moment → Agent reads the relevant domain file → Agent decides add/deepen/refine/correct/new-domain → Agent applies the change non-destructively and reports the diff in its response → Future sessions open the same domain file and layer on further understanding.**
 

@@ -75,7 +75,7 @@ This mirrors how expertise actually works. A developer who has worked on a codeb
 
 ## Knowledge is private by default
 
-`.claude/learn/knowledge/` is gitignored by default, and so is `.claude/learn/config.json`. The reason is deliberate: knowledge files contain the learner's mistakes, prior misunderstandings, and the revision history of their mental model. That is private learning material, not documentation intended for a team's shared repository. Teams who want a shared textbook — where accumulated domain knowledge is checked in and visible to all contributors — can opt in by inverting the gitignore pattern. A `.gitignore.example` file in the repository shows the exact pattern to add.
+`.claude/learn/knowledge/` is gitignored by default, and so is `.claude/learn/config.json`. The reason is deliberate: knowledge files contain the learner's mistakes, prior misunderstandings, and the revision history of their mental model. That is private learning material, not documentation intended for a team's shared repository. Teams who want a shared textbook — where accumulated domain knowledge is checked in and visible to all contributors — can opt in by uncommenting the inversion block inside `.gitignore` (per ADR-027 — the pattern lived in a separate `.gitignore.example` file before 2026-05-21).
 
 ---
 

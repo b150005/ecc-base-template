@@ -580,3 +580,7 @@ Positions below are tentative. Items settled by owner decision (gitignore postur
 - Project CLAUDE.md: [.claude/CLAUDE.md](../../../.claude/CLAUDE.md) — lists the fifteen-agent team this feature extends.
 
 Style note: structure goes Metadata, Context, Decision, Alternatives, Consequences, Implementation Notes, Open Questions, References. This is the shape used here going forward for decisions of comparable weight.
+
+## Amendment 2026-05-21 — Documentation mechanism superseded by ADR-027
+
+Decision 4 (knowledge files gitignored by default; opt-in is the only allowed sharing mechanism) is preserved. The *documentation mechanism* — using a separate `.gitignore.example` file to show the opt-in inversion — is superseded by ADR-027: the opt-in inversion now lives as a commented block inside `.gitignore` itself. All references to `.gitignore.example` in the body of this ADR are historical record; the current canonical location of the opt-in pattern is `.gitignore` (see [ADR-027](027-gitignore-example-integration.md) for the rationale).

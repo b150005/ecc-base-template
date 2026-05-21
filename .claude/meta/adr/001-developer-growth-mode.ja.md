@@ -583,3 +583,7 @@ CI では、単一のシェルスクリプト(`scripts/check-growth-invariants.s
 - プロジェクトの CLAUDE.md: [.claude/CLAUDE.md](../../../.claude/CLAUDE.md) — 本機能が拡張する 15 エージェントのチームの一覧。
 
 スタイル上の補足: 本 ADR の構造は、メタデータ、コンテキスト、決定、検討した代替案、結果、実装ノート、オープンクエスチョン、参考、の順とする。同程度の重みを持つ意思決定を今後記録する際にも、この形式を踏襲する。
+
+## 改訂 2026-05-21 — 文書化手段は ADR-027 により supersede
+
+Decision 4 (ナレッジファイルはデフォルトで gitignore される; オプトインが唯一の許される共有手段) は維持される。*文書化手段* — オプトイン反転を別ファイル `.gitignore.example` で示すこと — は ADR-027 によって supersede される: オプトイン反転は `.gitignore` 自身の中のコメントブロックとして存在する。本 ADR 本文中の `.gitignore.example` への参照はすべて歴史的記録であり、オプトインパターンの現在の正規所在地は `.gitignore` である (根拠は [ADR-027](027-gitignore-example-integration.ja.md) を参照)。

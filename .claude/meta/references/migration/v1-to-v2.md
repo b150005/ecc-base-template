@@ -140,7 +140,7 @@ The script checks three things:
 
 1. The `/learn` Skill has `disable-model-invocation: true`.
 2. Every agent that declares `## Learning Domains` contains the guard-branch text that reads `.claude/learn/config.json`.
-3. `.claude/learn/knowledge/` is listed in `.gitignore` (or `.gitignore.example`).
+3. `.claude/learn/knowledge/` is listed in `.gitignore` (which also contains the commented-out opt-in inversion block per ADR-027 — previously a separate `.gitignore.example` file before 2026-05-21).
 
 All three checks must pass before merging.
 

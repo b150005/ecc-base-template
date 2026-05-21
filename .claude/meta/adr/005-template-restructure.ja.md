@@ -160,3 +160,7 @@ v2.2.0 までのリポジトリのトップレベル構成は、性質の異な�
 - [ADR-004: コーチングピラー](004-coaching-pillar.md)
 - v3.0.0 計画セッション(2026-04-25)で記録されたユーザーの発言:
   「ルート直下の可視ディレクトリは0にするのが望ましいです。」
+
+## 改訂 2026-05-21 — `.gitignore` / `.gitignore.example` の Consequences は ADR-027 により supersede
+
+§Consequences の「`.gitignore` と `.gitignore.example` が `.claude/learn/knowledge/` と `.claude/learn/config.json` を指す」 という bullet は部分的に supersede される: `.gitignore.example` は別ファイルとしては存在しなくなった (ADR-027 で削除)。オプトイン反転は `.gitignore` 内のコメントブロックとして存在する。`.claude/learn/knowledge/` と `.claude/learn/config.json` のデフォルト ignore 行は不変。根拠は [ADR-027](027-gitignore-example-integration.ja.md) を参照。
