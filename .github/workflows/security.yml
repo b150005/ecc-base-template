@@ -1,0 +1,46 @@
+name: Security
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "17 6 * * 1" # Weekly Monday 6:17 AM UTC
+
+jobs:
+  codeql:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+    # Activation: create a repository variable CODEQL_ENABLED=true in
+    # GitHub Settings > Secrets and variables > Actions > Variables tab.
+    # Absent or any value other than 'true' → job is skipped (default-off).
+    # Supported languages: javascript, python, go, ruby, java, csharp, cpp, swift, actions
+    # Configure the language matrix in the steps below once the switch is set.
+    if: ${{ vars.CODEQL_ENABLED == 'true' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # Supported: javascript, python, go, ruby, java, csharp, cpp, swift, actions
+        # Example: language: ["javascript", "python"]
+        language: ["javascript"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v4
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:${{ matrix.language }}"

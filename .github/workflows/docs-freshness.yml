@@ -1,0 +1,225 @@
+name: Anthropic Docs Freshness
+
+# Monthly diff of the Claude Code docs index (llms.txt) against the
+# previous snapshot. Surfaces additions, removals, and renames so the
+# claude-md-authoring Skill's volatile rules can be re-verified by a
+# human/agent reviewer (per ADR-007).
+#
+# Default-off: every job is gated by .github/docs-freshness.yml's
+# `enabled: true`. There is no second `if: false` to remove from this
+# file.
+
+on:
+  schedule:
+    # Monthly on the 1st at 06:45 UTC. Offset from learn-invariants and
+    # security to reduce queue contention on free plans.
+    - cron: "45 6 1 * *"
+  workflow_dispatch:
+
+# Permissions are declared per-job (see `diff` below). The job-level
+# block fully overrides any workflow-level default for that job, so
+# stating a workflow-level `permissions: contents: read` is
+# misleading — kept here as a comment for reviewer clarity only.
+#
+# Note on `issues: write`: the diff job requests it because it
+# conditionally creates / updates a sticky tracker issue when
+# `open_issue_on_change: true` AND a diff is detected. With the
+# default config (`open_issue_on_change: false`) the issue step is
+# skipped — but the elevated job-level permission is still granted to
+# the GITHUB_TOKEN. Adopters who want strict minimum permissions can
+# either keep `open_issue_on_change: false` (the default) and remove
+# the `issues: write` line below, or split the issue creation into a
+# separate workflow.
+
+jobs:
+  diff:
+    name: Diff Anthropic docs index
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Read docs-freshness config
+        id: cfg
+        shell: bash
+        # `yq` is preinstalled on GitHub-hosted ubuntu-latest runners.
+        # If you switch to a self-hosted runner, ensure yq (Mike Farah's
+        # Go implementation) is on PATH before this step runs.
+        run: |
+          set -euo pipefail
+          CFG=".github/docs-freshness.yml"
+          if [[ ! -f "$CFG" ]]; then
+            echo "Config missing; skipping."
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          enabled=$(yq -r '.enabled // false' "$CFG")
+          url=$(yq -r '.llms_txt_url // "https://code.claude.com/docs/llms.txt"' "$CFG")
+          snapshot=$(yq -r '.snapshot_path // ".github/.docs-freshness-snapshot.txt"' "$CFG")
+          open_issue=$(yq -r '.open_issue_on_change // false' "$CFG")
+
+          # Validate snapshot path: must be a relative subpath, no traversal.
+          if [[ "$snapshot" =~ \.\. ]] || [[ "$snapshot" =~ ^/ ]] || [[ "$snapshot" =~ [*?] ]]; then
+            echo "Invalid snapshot_path: $snapshot" >&2
+            exit 1
+          fi
+          if ! [[ "$snapshot" =~ ^[A-Za-z0-9_./-]+$ ]]; then
+            echo "Invalid characters in snapshot_path: $snapshot" >&2
+            exit 1
+          fi
+          # Validate URL: https://, host starts with alphanumeric, no
+          # path-traversal segments. Path-traversal in a URL won't touch
+          # the local filesystem but could cause requests to unintended
+          # endpoints if the input is ever attacker-controlled.
+          if ! [[ "$url" =~ ^https://[A-Za-z0-9][A-Za-z0-9._-]*(/[A-Za-z0-9._?=&%-]+)+$ ]]; then
+            echo "Invalid llms_txt_url: $url" >&2
+            exit 1
+          fi
+          if [[ "$url" =~ /\.\.(/|$) ]] || [[ "$url" =~ /\./[^/] ]]; then
+            echo "Path traversal segment in llms_txt_url: $url" >&2
+            exit 1
+          fi
+
+          # Use heredoc form for outputs that *could* contain unusual
+          # characters in future configs; harmless for the values we
+          # currently set, but defensive against multiline yq output.
+          {
+            echo "enabled=$enabled"
+            printf 'url<<__EOF__\n%s\n__EOF__\n' "$url"
+            printf 'snapshot<<__EOF__\n%s\n__EOF__\n' "$snapshot"
+            echo "open_issue=$open_issue"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Fetch current llms.txt
+        if: steps.cfg.outputs.enabled == 'true'
+        id: fetch
+        env:
+          URL: ${{ steps.cfg.outputs.url }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          # -fsSL: fail on HTTP error, silent except errors, follow redirects.
+          if ! curl -fsSL --max-time 30 -o current.txt -- "$URL"; then
+            echo "::warning::Failed to fetch $URL"
+            echo "fetched=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Sanity check: a real llms.txt file is more than a few hundred
+          # bytes; an empty/bouncer page is not a useful diff input.
+          size=$(wc -c < current.txt | tr -d ' ')
+          if (( size < 200 )); then
+            echo "::warning::Fetched file is suspiciously small (${size} bytes); skipping diff."
+            echo "fetched=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "fetched=true" >> "$GITHUB_OUTPUT"
+          echo "size=$size" >> "$GITHUB_OUTPUT"
+
+      - name: Diff against previous snapshot
+        if: steps.cfg.outputs.enabled == 'true' && steps.fetch.outputs.fetched == 'true'
+        id: diff
+        env:
+          SNAPSHOT: ${{ steps.cfg.outputs.snapshot }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ ! -f "$SNAPSHOT" ]]; then
+            echo "No previous snapshot at $SNAPSHOT — first run."
+            echo "first_run=true" >> "$GITHUB_OUTPUT"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if cmp -s "$SNAPSHOT" current.txt; then
+            echo "No changes since last snapshot."
+            echo "first_run=false" >> "$GITHUB_OUTPUT"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "first_run=false" >> "$GITHUB_OUTPUT"
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            diff -u "$SNAPSHOT" current.txt > diff.patch || true
+          fi
+
+      - name: Report findings
+        if: steps.cfg.outputs.enabled == 'true' && steps.fetch.outputs.fetched == 'true'
+        env:
+          CHANGED: ${{ steps.diff.outputs.changed }}
+          FIRST_RUN: ${{ steps.diff.outputs.first_run }}
+          URL: ${{ steps.cfg.outputs.url }}
+        shell: bash
+        run: |
+          {
+            echo "## Anthropic docs freshness scan"
+            echo ""
+            echo "Source: ${URL}"
+            if [[ "$FIRST_RUN" == "true" ]]; then
+              echo ""
+              echo "First run — no previous snapshot to diff against. Commit"
+              echo "the snapshot to start tracking changes."
+            elif [[ "$CHANGED" == "true" ]]; then
+              echo ""
+              echo "Changes detected since last snapshot. The"
+              echo "claude-md-authoring Skill's volatile rules may need"
+              echo "re-verification (see ADR-007 §Re-verification protocol)."
+              echo ""
+              echo '<details><summary>Diff</summary>'
+              echo ""
+              echo '```diff'
+              cat diff.patch
+              echo '```'
+              echo '</details>'
+            else
+              echo ""
+              echo "No changes since last snapshot."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Open or update GitHub issue
+        if: |
+          steps.cfg.outputs.enabled == 'true' &&
+          steps.fetch.outputs.fetched == 'true' &&
+          steps.diff.outputs.changed == 'true' &&
+          steps.cfg.outputs.open_issue == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          URL: ${{ steps.cfg.outputs.url }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Idempotent: reuse a single open issue identified by a sentinel
+          # marker in the body, edit if found, otherwise create.
+          MARKER="<!-- docs-freshness-bot -->"
+          title="Anthropic docs freshness: changes detected ($(date -u +%Y-%m))"
+
+          # Truncate diff to stay well under GitHub's 65,536-char issue body
+          # cap. 30000 chars leaves room for the body wrapper and any GitHub
+          # body normalisation. If the diff exceeds the cap, we replace the
+          # tail with an explicit truncation marker rather than letting the
+          # API call fail.
+          DIFF_CAP=30000
+          if (( $(wc -c < diff.patch) > DIFF_CAP )); then
+            head -c "$DIFF_CAP" diff.patch > diff.trimmed
+            printf '\n... (diff truncated; full output in workflow run summary)\n' >> diff.trimmed
+          else
+            cp diff.patch diff.trimmed
+          fi
+
+          body=$(printf '%s\n\n**Source:** %s\n\nChanges detected since the last snapshot. The claude-md-authoring Skill volatile rules may need re-verification (ADR-007).\n\n```diff\n%s\n```\n' \
+            "$MARKER" "$URL" "$(cat diff.trimmed)")
+
+          existing=$(gh issue list --repo "$REPO" --state open --json number,body \
+            --jq ".[] | select(.body | startswith(\"$MARKER\")) | .number" \
+            | head -n1)
+          if [[ -n "$existing" ]]; then
+            gh issue edit "$existing" --repo "$REPO" --title "$title" --body "$body" >/dev/null
+            echo "Updated existing freshness issue #$existing"
+          else
+            gh issue create --repo "$REPO" --title "$title" --body "$body" \
+              --label "docs-freshness" >/dev/null 2>&1 || \
+            gh issue create --repo "$REPO" --title "$title" --body "$body" >/dev/null
+            echo "Opened new freshness issue"
+          fi

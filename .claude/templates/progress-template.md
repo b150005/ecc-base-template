@@ -8,9 +8,7 @@
    or compaction boundary occurs while the milestone is `◐`** — never
    on the `☐ → ◐` transition, never by an operator command. A milestone
    that ships `☐ → ☑` in one uninterrupted session never creates one
-   (zero ceremony when not needed). See
-   `.claude/meta/adr/016-cross-session-progress-persistence.md` for the
-   full rationale.
+   (zero ceremony when not needed).
 2. Copy this file to `specs/NN-progress.md`, where `NN` is the **stable,
    never-reused Roadmap row number** of the milestone (the same key
    ADR-014's reservation rule uses for `specs/NN-slug.md`). Milestone
@@ -56,7 +54,7 @@ workflow_step: 4                     # integer 1–9 per ## Development Workflow
 last_updated: 2026-05-16             # YYYY-MM-DD; date this record was last written
 head_sha: 6caa258                    # git HEAD short SHA at write time (staleness pin)
 spec_exists: true                    # true once specs/NN-slug.md exists on disk (US-001 (c))
-adr_links: [".claude/meta/adr/016-cross-session-progress-persistence.md"]   # [] if no ADR
+adr_links: []   # [] if no ADR yet, else the ADR path(s)
 ---
 ```
 

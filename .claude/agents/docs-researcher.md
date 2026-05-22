@@ -46,7 +46,7 @@ When searching for documentation, library versions, API references, or any techn
 ### Issue-tracker search (extension)
 
 When the question is *not* "how does this API work?" but "is this a known
-upstream bug?", apply these additional rules (see ADR-006):
+upstream bug?", apply these additional rules:
 
 - **Use status filters, not years.** `is:issue is:open label:bug <symptom>`
   before broadening to `is:closed`. Never put a year in the query — issue
@@ -62,9 +62,9 @@ upstream bug?", apply these additional rules (see ADR-006):
 ## Triage protocol — ours vs. upstream
 
 When the orchestrator delegates a "is this our bug or upstream's?"
-question, run all three steps before answering. See ADR-006 for the
-rationale and `.claude/meta/references/upstream-workaround-tracking.md`
-for usage details.
+question, run all three steps before answering. See
+`.claude/meta/references/upstream-workaround-tracking.md` for usage
+details.
 
 1. **Minimal reproduction** — reduce to a script that exhibits the symptom
    with no project-specific code. If the symptom disappears, the cause is
@@ -100,7 +100,7 @@ The Skill's invariants in `invariants.md` are also your re-verification
 target. When `docs-freshness.yml` (default-off, monthly) reports a
 non-empty diff, run through every invariant and either bump the "Last
 verified" date in `invariants.md` (if unchanged) or update the rule
-text and notify `architect` for an ADR-007 amendment (if changed).
+text and notify `architect` (if changed).
 
 When citing a volatile value inline in `CLAUDE.md` or another project
 document, append a verification date and source URL in the same
@@ -182,9 +182,7 @@ agent acts as **Generator**:
 6. Receive Critic findings via the same template; address MEDIUM/HIGH/
    CRITICAL items in the next round (max 2 rounds).
 
-See ADR-008 (research domain) and ADR-010 (cross-domain
-generalization) for the full rationale, and
-`.claude/skills/verification-layer/research/checklist.md` for the
+See `.claude/skills/verification-layer/research/checklist.md` for the
 Critic checklist your output will be reviewed against.
 
 ## Collaboration
@@ -196,6 +194,6 @@ Critic checklist your output will be reviewed against.
 
 ## Developer Learning Mode contract
 
-When `.claude/learn/config.json` exists and has `"enabled": true`, this agent is a learning-aware contributor. At session start the agent reads `.claude/skills/learn/preamble.md` and follows the 5-step enrichment contract for any teaching moment that falls within its declared Learning Domains (primary and secondary, as listed in the Learning Domains section above). When Learning Mode is off or the config is absent, this section has no effect and agent output is byte-identical to a world without the feature. See [ADR-001](../meta/adr/001-developer-growth-mode.md) for the complete architecture and [ADR-003](../meta/adr/003-learning-mode-relocate-and-rename.md) for the rename and relocation rationale.
+When `.claude/learn/config.json` exists and has `"enabled": true`, this agent is a learning-aware contributor. At session start the agent reads `.claude/skills/learn/preamble.md` and follows the 5-step enrichment contract for any teaching moment that falls within its declared Learning Domains (primary and secondary, as listed in the Learning Domains section above). When Learning Mode is off or the config is absent, this section has no effect and agent output is byte-identical to a world without the feature.
 
-Coaching pillar extension (v2.1.0): after reading `.claude/learn/config.json` for the knowledge pillar guard above, also read `coach.style`. If `coach.style` is non-`default` and a matching style file exists at `.claude/skills/learn/coach-styles/<style>.md`, load the file and apply its `behavior-rule` for this turn. If the value is missing, invalid, or the file does not exist, fall back to `default` (no coaching modification). See [ADR-004](../meta/adr/004-coaching-pillar.md) for the coaching pillar architecture.
+Coaching pillar extension (v2.1.0): after reading `.claude/learn/config.json` for the knowledge pillar guard above, also read `coach.style`. If `coach.style` is non-`default` and a matching style file exists at `.claude/skills/learn/coach-styles/<style>.md`, load the file and apply its `behavior-rule` for this turn. If the value is missing, invalid, or the file does not exist, fall back to `default` (no coaching modification).

@@ -1,0 +1,29 @@
+# ECC Delegation Consistency — derived-project configuration
+#
+# See .claude/meta/adr/020-ecc-absent-signal.md for the full design
+# and specs/13-ecc-absent-signal.md for the authoritative scope
+# (eight acceptance criteria, Non-goals, Out of scope).
+#
+# Single switch: flip `enabled: true` to activate the
+# .github/workflows/ecc-delegation-consistency-check.yml workflow.
+# There is no second `if: false` to remove from the workflow file —
+# the workaround-tracker.yml / coverage-tracker.yml single-switch
+# discipline (ADR-019 Decision 2, ADR-006 precedent).
+#
+# Default-off (ADR-020 §6 / Spec AC-3): the detector validates
+# code-reviewer.md's delegation-table internal consistency. The
+# template's own delegation table is consistent by design, so this
+# detector is green-by-construction on the template; the switch is off
+# because the template never needs an activation trigger — a derived
+# repo opts in with exactly this one change.
+#
+# STANDING DEGRADED-REVIEW POSTURE (Spec AC-1, ADR-020 §5):
+#   code-reviewer.md's language-specific layer delegates to ECC's
+#   *-reviewer agents. When ECC is absent from the operator's ~/.claude/,
+#   the language-specific depth is skipped; code-reviewer falls back to
+#   its generic checklist and states so explicitly in the review verdict.
+#   See README.md ## Prerequisites for the full standing posture.
+#   This detector validates INTERNAL CONSISTENCY (not ECC presence).
+
+# Master switch for the ecc-delegation-consistency-check.yml workflow.
+enabled: false

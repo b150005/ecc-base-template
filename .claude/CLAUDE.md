@@ -40,13 +40,13 @@ This project uses an agent team for structured development. The **orchestrator**
 | market-analyst | Market research, competitor analysis |
 | monetization-strategist | Business model, pricing, revenue strategy |
 | ui-ux-designer | UI/UX design, accessibility, usability review |
-| docs-researcher | Documentation research, API verification |
-| research-critic | Adversarial review of external research with primary-source-only citation |
-| adversarial-implementer | Parallel-implementation Critic for behavioural-delta verification (opt-in) |
-| architecture-critic | Counter-proposal Critic that takes rejected ADR alternatives seriously (opt-in) |
+| docs-researcher | Documentation research, API verification, freshness-safe search (verification-layer / research Generator) |
+| research-critic | Adversarial review of external research with primary-source-only citation (verification-layer / research Critic) |
+| adversarial-implementer | Parallel-implementation Critic for behavioural-delta verification (verification-layer / implementation Critic, default-off) |
+| architecture-critic | Counter-proposal Critic that takes rejected ADR alternatives seriously (verification-layer / design Critic, default-off) |
 | architect | System architecture, technology decisions |
 | implementer | Code implementation following architecture and TDD |
-| code-reviewer | Meta-reviewer: delegates language depth to ECC `*-reviewer` agents |
+| code-reviewer | Meta-reviewer: delegates language depth to ECC `*-reviewer`, owns template cross-cutting checks |
 | test-runner | Test execution, coverage reporting |
 | linter | Static analysis, code style enforcement |
 | security-reviewer | Vulnerability detection, OWASP Top 10 |
@@ -65,53 +65,137 @@ All agents detect the project ecosystem at runtime by reading this file and proj
 directory (e.g. `adr/001-foo.md`), a bilingual fork split by language (e.g.
 `adr/en/001-foo.md`, `adr/ja/001-foo.md`), or a co-located pair under one
 directory (e.g. `adr/001-foo.md` + `adr/001-foo.ja.md`). The template imposes
-no layout on forks — only the templates themselves.
+no layout on forks — only the templates themselves. A common pin worth
+adopting: put Specs under `specs/` and ADRs under `adr/` (or
+`.claude/meta/adr/`) at the repo root, three-digit zero-padded prefix on
+each filename; `product-manager` then authors a Spec at the row's reserved
+path and `architect` a new ADR alongside.
 
 ## CLAUDE.md authoring guidance
 
 When creating or significantly restructuring this file (or `README.md` or
-`.claude/agents/*.md`), verify that anything stated as fact about Anthropic
-tooling, model IDs, or API surfaces is checked against current official docs
-at edit time — these values drift. Keep cross-cutting invariants (file
-locations, agent names, workflow ordering) consistent with the rest of this
-file. Routine small edits (typo, single bullet, version bump) do not need
-this discipline.
+`.claude/agents/*.md`), invoke the **claude-md-authoring** Skill at
+`.claude/skills/claude-md-authoring/SKILL.md`. The Skill provides a
+Pre/Post checklist, four invariant rules verified against Anthropic's
+official docs, and a runtime protocol for volatile values. Routine
+small edits (typo, single bullet, version bump) do not need the Skill.
+
+## Developer Learning Mode
+
+Default-off learning layer with two orthogonal pillars: the **knowledge pillar**
+(agents contribute teaching moments to a domain-organized knowledge base) and the
+**coaching pillar** (agents change how they work during implementation based on a
+chosen coaching style). At session start, read `.claude/learn/config.json`; if
+absent or `"enabled": false`, skip all learning behavior entirely. If
+`"enabled": true`, read `.claude/skills/learn/preamble.md` for the enrichment
+contract. Also read `coach.style` from `.claude/learn/config.json`; if non-`default`
+and the style file exists at `.claude/skills/learn/coach-styles/<style>.md`, load
+and apply the `behavior-rule` for this turn.
+
+Toggled only via the `/learn` Skill. Use `/learn coach <style>` to set the coaching
+style; `/learn coach list` to see available styles. Domain definitions live in
+`.claude/meta/references/domain-taxonomy.md`. Background on the feature is at
+`.claude/meta/references/learning-mode-explained.md` (and its `.ja.md` sibling).
+
+## Plan-First & Learning-Aware Defaults
+
+This template ships with `permissions.defaultMode: "plan"` in
+`.claude/settings.json`. New sessions therefore boot in **Plan Mode**:
+Claude proposes a plan and waits for explicit approval before any
+write or shell side effect. Toggle off for the current session with
+Shift+Tab, or override per developer in `.claude/settings.local.json`.
+
+A learning-aware custom output style is shipped at
+`.claude/output-styles/ecc-learn.md`. It builds on the built-in
+`Learning` style — Claude inserts `TODO(human)` markers so you write
+small fragments yourself — and adds short `Insight:` notes that explain
+*why* a non-obvious choice was made. Selection is opt-in: choose it
+once via `/output-style ecc-learn`.
+
+The coaching hook is implemented in `.claude/hooks/coaching-context.sh`
+(self-documenting inline docblock) and registered in
+`.claude/settings.json` under `UserPromptSubmit`.
+
+## Roadmap
+
+When a fork keeps a Roadmap, it lives at `.claude/ROADMAP.md` — the
+row-by-row state of each milestone, plus the protocol rules that govern
+it. `orchestrator` reads that file at session start, **before** the
+Analyze-step row-guard (G1–G3). If `.claude/ROADMAP.md` does not exist,
+the row-guard is silently skipped — the template ships without one and
+the file is genuinely optional.
+
+**Write-ownership summary** (when the file exists): `product-manager`
+creates rows and flips status glyphs (`☐→◐` at Spec authoring, `◐→☑`
+after step-6 quality-gate pass); `architect` adds `adr:` links;
+`orchestrator` is read-only.
+
+## Subagent dispatch contract
+
+All subagent dispatch (any `Agent` tool call from `orchestrator` or main Claude) follows a fixed 5-slot prompt template and a delegate-and-stop rule. Full protocol with worked before/after examples in `.claude/meta/references/dispatch-contract.md`. Applies to ALL parent→subagent dispatches, including verification-layer Generator/Critic routing.
+
+**5-slot prompt structure** (every dispatch prompt fits this shape):
+
+- `ROLE:` — agent name + posture (1 line)
+- `CONTEXT:` — ≤ 3 bullets — the decision this informs, Roadmap row if any
+- `TASK:` — imperative verb + object (1 sentence)
+- `CONSTRAINTS:` — ≤ 5 bullets — what to skip, scope boundary, stop condition
+- `OUTPUT:` — exact shape the parent will consume — format + max length
+
+**Delegate-and-stop rule.** After writing an `Agent` dispatch, the parent agent may only call `Agent`, `AskUserQuestion`, or `ScheduleWakeup` until the subagent returns. No `Read`, `Bash`, `Edit`, `WebFetch`, no Skill invocations. This is the forcing function that prevents the parent from re-absorbing the delegated task between dispatch and return.
+
+## Worktree advisory protocol
+
+Before dispatching any multi-step plan, `orchestrator` evaluates worktree-parallelism suitability and emits a `## Worktree Recommendation` block **ahead of** the implementation plan. Full rubric, per-worktree dispatch templates, and the SAFE / UNSAFE write-zone list in `.claude/meta/references/worktree-advisory.md`.
+
+**6-question suitability rubric** (answered in Analyze):
+
+1. **File-disjoint?** Subtasks touch disjoint file sets.
+2. **Roadmap-disjoint?** Subtasks affect different Roadmap rows.
+3. **State-disjoint?** Subtasks don't share mutable shared state.
+4. **Mergeable?** Outputs are trivially mergeable (no integration work).
+5. **Reversible?** Rejecting one slice leaves the others useful.
+6. **Net-faster?** Parallelism wins wall-clock once review costs count.
+
+Yes on all 6 → recommend multi-worktree. No on any of 1–3 → single-worktree (forced — shared-state risk). No on 4–6 → single-worktree (recommended — parallelism does not pay).
+
+**Write-zone rule.** UNSAFE for any non-owner worktree: `.claude/CLAUDE.md`, `.claude/ROADMAP.md`, `CHANGELOG.md`, `specs/NN-progress.md`, lockfiles. In multi-worktree mode, `orchestrator` designates **one Roadmap-owner worktree** that exclusively handles those files; other worktrees produce hand-off artifacts only.
 
 ## Development Workflow
 
-1. **Issue Analysis**: Feed issues to the orchestrator via GitHub MCP or
-   copy-paste. For defect reports, the orchestrator may run an "ours vs.
-   upstream" triage via `docs-researcher` before deciding the workflow path.
-2. **Product Planning**: The product-manager creates a spec, user stories,
-   and acceptance criteria using `.claude/templates/spec-template.md`.
-3. **Research & Reuse**: Search GitHub, package registries, and docs before
-   writing new code. When the result will inform a decision (architecture,
-   library selection, API usage, version pin), apply an independent
-   verification pass — separate Generator (research) and Critic (review)
-   roles, with the Critic using a different tool family and primary-source-
-   only citation. Forks adopting this discipline at scale can opt in via
-   external GAN protocols or by writing their own verification rules.
-4. **Architecture**: The architect designs the solution; significant
-   decisions are recorded as ADRs using `.claude/templates/adr-template.md`.
-5. **Implementation**: The implementer writes code following TDD (RED →
-   GREEN → IMPROVE). When the implementation is a workaround for an upstream
-   defect, the implementer places a `WORKAROUND-UPSTREAM(<owner>/<repo>#<issue>, fixed=>=<version>)`
-   marker and copies `.claude/templates/workaround-template.md` to
-   `workarounds/NNN-*.md` (or any equivalent directory the fork chooses).
-6. **Quality Gate**: The code-reviewer (delegates language depth to the
-   matching ECC `<lang>-reviewer` if available), linter, security-reviewer,
-   and performance-engineer validate the implementation.
-   - **6a. Compliance check (opt-in)**: Forks subject to jurisdictional
-     compliance (chat, payments, PII collection, data egress) should run a
-     jurisdiction-specific checklist with primary-source citations. The
-     checklist must include a disclaimer and never auto-mark items as
-     "complied with" — only human reviewers can.
-7. **Documentation**: The technical-writer updates docs and changelog. When
-   a workaround is removed, the technical-writer maps `user_impact` to the
-   appropriate CHANGELOG category (`internal` / `changed` / `fixed`).
-8. **Release**: The devops-engineer manages deployment and release.
-9. **Commit**: Conventional commits format (feat, fix, refactor, docs, test,
-   chore, perf, ci).
+1. **Issue Analysis**: Feed issues to the orchestrator via GitHub MCP or copy-paste. For defect reports, the orchestrator runs the **ours vs. upstream triage** (3-step protocol via docs-researcher) before deciding the workflow path
+2. **Product Planning**: The product-manager creates a spec, user stories, and acceptance criteria using `.claude/templates/spec-template.md`
+3. **Research & Reuse**: Search GitHub, package registries, and docs before writing new code. When the result will inform a decision (architecture, library selection, API usage, version pin), invoke the **verification-layer** Skill — research domain (`.claude/skills/verification-layer/research/protocol.md`; shared invariants in `.claude/skills/verification-layer/SKILL.md`). The `docs-researcher` (Generator) declares a Tier and the `research-critic` (Critic) reviews using a different tool family with primary-source-only citation. Default config in `.claude/verification.yml`; opt out via `research.enabled: false`. The same Skill also covers the **implementation** and **design** domains (default-off; opt in per domain).
+4. **Architecture**: The architect designs the solution; significant decisions are recorded as ADRs using `.claude/templates/adr-template.md`
+5. **Implementation**: The implementer writes code following TDD (RED → GREEN → IMPROVE). When the implementation is a workaround for an upstream defect, the implementer also places a `WORKAROUND-UPSTREAM(<owner>/<repo>#<issue>, fixed=>=<version>)` marker and copies `.claude/templates/workaround-template.md` to `workarounds/NNN-*.md` (the default `registry_dir`; or `docs/workarounds/NNN-*.md` if you keep a `docs/` tree — match `registry_dir` in `.github/workaround-tracker.yml`)
+6. **Quality Gate**: The code-reviewer (delegates language depth to the matching ECC `<lang>-reviewer`, owns template cross-cutting checks), linter, security-reviewer, and performance-engineer validate the implementation
+   - **6a. Compliance check (opt-in)**: When `.claude/compliance.yml` has `compliance.enabled: true` and a non-empty `target_jurisdictions`, the **compliance-checklist** Skill (`.claude/skills/compliance-checklist/SKILL.md`, default-off) is invoked by `product-manager` / `security-reviewer` / `technical-writer` for capabilities that may have legal exposure (chat, payments, PII collection, data egress). The Skill produces a checklist with primary-source citations and a mandatory disclaimer; it never marks items as "complied with" — only the human reviewer can
+7. **Documentation**: The technical-writer updates docs and changelog. When a workaround is removed, the technical-writer maps `user_impact` to the appropriate CHANGELOG category (`internal` / `changed` / `fixed`)
+8. **Release**: The devops-engineer manages deployment and release
+9. **Commit**: Conventional commits format (feat, fix, refactor, docs, test, chore, perf, ci)
+
+When an `◐ in-progress` milestone crosses a session or compaction boundary, its in-flight workflow state persists to `specs/NN-progress.md` (`NN` = the Roadmap row number) — created/updated by `product-manager`/`implementer` at the boundary, read by `orchestrator` at the Analyze step, deleted on the `◐ → ☑`/`✗` flip, and composable with (not a replacement for) `/save-session`.
+
+### Ref-allow expiry review cadence
+
+ref-allow markers in fork artifacts may carry an optional `| expires:
+YYYY-MM-DD` clause. Expired markers produce a WARN (not FAIL) from
+`.claude/meta/scripts/check-ref-allow-expiry.sh`. Fork maintainers
+review markers authored in their derived repositories; the
+`technical-writer` removes markers that have become over-suppressions
+(i.e., the referenced artifact now exists on disk) as part of step 7
+documentation work for each milestone.
+
+### Upstream workaround lifecycle
+
+When a defect is traced to an upstream library or framework, follow
+the lifecycle: triage → search → record → track → remove. See
+`.claude/meta/references/upstream-workaround-tracking.md` for the
+day-to-day usage details. The CI scaffold lives at
+`.github/workflows/workaround-check.yml` and ships **default-off**.
+Activate by setting `enabled: true` in `.github/workaround-tracker.yml`.
+The `annotate_dependabot_prs` and `fail_on_marker_drift` overlays
+remain `false` by default.
 
 ## Testing Requirements
 
@@ -133,14 +217,14 @@ this discipline.
 Derived projects should:
 
 1. Replace the "About This Project" section with project-specific context.
-   The fastest way is to run `.claude/meta/scripts/init.sh` once after
-   forking; it interactively replaces the placeholder. Manual editing is
-   fine too.
+   The fastest way is to run `.claude/meta/scripts/init.sh` once after forking;
+   it interactively replaces the placeholder. Manual editing is fine too.
 2. Add framework-specific architecture details (e.g., state management, routing).
 3. Add framework-specific testing tools (e.g., Jest, pytest, go test).
 4. Add framework-specific code style rules (e.g., Biome, Ruff, gofmt).
 5. Keep the universal sections (workflow, testing requirements, code quality).
-6. Add your own CI workflows under `.github/workflows/` (this template ships
-   the folder empty by design — fork CI is opt-in). The `develop` branch of
-   the upstream template carries reference workflows you can copy as a
-   starting point.
+6. Fill the Roadmap section as you plan milestones; let `product-manager` own row creation.
+7. To activate CodeQL scanning, create a repository variable `CODEQL_ENABLED=true` in GitHub Settings > Secrets and variables > Actions > Variables tab; absent or any other value keeps the job skipped.
+8. If you do not plan to use Developer Learning Mode, delete `.claude/meta/`,
+   `.github/workflows/learn-invariants.yml`, and the
+   `## Developer Learning Mode` section above.

@@ -28,8 +28,6 @@
 #     should be ready for it.
 #   - Knowledge files reveal the team's mistakes over time. Psychological safety
 #     matters.
-# See ADR-027 for the design rationale of integrating this opt-in block into
-# .gitignore (it lived in a separate .gitignore.example file before 2026-05-21).
 # ─────────────────────────────────────────────────────────────────────────────
 
 # ─────────────────────────────────────────────────────────────

@@ -1,0 +1,113 @@
+name: Coverage Gate
+
+# Language-agnostic CI scaffold enforcing the canonical "Minimum NN% test
+# coverage" rule as a HARD build-failing check (milestone #12). The
+# authoritative scope is specs/12-coverage-ci-gate.md (the eight
+# acceptance criteria, R-01–R-04); the structural decisions are
+# .claude/meta/adr/019-coverage-ci-gate.md (Decisions 1–5).
+#
+# STRUCTURAL FORM (ADR-019 Decision 1): this is a STANDALONE forkable
+# workflow exposing a `workflow_call` interface, authored ALONGSIDE —
+# NOT as a modification of — .github/workflows/ci-base.yml. ci-base.yml
+# owns the contract "run the derived repo's test-command" with NO
+# threshold; this workflow owns a DIFFERENT contract "is the resulting
+# coverage at or above the canonical threshold?". Two contracts, two
+# files, two owners. ci-base.yml is byte-unchanged (Spec
+# Key-interaction 1 / hard constraint 4).
+#
+# ACTIVATION POSTURE (ADR-019 Decision 2): DEFAULT-OFF behind a SINGLE
+# switch — `enabled: true` in .github/coverage-tracker.yml — the
+# workaround-check.yml precedent. The job's `if:` reads that flag and
+# short-circuits otherwise. There is NO second `if: false` guard, NO
+# second config key, NO repository variable. The template repository has
+# no application code and no coverage to measure (Spec R-03 / AC-5);
+# with the switch off the job does not run against the template at all,
+# so the template's own CI is green-by-construction with NO inert-branch
+# special case and NO ref-allow-style suppression. A derived repo opts
+# in with exactly one change.
+#
+# SINGLE SOURCE OF TRUTH (ADR-019 Decision 3): the threshold is NOT a
+# caller input and is NOT carried by coverage-tracker.yml. It is derived
+# at CI runtime by reading the canonical "- Minimum NN% test coverage"
+# line from .claude/CLAUDE.md `## Testing Requirements` via
+# .claude/meta/scripts/coverage-threshold.sh. A future threshold change
+# is a one-line edit to `## Testing Requirements` and nothing else; the
+# enforcement tracks it automatically. The extractor fails CLOSED with
+# an explicit message if the canonical line is absent.
+#
+# LANGUAGE-AGNOSTIC FORKABILITY (ADR-019 Decision 4): the caller runs
+# its own language-specific coverage tool, computes a single
+# project-level percentage by whatever means is native to its toolchain
+# (coverage.py, go tool cover, lcov, JaCoCo, llvm-cov, …), and passes
+# that NUMBER in as the single required `workflow_call` input. The
+# template parses NO coverage report format and performs one numeric
+# comparison. Mirrors ci-base.yml's `workflow_call` input pattern.
+#
+# SECURITY: this is a reusable `workflow_call` callee only — it has no
+# `pull_request`/`pull_request_target` trigger and never checks out
+# untrusted PR head code; the calling workflow owns the trigger and
+# decides what to pass. `permissions: contents: read` (least privilege,
+# the roadmap-drift-check.yml precedent). The caller-supplied coverage
+# percentage is passed to the script via an environment variable, never
+# interpolated into a shell command, so a hostile input string cannot
+# be executed (no `${{ inputs.* }}` in a `run:` body).
+
+on:
+  workflow_call:
+    inputs:
+      coverage-percentage:
+        description: >-
+          The derived repository's already-computed project-level test
+          coverage percentage (a number, e.g. 87 or 87.4). The caller
+          computes this with its own toolchain; this workflow parses no
+          coverage report format (ADR-019 Decision 4). The threshold is
+          NOT a caller input — it comes from the canonical source
+          (ADR-019 Decision 3) so a caller cannot weaken the gate.
+        required: true
+        type: string
+
+jobs:
+  coverage-gate:
+    name: Coverage gate (fails when coverage is below the canonical minimum)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Read coverage-gate activation switch
+        id: cfg
+        shell: bash
+        run: |
+          set -euo pipefail
+          CFG=".github/coverage-tracker.yml"
+          if [ ! -f "$CFG" ]; then
+            echo "Coverage-tracker config missing; coverage gate inactive."
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Single switch (ADR-019 Decision 2): a lone `enabled:` boolean.
+          # Parsed without yq to keep the scaffold dependency-free; the
+          # config shape is a single top-level key by design.
+          enabled="$(grep -E '^[[:space:]]*enabled:[[:space:]]*(true|false)' "$CFG" \
+            | head -n1 \
+            | sed -E 's/^[[:space:]]*enabled:[[:space:]]*([a-z]+).*/\1/')"
+          echo "enabled=${enabled:-false}" >> "$GITHUB_OUTPUT"
+
+      - name: Enforce coverage threshold (hard build-failing check)
+        if: steps.cfg.outputs.enabled == 'true'
+        shell: bash
+        env:
+          # Caller-supplied measurement passed via env, never interpolated
+          # into the run: body (injection-safe). The expression is evaluated
+          # in the YAML layer into this env var; the run: step then passes
+          # it as the double-quoted shell variable "$MEASURED_COVERAGE", so
+          # a hostile input string is data, never a command.
+          MEASURED_COVERAGE: ${{ inputs.coverage-percentage }}
+        run: |
+          set -euo pipefail
+          bash .claude/meta/scripts/coverage-threshold.sh gate "$MEASURED_COVERAGE"
