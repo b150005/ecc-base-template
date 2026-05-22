@@ -42,7 +42,7 @@ When you receive a task:
    If you prefer otherwise, say so before I dispatch.
    ```
 
-   The block is mandatory regardless of task size (for single-file edits it is one line: "Mode: single-worktree. Reason: single-file change."). For `multi-worktree-N`, also name the designated **Roadmap-owner worktree** — the single worktree authorized to write to `.claude/CLAUDE.md`, `.claude/ROADMAP.md`, `CHANGELOG.md`, `specs/NN-progress.md`, and lockfiles. Full rubric and per-worktree dispatch templates in `.claude/meta/references/worktree-advisory.md`.
+   The block is mandatory regardless of task size (for single-file edits it is one line: "Mode: single-worktree. Reason: single-file change."). For `multi-worktree-N`, also name the designated **Roadmap-owner worktree** — the single worktree authorized to write to `.claude/CLAUDE.md`, `.claude/ROADMAP.md`, `CHANGELOG.md`, `specs/NN-progress.md`, and lockfiles.
 
    Then proceed to Assess Feasibility (step 2) and the existing dispatch flow unchanged — the worktree advisory adds a post-guard / pre-dispatch advisory; it does not alter any single-worktree path.
 2. **Assess Feasibility**: Evaluate whether the task is implementable within the current architecture. If unclear, delegate to the **architect** agent for assessment.
@@ -68,7 +68,7 @@ When you receive a task:
 
 ## Subagent dispatch contract
 
-Every `Agent` tool call this agent makes follows two layers (full rule in `.claude/CLAUDE.md` § Subagent dispatch contract; canonical reference with worked examples in `.claude/meta/references/dispatch-contract.md`).
+Every `Agent` tool call this agent makes follows two layers (full rule in `.claude/CLAUDE.md` § Subagent dispatch contract).
 
 **Layer 1 — 5-slot prompt template.** Every dispatch prompt fits:
 
@@ -180,11 +180,9 @@ When a defect is reported, decide early whether the cause is in this repository 
    3. **Known-issues search** — check the upstream issue tracker
 2. If `docs-researcher` confirms upstream causation, escalate per these responsibilities:
    - **architect** decides whether to adopt the workaround (and whether it warrants a project ADR)
-   - **implementer** places the `WORKAROUND-UPSTREAM(<owner>/<repo>#<issue>, fixed=>=<version>)` marker and copies `.claude/templates/workaround-template.md` into the registry
-   - **technical-writer** maintains the registry entry and the CHANGELOG mapping when status flips to `resolved`
+   - **implementer** places the `WORKAROUND-UPSTREAM(<owner>/<repo>#<issue>, fixed=>=<version>)` marker and optionally records it under `workarounds/` using `.claude/templates/workaround-template.md`
+   - **technical-writer** maps `user_impact` to the CHANGELOG when the workaround is removed
 3. If the cause is in this repository, proceed with the normal feature/bug-fix flow (TDD via **test-runner** and **implementer**).
-
-See `.claude/meta/references/upstream-workaround-tracking.md` for the full protocol.
 
 ## Ecosystem Detection
 

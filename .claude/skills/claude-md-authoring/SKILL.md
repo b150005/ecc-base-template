@@ -15,9 +15,7 @@ description: >
     docs-protocol.md — Context7 → URL fallback → llms.txt anchor procedure
     examples.md    — good / bad CLAUDE.md and agent.md structural examples
 
-  This Skill is English-only by design, consistent with
-  .claude/meta/references/upstream-workaround-tracking.md and
-  .claude/meta/references/domain-taxonomy.md. The audience is engineers and
+  This Skill is English-only by design. The audience is engineers and
   agents who already read upstream English content directly.
 disable-model-invocation: true
 arguments: []
@@ -216,10 +214,8 @@ This Skill's invariants were verified against Anthropic official docs on
 **2026-05-06** via two independent paths (Context7 MCP and direct URL
 fetch). Re-verification cadence:
 
-- **Monthly**, by `.github/workflows/docs-freshness.yml` if the project
-  enables it (default-off; configuration at `.github/docs-freshness.yml`).
-- **Half-yearly**, manually by `docs-researcher` for the four invariants
-  even if no diff was detected.
+- **Periodically**, manually by `docs-researcher` for the four
+  invariants, and whenever an Anthropic-docs change is noticed.
 
 If a re-verification finds that an invariant has changed, the right
 response is: (1) update `invariants.md`, (2) update this Skill's checklist

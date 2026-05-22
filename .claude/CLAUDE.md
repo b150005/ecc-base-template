@@ -93,9 +93,8 @@ and the style file exists at `.claude/skills/learn/coach-styles/<style>.md`, loa
 and apply the `behavior-rule` for this turn.
 
 Toggled only via the `/learn` Skill. Use `/learn coach <style>` to set the coaching
-style; `/learn coach list` to see available styles. Domain definitions live in
-`.claude/meta/references/domain-taxonomy.md`. Background on the feature is at
-`.claude/meta/references/learning-mode-explained.md` (and its `.ja.md` sibling).
+style; `/learn coach list` to see available styles. The Skill at
+`.claude/skills/learn/` carries the enrichment protocol and domain definitions.
 
 ## Plan-First & Learning-Aware Defaults
 
@@ -132,7 +131,7 @@ after step-6 quality-gate pass); `architect` adds `adr:` links;
 
 ## Subagent dispatch contract
 
-All subagent dispatch (any `Agent` tool call from `orchestrator` or main Claude) follows a fixed 5-slot prompt template and a delegate-and-stop rule. Full protocol with worked before/after examples in `.claude/meta/references/dispatch-contract.md`. Applies to ALL parent→subagent dispatches, including verification-layer Generator/Critic routing.
+All subagent dispatch (any `Agent` tool call from `orchestrator` or main Claude) follows a fixed 5-slot prompt template and a delegate-and-stop rule. Applies to ALL parent→subagent dispatches, including verification-layer Generator/Critic routing.
 
 **5-slot prompt structure** (every dispatch prompt fits this shape):
 
@@ -146,7 +145,7 @@ All subagent dispatch (any `Agent` tool call from `orchestrator` or main Claude)
 
 ## Worktree advisory protocol
 
-Before dispatching any multi-step plan, `orchestrator` evaluates worktree-parallelism suitability and emits a `## Worktree Recommendation` block **ahead of** the implementation plan. Full rubric, per-worktree dispatch templates, and the SAFE / UNSAFE write-zone list in `.claude/meta/references/worktree-advisory.md`.
+Before dispatching any multi-step plan, `orchestrator` evaluates worktree-parallelism suitability and emits a `## Worktree Recommendation` block **ahead of** the implementation plan.
 
 **6-question suitability rubric** (answered in Analyze):
 
@@ -167,7 +166,7 @@ Yes on all 6 → recommend multi-worktree. No on any of 1–3 → single-worktre
 2. **Product Planning**: The product-manager creates a spec, user stories, and acceptance criteria using `.claude/templates/spec-template.md`
 3. **Research & Reuse**: Search GitHub, package registries, and docs before writing new code. When the result will inform a decision (architecture, library selection, API usage, version pin), invoke the **verification-layer** Skill — research domain (`.claude/skills/verification-layer/research/protocol.md`; shared invariants in `.claude/skills/verification-layer/SKILL.md`). The `docs-researcher` (Generator) declares a Tier and the `research-critic` (Critic) reviews using a different tool family with primary-source-only citation. Default config in `.claude/verification.yml`; opt out via `research.enabled: false`. The same Skill also covers the **implementation** and **design** domains (default-off; opt in per domain).
 4. **Architecture**: The architect designs the solution; significant decisions are recorded as ADRs using `.claude/templates/adr-template.md`
-5. **Implementation**: The implementer writes code following TDD (RED → GREEN → IMPROVE). When the implementation is a workaround for an upstream defect, the implementer also places a `WORKAROUND-UPSTREAM(<owner>/<repo>#<issue>, fixed=>=<version>)` marker and copies `.claude/templates/workaround-template.md` to `workarounds/NNN-*.md` (the default `registry_dir`; or `docs/workarounds/NNN-*.md` if you keep a `docs/` tree — match `registry_dir` in `.github/workaround-tracker.yml`)
+5. **Implementation**: The implementer writes code following TDD (RED → GREEN → IMPROVE). When the implementation is a workaround for an upstream defect, the implementer also places a `WORKAROUND-UPSTREAM(<owner>/<repo>#<issue>, fixed=>=<version>)` marker at each workaround site, and optionally records it under `workarounds/` using `.claude/templates/workaround-template.md`
 6. **Quality Gate**: The code-reviewer (delegates language depth to the matching ECC `<lang>-reviewer`, owns template cross-cutting checks), linter, security-reviewer, and performance-engineer validate the implementation
    - **6a. Compliance check (opt-in)**: When `.claude/compliance.yml` has `compliance.enabled: true` and a non-empty `target_jurisdictions`, the **compliance-checklist** Skill (`.claude/skills/compliance-checklist/SKILL.md`, default-off) is invoked by `product-manager` / `security-reviewer` / `technical-writer` for capabilities that may have legal exposure (chat, payments, PII collection, data egress). The Skill produces a checklist with primary-source citations and a mandatory disclaimer; it never marks items as "complied with" — only the human reviewer can
 7. **Documentation**: The technical-writer updates docs and changelog. When a workaround is removed, the technical-writer maps `user_impact` to the appropriate CHANGELOG category (`internal` / `changed` / `fixed`)
@@ -176,26 +175,15 @@ Yes on all 6 → recommend multi-worktree. No on any of 1–3 → single-worktre
 
 When an `◐ in-progress` milestone crosses a session or compaction boundary, its in-flight workflow state persists to `specs/NN-progress.md` (`NN` = the Roadmap row number) — created/updated by `product-manager`/`implementer` at the boundary, read by `orchestrator` at the Analyze step, deleted on the `◐ → ☑`/`✗` flip, and composable with (not a replacement for) `/save-session`.
 
-### Ref-allow expiry review cadence
-
-ref-allow markers in fork artifacts may carry an optional `| expires:
-YYYY-MM-DD` clause. Expired markers produce a WARN (not FAIL) from
-`.claude/meta/scripts/check-ref-allow-expiry.sh`. Fork maintainers
-review markers authored in their derived repositories; the
-`technical-writer` removes markers that have become over-suppressions
-(i.e., the referenced artifact now exists on disk) as part of step 7
-documentation work for each milestone.
-
 ### Upstream workaround lifecycle
 
-When a defect is traced to an upstream library or framework, follow
-the lifecycle: triage → search → record → track → remove. See
-`.claude/meta/references/upstream-workaround-tracking.md` for the
-day-to-day usage details. The CI scaffold lives at
-`.github/workflows/workaround-check.yml` and ships **default-off**.
-Activate by setting `enabled: true` in `.github/workaround-tracker.yml`.
-The `annotate_dependabot_prs` and `fail_on_marker_drift` overlays
-remain `false` by default.
+When a defect is traced to an upstream library or framework, the
+implementer places a `WORKAROUND-UPSTREAM(<owner>/<repo>#<issue>,
+fixed=>=<version>)` marker at each workaround site and optionally
+records it under `workarounds/` using
+`.claude/templates/workaround-template.md`. Remove the marker and the
+workaround once the upstream fix lands and the dependency is bumped
+past `<version>`.
 
 ## Testing Requirements
 
@@ -223,8 +211,12 @@ Derived projects should:
 3. Add framework-specific testing tools (e.g., Jest, pytest, go test).
 4. Add framework-specific code style rules (e.g., Biome, Ruff, gofmt).
 5. Keep the universal sections (workflow, testing requirements, code quality).
-6. Fill the Roadmap section as you plan milestones; let `product-manager` own row creation.
-7. To activate CodeQL scanning, create a repository variable `CODEQL_ENABLED=true` in GitHub Settings > Secrets and variables > Actions > Variables tab; absent or any other value keeps the job skipped.
-8. If you do not plan to use Developer Learning Mode, delete `.claude/meta/`,
-   `.github/workflows/learn-invariants.yml`, and the
+6. Create `.claude/ROADMAP.md` if you want the Roadmap mechanism; let
+   `product-manager` own row creation. Without it, the orchestrator skips
+   the Roadmap row-guard entirely.
+7. Add your own CI workflows under `.github/workflows/` — the template
+   ships none.
+8. If you do not plan to use Developer Learning Mode, delete
+   `.claude/skills/learn/`, `.claude/hooks/coaching-context.sh`,
+   `.claude/output-styles/ecc-learn.md`, and the
    `## Developer Learning Mode` section above.

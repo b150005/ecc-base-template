@@ -60,12 +60,9 @@ This template uses sibling filenames for bilingual docs:
 - `<filename>.ja.md` — Japanese translation in 敬体 (です・ます調).
 
 Both files live in the same directory; there is no `docs/en/` /
-`docs/ja/` split.
-
-Some references are **English-only by design** and do not have a `.ja.md`
-sibling — for example `.claude/meta/references/domain-taxonomy.md` and
-`.claude/meta/references/upstream-workaround-tracking.md`. When in doubt
-the document itself states its translation policy in a header note.
+`docs/ja/` split. Some documents may be English-only by design — when
+in doubt, the document itself states its translation policy in a
+header note.
 
 Claude reads English documentation only to minimize context window usage.
 
@@ -225,10 +222,8 @@ Keep a Changelog and would conflict with downstream tooling that
 consumes the file. If your project keeps an internal release log, that
 is where internal removals belong.
 
-Workaround registry entries are English-only by convention. Translate
-the README sections that mention the tracking feature, but do not
-translate `.claude/meta/references/upstream-workaround-tracking.md`
-or individual `workarounds/NNN-*.md` files.
+Workaround registry entries (`workarounds/NNN-*.md`) are English-only
+by convention — do not translate them.
 
 ## Developer Learning Mode contract
 

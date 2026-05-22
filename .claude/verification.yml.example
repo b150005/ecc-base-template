@@ -104,19 +104,14 @@ design:
 citation_discipline:
   enabled: true
 
-  # Paths to scan. The default list is the single source of truth at
-  # .claude/meta/citation-targets.txt — adding a new load-bearing
-  # document directory should be done there, not duplicated here. This
-  # `paths:` key only needs to be set when a derived project wants to
-  # OVERRIDE the default (e.g. add or remove specific directories for
-  # this project only). Leaving the key absent means "use the
-  # citation-targets.txt list."
+  # Paths to scan for citation discipline. Set this to the directories
+  # in your project that carry load-bearing references (ADRs, specs,
+  # knowledge files, workaround entries).
   #
-  # Example override (uncomment to use):
+  # Example (uncomment to use):
   # paths:
-  #   - .claude/learn/knowledge
-  #   - .claude/meta/adr
-  #   - .claude/meta/prd
+  #   - docs
+  #   - adr
   #   - workarounds            # if you keep a top-level workarounds/ tree
 
   # An inline escape hatch — a one-time allow comment placed adjacent

@@ -64,9 +64,7 @@ Quote the ECC agent's verdict in your final report.
 
 <!-- Standing posture: when ECC is absent the language-specific layer
      is degraded (template cross-cutting checks only). See README.md
-     ## Prerequisites for the full standing posture. To detect
-     delegation-table drift, run:
-       bash .claude/meta/scripts/check-ecc-delegation-consistency.sh -->
+     ## Prerequisites for the full standing posture. -->
 
 **Delegation outcome — three cases the agent must distinguish:**
 
@@ -137,27 +135,17 @@ this checklist.
 
 #### Upstream workaround marker review
 
-When the diff contains a `WORKAROUND-UPSTREAM(...)` marker, verify all
-of the following:
+When the diff contains a `WORKAROUND-UPSTREAM(...)` marker, verify:
 
-- The marker matches the strict format
-  `WORKAROUND-UPSTREAM(<owner>/<repo>#<issue>, fixed=>=<version>)`.
-  Loose forms (`WORKAROUND-UPSTREAM(...)` without owner, missing
-  `fixed=>=`) are CRITICAL because the CI cross-reference grep will
-  reject them.
-- A registry entry exists at the configured `registry_dir` (see
-  `.github/workaround-tracker.yml`) and its `upstream.issue_url`
-  resolves to the same `<owner>/<repo>#<issue>`.
-- The entry's `affected_versions` is a well-formed semver range and
-  `security_impact` is one of `none` / `low` / `medium` / `high`.
-- The entry's `upstream.package` matches the allowlist
-  `[A-Za-z0-9@/_.+:-]+`. Out-of-band characters cause the CI to skip
-  the entry silently.
-- The body's `Verification steps` is concrete enough that a future
-  reader can run them without reconstructing context.
+- The marker matches the format
+  `WORKAROUND-UPSTREAM(<owner>/<repo>#<issue>, fixed=>=<version>)` —
+  owner/repo present, `fixed=>=` version present.
+- If the project keeps a `workarounds/` registry, a matching entry
+  exists with a well-formed `affected_versions` semver range.
+- The verification steps are concrete enough that a future reader can
+  run them without reconstructing context.
 
-Treat missing markers, missing entries, or malformed front-matter as
-HIGH or CRITICAL depending on whether they would slip past CI.
+Treat a malformed marker as HIGH.
 
 #### Verification-layer hand-off
 

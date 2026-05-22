@@ -23,9 +23,8 @@ description: >
     design/checklist.md        — Critic checklist for ADR review
     design/failure-modes.md    — typical design-error patterns
 
-  This Skill is English-only by design, consistent with
-  .claude/meta/references/upstream-workaround-tracking.md and the
-  claude-md-authoring Skill (ADR-007).
+  This Skill is English-only by design, consistent with the
+  claude-md-authoring Skill.
 disable-model-invocation: true
 arguments: []
 ---

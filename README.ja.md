@@ -107,25 +107,12 @@ orchestrator が product-manager (受け入れ基準) / architect (モジュー�
 
 ## CI
 
-本テンプレートは `.github/workflows/` に一連の GitHub Actions ワーク
-フローを同梱しています。大半は **デフォルト無効** (config トグルで
-opt-in。`.github/` 配下の tracker yaml は `enabled: false` で出荷)
-なので、fork 直後は opt-in するまで静かなままです。内容:
-
-- `ci-base.yml` — build/test スカフォールド
-- `security.yml` — セキュリティスキャン (CodeQL は repo 変数で gate)
-- `coverage-gate.yml` — カバレッジ閾値 (`.github/coverage-tracker.yml`)
-- `bilingual-parity-check.yml` — EN/JA ドキュメント整合
-- `dangling-ref-check.yml` — 相互参照の整合性
-- `workaround-check.yml` — upstream-workaround tracking (`.github/workaround-tracker.yml`)
-- `learn-invariants.yml`、`skill-invariants.yml`、
-  `research-tier-auth-check.yml`、`roadmap-drift-check.yml`、
-  `ecc-delegation-consistency-check.yml`、`docs-freshness.yml` —
-  オプションの Learning Mode / verification-layer / Roadmap / Skill
-  機能のガード
-
-不要なワークフローは削除するか、config トグルを無効のままにしてくだ
-さい。独自のワークフローを併設しても構いません。
+本テンプレートは GitHub Actions ワークフローを **同梱しません** —
+`.github/workflows/` には `.gitkeep` のみがあります。CI はプロジェクト
+ごとの選択です。準備ができたら、スタックに合わせたワークフロー (build、
+test、lint、coverage、security scan) を追加してください。`dependabot.yml`
+は `github-actions` の更新を有効にして同梱しています — 言語エコシステム
+を追記して拡張してください。
 
 ---
 

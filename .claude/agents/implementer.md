@@ -88,14 +88,12 @@ do two things in the same change:
    `WORKAROUND-UPSTREAM(<owner>/<repo>#<issue>, fixed=>=<version>)`.
    The `<owner>` and `<repo>` come from the upstream issue URL; the
    version is the expected upstream fix.
-2. Copy `.claude/templates/workaround-template.md` to the registry
-   directory configured in `.github/workaround-tracker.yml` (default
-   `workarounds/`) as `NNN-kebab-slug.md`. Fill the YAML front-matter
-   exactly as required by the template — no code fence around the
-   front-matter; the CI YAML parser reads it directly.
+2. Optionally record it under `workarounds/` using
+   `.claude/templates/workaround-template.md` (as `NNN-kebab-slug.md`)
+   if the project keeps a workaround registry.
 
-Both artifacts are required. CI cross-references the marker against
-the registry entry; either alone is treated as drift.
+Remove the marker (and the workaround code) once the upstream fix
+lands and the dependency is bumped past `<version>`.
 
 ## Milestone progress record (update + retirement)
 

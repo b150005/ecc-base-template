@@ -2,13 +2,10 @@
 
 ## How to use this template
 
-1. Decide where your workaround registry lives. The path you pick must
-   match `registry_dir` in `.github/workaround-tracker.yml`. Common
-   choices:
-   - `workarounds/NNN-short-slug.md` at the repo root (matches the
-     default `registry_dir: workarounds`)
+1. Decide where your workaround registry lives. Common choices:
+   - `workarounds/NNN-short-slug.md` at the repo root
    - `docs/workarounds/NNN-short-slug.md` if you already have a `docs/`
-     tree (set `registry_dir: docs/workarounds` in the config)
+     tree
 2. Copy this file into that directory and rename it to
    `NNN-kebab-case-slug.md`. Numbering starts at `001` and is
    zero-padded.

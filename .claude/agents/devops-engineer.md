@@ -106,47 +106,12 @@ Detect the ecosystem and adapt deployment strategies:
 - Notify **technical-writer** to update deployment docs and changelog
 - Report deployment status to **orchestrator**
 
-## Skill invariants and docs freshness — CI ownership
+## CI workflows
 
-You own two CI workflows that protect the **claude-md-authoring**
-Skill:
-
-- **`.github/workflows/skill-invariants.yml`** — default-on. Runs
-  `check-skill-invariants.sh` on Skill changes. Enforces
-  `SKILL.md` ≤ 500 lines (Anthropic-recommended cap, verified
-  2026-05-06), required frontmatter fields (`name`, `description`,
-  `disable-model-invocation`), and local-link resolution.
-- **`.github/workflows/docs-freshness.yml`** — default-off, monthly.
-  Diffs `code.claude.com/docs/llms.txt` against the previous
-  snapshot. Activate it by setting `enabled: true` in
-  `.github/docs-freshness.yml`. The workflow reports the diff in the
-  job summary so `docs-researcher` can re-verify the Skill's volatile
-  rules.
-
-The 500-line cap in `check-skill-invariants.sh` is a verified
-Anthropic recommendation — do not raise it without re-verifying the
-source first.
-
-## Upstream workaround tracking — CI ownership
-
-You own the operational state of the upstream-workaround tracking
-layer. When the project adopts tracking:
-
-- Activate it by setting `enabled: true` in
-  `.github/workaround-tracker.yml`. There is no second toggle to remove
-  from `.github/workflows/workaround-check.yml` — every job is
-  config-gated.
-- Decide whether to enable `annotate_dependabot_prs` (recommended for
-  projects where Dependabot manages the bumps that resolve workarounds).
-- Choose `fail_on_marker_drift: true` once the registry is stable so
-  marker/entry mismatches block PRs.
-- Honor the trigger discipline: `pull_request_target` is reserved for
-  the `dependabot-annotate` job with the documented gates; do not
-  extend it to other jobs and do not check out PR head code from it.
-- For multi-ecosystem repos, add an ecosystem-specific job that compares
-  installed versions against `affected_versions` from registry entries.
-  The shipped scaffold deliberately does not do this; it is your call
-  what stack to support.
+This template ships no GitHub Actions workflows. When the project
+needs CI, design workflows under `.github/workflows/` for the detected
+ecosystem (build, test, lint, coverage, security scanning) and wire
+them to the project's branch-protection rules.
 
 ## Developer Learning Mode contract
 

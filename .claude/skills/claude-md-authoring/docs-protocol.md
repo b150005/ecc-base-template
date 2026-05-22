@@ -116,7 +116,6 @@ protocol should run before the next authoring session:
 
 - A new `claude-code` minor or major release in the changelog (Claude
   Code releases sometimes adjust thresholds).
-- A `docs-freshness.yml` workflow run (default-off, monthly) that
-  reports a non-empty `llms.txt` diff.
+- A noticed change in Anthropic's published `llms.txt` / docs.
 - A community report or upstream issue citing a different number than
   what `invariants.md` records.

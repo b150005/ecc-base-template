@@ -110,25 +110,11 @@ quality agents for review — you steer the hand-offs.
 
 ## CI
 
-This template ships a set of GitHub Actions workflows under
-`.github/workflows/`. Most are **default-off** behind a config toggle
-(the tracker yamls under `.github/` ship `enabled: false`), so a fresh
-fork stays quiet until you opt in. They cover:
-
-- `ci-base.yml` — build/test scaffold
-- `security.yml` — security scanning (CodeQL gated by a repo variable)
-- `coverage-gate.yml` — coverage threshold (`.github/coverage-tracker.yml`)
-- `bilingual-parity-check.yml` — EN/JA doc parity
-- `dangling-ref-check.yml` — cross-reference integrity
-- `workaround-check.yml` — upstream-workaround tracking (`.github/workaround-tracker.yml`)
-- `learn-invariants.yml`, `skill-invariants.yml`,
-  `research-tier-auth-check.yml`, `roadmap-drift-check.yml`,
-  `ecc-delegation-consistency-check.yml`, `docs-freshness.yml` — guards
-  for the optional Learning Mode / verification-layer / Roadmap / Skill
-  features
-
-Delete any workflow you don't want, or leave its config toggle off.
-Write your own alongside them.
+This template ships **no** GitHub Actions workflows — `.github/workflows/`
+contains only a `.gitkeep`. CI is a per-project choice; add workflows
+sized to your stack (build, test, lint, coverage, security scanning)
+when you are ready. `dependabot.yml` is included with `github-actions`
+updates enabled — extend it with your language ecosystem.
 
 ---
 

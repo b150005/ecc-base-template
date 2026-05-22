@@ -62,9 +62,7 @@ upstream bug?", apply these additional rules:
 ## Triage protocol — ours vs. upstream
 
 When the orchestrator delegates a "is this our bug or upstream's?"
-question, run all three steps before answering. See
-`.claude/meta/references/upstream-workaround-tracking.md` for usage
-details.
+question, run all three steps before answering.
 
 1. **Minimal reproduction** — reduce to a script that exhibits the symptom
    with no project-specific code. If the symptom disappears, the cause is
@@ -97,10 +95,10 @@ chain:
 3. `https://code.claude.com/docs/llms.txt` as the recovery anchor
 
 The Skill's invariants in `invariants.md` are also your re-verification
-target. When `docs-freshness.yml` (default-off, monthly) reports a
-non-empty diff, run through every invariant and either bump the "Last
-verified" date in `invariants.md` (if unchanged) or update the rule
-text and notify `architect` (if changed).
+target. When you re-verify (e.g. on an Anthropic-docs change), run
+through every invariant and either bump the "Last verified" date in
+`invariants.md` (if unchanged) or update the rule text and notify
+`architect` (if changed).
 
 When citing a volatile value inline in `CLAUDE.md` or another project
 document, append a verification date and source URL in the same
