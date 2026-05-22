@@ -80,9 +80,8 @@ description. The present subsection is the *written, independently-checkable*
 statement of the same obligation — it is enforceable as a written contract even
 when the guardrail's topic-keyword scan does not fire (because the topic
 description omitted the keyword while the content is still auth-touching).
-The detector `check-research-tier-auth.sh` enforces this rule by
-scanning verification-review artifact *content*, not only topic lines — exactly
-closing the gap the guardrail alone leaves open.
+The Critic verifies this by scanning the verification-review artifact's
+*content*, not only its topic lines.
 
 ## Protocol (T1 / T2)
 

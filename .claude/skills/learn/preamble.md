@@ -57,8 +57,8 @@ against the target domain file.
 ### Step 1: Identify the target domain
 
 Map the teaching moment to a domain key the agent owns (see the `## Learning Domains`
-section at the top of this agent's prompt body). Domain key definitions are in
-`.claude/meta/references/domain-taxonomy.md`.
+section at the top of this agent's prompt body), which is the authoritative
+list of the domains that agent contributes to.
 
 If the teaching moment spans two domains, pick the one where the concept is most
 foundational. Place the primary explanation there. In the secondary domain file, write a
@@ -428,7 +428,8 @@ contributing-agents: []
 # <Title-Cased Key>
 
 This is a custom domain opened by the learner. It covers concepts that do not fit
-cleanly into the 19 canonical domains defined in .claude/meta/references/domain-taxonomy.md.
+cleanly into the canonical domains (each agent declares its own in its
+`## Learning Domains` section).
 
 Agents contribute here only when their Learning Domains section includes this key.
 The enrichment protocol is defined in .claude/skills/learn/preamble.md.
@@ -453,10 +454,7 @@ These prohibitions apply unconditionally at every level and for every domain.
 ### No pedagogical content in code or artifacts
 
 Do not modify code comments, inline documentation, generated artifacts, or any file
-outside `.claude/learn/knowledge/` to add pedagogical content. Additionally, do not
-read, cite, or write under `.claude/meta/references/examples/` (which holds both `*.md`
-and `*.ja.md` worked examples) — these are read-only references for forkers, not part
-of the live learner surface.
+outside `.claude/learn/knowledge/` to add pedagogical content.
 If a teaching moment belongs in a code comment, put it in the domain knowledge file and
 cross-reference it from the diff report. The production code files are not the knowledge base.
 
@@ -650,13 +648,9 @@ cost of eventual consistency").
 - **Config:** `.claude/learn/config.json` — state file read at session start.
 - **Toggle Skill:** `.claude/skills/learn/SKILL.md` — the only surface through which
   config is written.
-- **Domain files:** `.claude/learn/knowledge/<domain>.md` — 19 canonical domains plus any
+- **Domain files:** `.claude/learn/knowledge/<domain>.md` — one file per domain an
+  agent contributes to (see each agent's `## Learning Domains` section), plus any
   learner-opened custom domains; files are lazy-materialized on first teaching moment.
-- **Domain taxonomy (authoritative):** `.claude/meta/references/domain-taxonomy.md` — canonical
-  definitions, scope boundaries, and per-agent ownership matrix.
-- **Worked examples (read-only references):** `.claude/meta/references/examples/<domain>.md` —
-  realistic populated knowledge files from a shared fictional project (Meridian),
-  one file per canonical domain. Agents never read, cite, or write under this tree.
 - **CLAUDE.md pointer:** `.claude/CLAUDE.md` — the `## Developer Learning Mode` block that
   agents discover on session start.
 - **Coach style files:** `.claude/skills/learn/coach-styles/<style>.md` — one file per style;
@@ -839,9 +833,9 @@ Field semantics:
   body..."). This field is the enforcement surface; its content must be unambiguous.
 - `stop-markers` — a list of HTML comment strings the agent emits to delimit the coaching
   output. Empty list for `default` and `silent`, which have no coaching output to terminate.
-  Stop markers are grep-able assertions that the style ran. CI check 5 (in
-  `.claude/meta/scripts/check-learn-invariants.sh`) verifies that each canonical file has a `behavior-rule:`
-  key; stop markers are verified by checking agent responses rather than by CI.
+  Stop markers are grep-able assertions that the style ran. Each canonical
+  coach-style file must carry a `behavior-rule:` key; stop markers are
+  verified by checking agent responses.
 
 Style files are loaded at guard time, not at session start. The agent reads the style file
 only when the active style is non-`default` and the file exists. This keeps session-start

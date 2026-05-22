@@ -373,7 +373,8 @@ contributing-agents: []
 # <Title-Cased Key>
 
 This is a custom domain opened by the learner. It covers concepts that do not fit
-cleanly into the 19 canonical domains defined in .claude/meta/references/domain-taxonomy.md.
+cleanly into the canonical domains (each agent declares its own in its
+`## Learning Domains` section).
 
 Agents contribute here only when their learning_domains declaration includes this key.
 The enrichment protocol is defined in .claude/skills/learn/preamble.md.
@@ -475,7 +476,6 @@ Usage:
 
 Learning Mode state: .claude/learn/config.json
 Enrichment protocol: .claude/skills/learn/preamble.md
-Domain taxonomy: .claude/meta/references/domain-taxonomy.md
 ```
 
 Unknown subcommands do not halt the session. They print the usage message and return.
@@ -714,7 +714,5 @@ override it.
 Cross-references:
 
 - Enrichment contract: `.claude/skills/learn/preamble.md`
-- Domain taxonomy (authoritative list of 19 canonical domains): `.claude/meta/references/domain-taxonomy.md`
-- Feature overview: `.claude/meta/references/learning-mode-explained.md`
 - Coach style files: `.claude/skills/learn/coach-styles/<style>.md`
 - Per-agent domain ownership: each agent's `## Learning Domains` section in `.claude/agents/`

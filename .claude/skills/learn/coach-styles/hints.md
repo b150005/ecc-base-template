@@ -85,8 +85,8 @@ Rationale: The method is read-only and takes a scalar key, which is the canonica
 
 ## Stop marker semantics
 
-`<!-- coach:hints stop -->` is a grep-able assertion that the style ran correctly. The CI
-check `check-learn-invariants.sh` can assert its presence in hints-mode responses. If the
+`<!-- coach:hints stop -->` is a grep-able assertion that the style ran correctly. A
+reviewer (or a project's own check) can assert its presence in hints-mode responses. If the
 marker is absent, the style rule was not applied. The marker appears after the hint block
 and before any trailing `## Learning:` sections (which the knowledge pillar may still emit
 if enabled).

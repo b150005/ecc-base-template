@@ -18,31 +18,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and the Roadmap index (`.claude/ROADMAP.md`) — is no longer shipped.
   These are template-internal records with no relevance to fork users;
   they remain in the upstream git history if a decision needs tracing.
-- **`.claude/payload-manifest.txt`** and
-  **`.github/workflows/payload-manifest-check.yml`** are removed — they
-  enforced the now-defunct main/develop payload boundary.
+- **`.claude/payload-manifest.txt`** and the payload-manifest-check
+  workflow are removed — they enforced the now-defunct main/develop
+  payload boundary.
+- **All GitHub Actions workflows are removed.** `.github/workflows/`
+  ships empty (only `.gitkeep`). The 12 template-internal workflows
+  (bilingual-parity, dangling-ref, skill-invariants, learn-invariants,
+  roadmap-drift, coverage-gate, ecc-delegation, research-tier-auth,
+  workaround-check, docs-freshness, ci-base, security) and their 5
+  `.github/*-tracker.yml` configs are gone. Forks add their own CI.
+- **`.claude/meta/` is removed entirely** — the reference docs
+  (`references/`) and helper scripts (`scripts/`) are deleted. The only
+  surviving script is `.claude/init.sh` (the one-shot post-fork
+  initializer), relocated from `.claude/meta/scripts/init.sh`.
 
 ### Changed
 
-- **`.claude/init.sh`** moved from `.claude/meta/scripts/init.sh`. The
-  payload-manifest-check removal prompt and the upstream-`develop`
-  reference workflow note are gone from its Next-steps checklist.
-- **`README.md` / `README.ja.md`** rewritten: the two-branch "Forking"
-  section becomes a single-branch "Using this template" note; the CI
-  section now documents the bundled workflows instead of pointing at
-  `develop`.
-- **`.claude/CLAUDE.md` and `.claude/agents/*.md`** keep all
-  fork-facing features (Roadmap mechanism, Learning Mode, verification
-  layer, dispatch contract, worktree advisory, upstream-workaround
-  tracking) but drop dead references to the deleted ADR/Spec history.
+- **`.claude/init.sh`** drops the payload-manifest-check removal prompt
+  and the upstream-`develop` reference note from its Next-steps checklist.
+- **`README.md` / `README.ja.md`** rewritten: single-branch "Using this
+  template"; the CI section states the template ships no workflows.
+- **`.claude/CLAUDE.md` and `.claude/agents/*.md`** keep all fork-facing
+  features (Roadmap mechanism, Learning Mode, verification layer,
+  dispatch contract, worktree advisory, upstream-workaround marker
+  convention) as inline rules, but drop dead references to the deleted
+  ADR/Spec history, references, scripts, and workflows.
+- **Learning Mode runs in a lighter form**: the `learn` Skill keeps the
+  enrichment contract and coaching styles, but the deleted
+  `domain-taxonomy.md` and worked-`examples/` are no longer referenced —
+  each agent's `## Learning Domains` section is the authoritative
+  domain list.
 
-### Retained (fork-facing payload — unchanged in scope)
+### Retained (fork-facing payload)
 
 - All 18 agents, all 10 document templates, all skills
   (`learn` / `verification-layer` / `claude-md-authoring` /
-  `compliance-checklist`), hooks, output styles, and the CI workflows.
-  Learning Mode and the Roadmap mechanism remain available as opt-in
-  features for fork users.
+  `compliance-checklist` / `quiet`), hooks, and output styles.
+  Learning Mode and the Roadmap mechanism remain opt-in features.
 
 ### Migration
 

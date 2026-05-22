@@ -115,9 +115,6 @@ finds that an invariant has shifted or been invalidated:
 - Coordinate with `technical-writer` to update
   `.claude/skills/claude-md-authoring/invariants.md` and the SKILL.md
   Invariant Core summary.
-- Coordinate with `devops-engineer` if the change affects what
-  `check-skill-invariants.sh` enforces (e.g., a new required
-  frontmatter field).
 
 ## Upstream workaround decisions
 
