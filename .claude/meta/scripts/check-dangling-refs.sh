@@ -192,6 +192,13 @@ is_reservation_link() {
 is_optin_absent_config() {
   local file="$1" lineno="$2" path="$3"
 
+  # Condition 0: .claude/ROADMAP.md is a known opt-in artifact the template
+  # does not ship. Forks create it to enable the Roadmap mechanism; until
+  # then, references to it are valid-by-design (not dangling).
+  if [ "$path" = ".claude/ROADMAP.md" ]; then
+    return 0
+  fi
+
   # Condition 1: .example sibling exists
   if [ -e "${path}.example" ]; then
     return 0
@@ -321,12 +328,13 @@ check_path_refs_in_file() {
     fi
 
     if [ ! -e "$path" ]; then
-      # Class B: opt-in/default-off absent .claude/ config WARN carve-out
-      # (ADR-015 Amendment 2026-05-16). Only applies to .json/.yml/.yaml under
-      # .claude/ when co-located structural context signals "absence is valid".
-      case "$path" in .claude/*.json | .claude/*.yml | .claude/*.yaml)
+      # Class B: opt-in/default-off absent .claude/ artifact WARN carve-out.
+      # Applies to .json/.yml/.yaml config under .claude/ when co-located
+      # structural context signals "absence is valid", and to the opt-in
+      # .claude/ROADMAP.md (a feature-enabling file the template does not ship).
+      case "$path" in .claude/*.json | .claude/*.yml | .claude/*.yaml | .claude/ROADMAP.md)
         if is_optin_absent_config "$file" "$lineno" "$path"; then
-          warn "$file:$lineno: opt-in-config-absent (WARN not FAIL): $path — intentionally absent opt-in/default-off config (ADR-015 amendment)"
+          warn "$file:$lineno: opt-in-absent (WARN not FAIL): $path — intentionally absent opt-in/default-off artifact"
           continue
         fi
         ;;

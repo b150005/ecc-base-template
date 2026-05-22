@@ -269,10 +269,12 @@ echo "===================="
 summary_header
 
 if [ ! -f "$ROADMAP_MD" ]; then
-  fail_check "no $ROADMAP_MD — cannot check Roadmap drift"
+  # The Roadmap is an opt-in feature. A fork (or this template's own main)
+  # without .claude/ROADMAP.md has nothing to check — skip cleanly.
+  echo "  [SKIP] no $ROADMAP_MD — Roadmap is an opt-in feature; nothing to check"
   echo ""
-  echo "Roadmap drift checks: FAIL"
-  exit 1
+  echo "Roadmap drift checks: SKIP"
+  exit 0
 fi
 
 # Build the parsed row table once (rownum -> status, design cell).

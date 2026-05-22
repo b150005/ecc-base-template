@@ -66,10 +66,10 @@ directory (e.g. `adr/001-foo.md`), a bilingual fork split by language (e.g.
 `adr/en/001-foo.md`, `adr/ja/001-foo.md`), or a co-located pair under one
 directory (e.g. `adr/001-foo.md` + `adr/001-foo.ja.md`). The template imposes
 no layout on forks — only the templates themselves. A common pin worth
-adopting: put Specs under `specs/` and ADRs under `adr/` (or
-`.claude/meta/adr/`) at the repo root, three-digit zero-padded prefix on
-each filename; `product-manager` then authors a Spec at the row's reserved
-path and `architect` a new ADR alongside.
+adopting: put Specs under `specs/` and ADRs under `adr/` at the repo
+root, three-digit zero-padded prefix on each filename; `product-manager`
+then authors a Spec at the row's reserved path and `architect` a new
+ADR alongside.
 
 ## CLAUDE.md authoring guidance
 
@@ -217,7 +217,7 @@ remain `false` by default.
 Derived projects should:
 
 1. Replace the "About This Project" section with project-specific context.
-   The fastest way is to run `.claude/meta/scripts/init.sh` once after forking;
+   The fastest way is to run `.claude/init.sh` once after forking;
    it interactively replaces the placeholder. Manual editing is fine too.
 2. Add framework-specific architecture details (e.g., state management, routing).
 3. Add framework-specific testing tools (e.g., Jest, pytest, go test).
