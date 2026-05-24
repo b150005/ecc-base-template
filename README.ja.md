@@ -34,8 +34,8 @@ ECC が無くてもテンプレートは起動しますが、エージェント�
   ほか。全エージェントはエコシステム非依存で、言語・フレームワークを実行時に
   検出します。
 - **クリーンなルートディレクトリ。** fork 後はあなたがリポジトリルートを
-  完全に所有します — テンプレートは `docs/`、`scripts/`、`learn/`、ADR/Spec
-  番号などを予約しません。
+  完全に所有します — テンプレートは `docs/`、`scripts/`、ADR/Spec 番号
+  などを予約しません。
 - **ADR / プロダクト Spec 用ドキュメントテンプレート** が `.claude/templates/`
   に同梱。英語版 `*.md` と日本語版 `*.ja.md` の両方を提供します。プロジェクト
   の意思決定記録を置きたい場所にコピーして使用してください。
@@ -45,19 +45,14 @@ ECC が無くてもテンプレートは起動しますが、エージェント�
 
 ---
 
-## Forking について
+## このテンプレートの使い方
 
-本リポジトリは **2 ブランチモデル** を採用しています:
-
-- **`main`** — fork ペイロード。「Use this template」で新しいリポジトリに
-  コピーされる対象です: agent 定義、ドキュメントテンプレート、fork 向け設定、
-  初期化スクリプトのみ。テンプレート内部成果物は含まれません。
-- **`develop`** — テンプレート開発ブランチ。Spec、ADR、PRD、内部 CI
-  ワークフロー、テンプレート自身の Roadmap を保持。**fork 向けではありません。**
-
-fork (「Use this template」または `git clone`) すると `main` で作業を開始し、
-fork ペイロードのみを受け取ります。テンプレート内部成果物を手動で削除する
-必要はありません。
+本リポジトリ自体が fork ペイロードです: agent 定義、ドキュメント
+テンプレート、Skill、CI ワークフロー、fork 向け設定、初期化スクリプト。
+「Use this template」(または `git clone`) でこれら一式が新しいリポジトリ
+にコピーされます。テンプレート自身の設計履歴 (ADR、内部 Spec) は同梱
+されません — 過去の意思決定を辿る必要があれば upstream の git 履歴に
+残っています。
 
 ---
 
@@ -80,20 +75,17 @@ cd <your-repo>
 ### 3. 初期化スクリプトを実行
 
 ```sh
-.claude/meta/scripts/init.sh
+.claude/init.sh
 ```
 
 プロジェクト名、1 行説明、技術スタックを尋ねた後、`.claude/CLAUDE.md` の
 `## About This Project` プレースホルダを置換し、`.env.example` を `.env`
-にコピーします。テンプレート内部の `payload-manifest-check.yml`
-ワークフローの削除も対話的に提案されます(デフォルトは残す。どちらでも
-安全 — このワークフローは upstream テンプレートリポジトリでのみ動くよう
-ガードされています)。再実行は安全です。
+にコピーします。再実行は安全です。
 
 非対話形式:
 
 ```sh
-.claude/meta/scripts/init.sh \
+.claude/init.sh \
   --project-name "TaskFlow" \
   --description "Team task management API" \
   --stack "Go / Gin / PostgreSQL"
@@ -115,36 +107,12 @@ orchestrator が product-manager (受け入れ基準) / architect (モジュー�
 
 ## CI
 
-本テンプレートは **`main` 上に fork 向け GitHub Actions ワークフローを
-含めません** (設計上の意図的判断)。`.github/workflows/` フォルダは
-`.gitkeep` で保持されており、ここに CI を追加できることを忘れないため
-の仕組みです。
-
-GitHub ワークフローは fork ごとの選択です — プロジェクトによって必要な
-CI 構成は異なります (lint、test、coverage gate、security scan、依存更新
-トリアージなど)。万人向けのセットを同梱して不要分を削除させる代わりに、
-枠だけ空のまま提供し、`develop` ブランチの参考ワークフローを紹介します:
-
-```sh
-git remote add template https://github.com/b150005/ecc-base-template.git
-git fetch template develop
-git checkout template/develop -- .github/workflows/<workflow>.yml
-```
-
-プロジェクトに合うワークフロー (例: `ci-base.yml`、`security.yml`、
-`coverage-gate.yml`、`workaround-check.yml`) を選ぶか、独自に作成してくだ
-さい。
-
-### `main` に同梱される唯一のワークフロー
-
-`.github/workflows/payload-manifest-check.yml` は、上流テンプレートが
-自身の `main` 宛 PR を `.claude/payload-manifest.txt` (develop 上に存在)
-に対して gate するためのテンプレート内部 boundary-enforcement
-ワークフローです。fork ではこの workflow は無害に動作します — `develop`
-ブランチの checkout を試み、存在しない場合は静かに SUCCESS で skip
-します。完全に空の `.github/workflows/` を望む fork はこの 1 ファイル
-を `git rm` で削除して問題ありません。残したままにすれば、PR ごとに
-no-op success が報告されるだけです。
+本テンプレートは GitHub Actions ワークフローを **同梱しません** —
+`.github/workflows/` には `.gitkeep` のみがあります。CI はプロジェクト
+ごとの選択です。準備ができたら、スタックに合わせたワークフロー (build、
+test、lint、coverage、security scan) を追加してください。`dependabot.yml`
+は `github-actions` の更新を有効にして同梱しています — 言語エコシステム
+を追記して拡張してください。
 
 ---
 
@@ -198,16 +166,21 @@ your-repo/
 ├── CHANGELOG.md               ← [Unreleased] から開始
 ├── LICENSE
 ├── .env.example
-├── .gitignore                ← Learning Mode の opt-in 反転をインラインで文書化 (ADR-027 参照)
+├── .gitignore                ← Learning Mode の opt-in 反転をインラインで文書化
 ├── .gitattributes
 ├── .claude/
 │   ├── CLAUDE.md              ← プロジェクト指示 (About セクションをまず編集)
 │   ├── agents/                ← 18 個の agent 定義ファイル
-│   ├── templates/             ← コピーして使う ADR / Spec テンプレート
-│   ├── meta/scripts/init.sh   ← 対話型初期化スクリプト
-│   └── settings.json          ← Claude Code 設定
+│   ├── templates/             ← ADR / Spec / Roadmap / progress テンプレート
+│   ├── skills/                ← Learning Mode / verification-layer / authoring / compliance
+│   ├── meta/references/       ← agent と Skill が参照するドキュメント
+│   ├── meta/scripts/          ← CI ヘルパースクリプト
+│   ├── hooks/                 ← coaching-context フック (Learning Mode)
+│   ├── output-styles/         ← ecc-learn 出力スタイル (opt-in)
+│   ├── init.sh                ← 対話型初期化スクリプト
+│   └── settings.json          ← Claude Code 設定 (Plan Mode デフォルト)
 └── .github/
-    ├── workflows/.gitkeep     ← 設計上空 — CI はここに追加
+    ├── workflows/             ← CI ワークフロー (大半デフォルト無効; 機能ごと opt-in)
     ├── CODEOWNERS
     ├── ISSUE_TEMPLATE/
     ├── PULL_REQUEST_TEMPLATE.md
@@ -234,17 +207,9 @@ your-repo/
 ## テンプレート本体への貢献
 
 このセクションは **ecc-base-template 本体** で作業する人向けで、fork
-ユーザー向けではありません。
-
-- Issue と PR は `develop` ブランチに対して開いてください。
-- `main` はテンプレート maintainer が維持する payload-only ブランチで、
-  直接 PR は受け付けません。
-- `develop → main` のマージは develop 上の `payload-manifest-check` CI
-  でゲートされ、fork payload のクリーン性を担保します。
-
-テンプレート開発基盤一式 (Spec、ADR、内部 CI ワークフロー、Roadmap
-index) は `develop` 上にあります。テンプレート自身の設計と保守を確認
-するには `develop` ブランチを参照してください。
+ユーザー向けではありません。Issue と PR は `main` に対して開いてくだ
+さい。テンプレート自身の設計履歴は、同梱の ADR ファイルではなく git
+履歴に記録されています。
 
 ---
 

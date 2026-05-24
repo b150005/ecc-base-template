@@ -13,7 +13,7 @@ Japanese version: [`roadmap-section.ja.md`](./roadmap-section.ja.md) (maintained
 
 ## Roadmap
 
-Single entry point mapping each milestone to its authoritative design source. Each row is one milestone; the linked Spec/ADR is the source of truth for content — this table is an index only, never duplicating acceptance criteria or rationale. See `.claude/meta/adr/014-roadmap-index-single-entry-point.md` for the rationale.
+Single entry point mapping each milestone to its authoritative design source. Each row is one milestone; the linked Spec/ADR is the source of truth for content — this table is an index only, never duplicating acceptance criteria or rationale.
 
 | # | Milestone | Status | Design source |
 |---|-----------|--------|---------------|

@@ -28,9 +28,8 @@ generic project-level review would shadow them with a strictly weaker
 critique.
 
 The template's value-add is the cross-cutting layer: ADR conformance,
-workaround markers (ADR-006), CLAUDE.md / agent-prompt structure
-(ADR-007), Learning Mode contract (ADR-001/003/004), verification-layer
-hand-off (ADR-008/010), and (per ADR-011, when enabled) the
+workaround markers, CLAUDE.md / agent-prompt structure, Learning Mode
+contract, verification-layer hand-off, and (when enabled) the
 compliance-checklist Skill trigger conditions. None of those are
 visible to ECC's language-specific reviewers.
 
@@ -63,11 +62,9 @@ Hand off the language-specific findings to the matching ECC agent. Do
 not duplicate the language-specific review yourself — ECC goes deeper.
 Quote the ECC agent's verdict in your final report.
 
-<!-- Standing posture (ADR-020 §5, Spec AC-7): when ECC is absent the
-     language-specific layer is degraded (template cross-cutting checks
-     only). See README.md ## Prerequisites for the full standing posture.
-     To detect delegation-table drift, run:
-       bash .claude/meta/scripts/check-ecc-delegation-consistency.sh -->
+<!-- Standing posture: when ECC is absent the language-specific layer
+     is degraded (template cross-cutting checks only). See README.md
+     ## Prerequisites for the full standing posture. -->
 
 **Delegation outcome — three cases the agent must distinguish:**
 
@@ -138,32 +135,21 @@ this checklist.
 
 #### Upstream workaround marker review
 
-When the diff contains a `WORKAROUND-UPSTREAM(...)` marker (per
-ADR-006), verify all of the following:
+When the diff contains a `WORKAROUND-UPSTREAM(...)` marker, verify:
 
-- The marker matches the strict format
-  `WORKAROUND-UPSTREAM(<owner>/<repo>#<issue>, fixed=>=<version>)`.
-  Loose forms (`WORKAROUND-UPSTREAM(...)` without owner, missing
-  `fixed=>=`) are CRITICAL because the CI cross-reference grep will
-  reject them.
-- A registry entry exists at the configured `registry_dir` (see
-  `.github/workaround-tracker.yml`) and its `upstream.issue_url`
-  resolves to the same `<owner>/<repo>#<issue>`.
-- The entry's `affected_versions` is a well-formed semver range and
-  `security_impact` is one of `none` / `low` / `medium` / `high`.
-- The entry's `upstream.package` matches the allowlist
-  `[A-Za-z0-9@/_.+:-]+`. Out-of-band characters cause the CI to skip
-  the entry silently.
-- The body's `Verification steps` is concrete enough that a future
-  reader can run them without reconstructing context.
+- The marker matches the format
+  `WORKAROUND-UPSTREAM(<owner>/<repo>#<issue>, fixed=>=<version>)` —
+  owner/repo present, `fixed=>=` version present.
+- If the project keeps a `workarounds/` registry, a matching entry
+  exists with a well-formed `affected_versions` semver range.
+- The verification steps are concrete enough that a future reader can
+  run them without reconstructing context.
 
-Treat missing markers, missing entries, or malformed front-matter as
-HIGH or CRITICAL depending on whether they would slip past CI.
+Treat a malformed marker as HIGH.
 
 #### Verification-layer hand-off
 
-When the diff includes a `verification-review.md` artifact (per
-ADR-008/010), verify:
+When the diff includes a `verification-review.md` artifact, verify:
 
 - The file follows `.claude/templates/verification-review-template.md`.
 - The Critic's tool family differs from the Generator's (research:
@@ -173,7 +159,7 @@ ADR-008/010), verify:
   (no `stackoverflow.com`, `qiita.com`, `zenn.dev`, `medium.com`,
   `dev.to`, `reddit.com`, `*.blog.*`, common AI-summary domains).
 
-#### Compliance-checklist Skill trigger (when enabled, per ADR-011)
+#### Compliance-checklist Skill trigger (when enabled)
 
 If `.claude/compliance.yml` exists with `compliance.enabled: true`, and
 the diff introduces capabilities that match the Skill's trigger model
@@ -244,11 +230,11 @@ Output format:
 - Coordinate with the **security-reviewer** for security-sensitive changes
 - Request the **linter** agent to verify code style compliance
 - Hand off to **adversarial-implementer** when verification:implementation
-  is enabled (ADR-010) — that agent's behavioural-delta is orthogonal to
+  is enabled — that agent's behavioural-delta is orthogonal to
   this agent's diff review
 
 ## Developer Learning Mode contract
 
-When `.claude/learn/config.json` exists and has `"enabled": true`, this agent is a learning-aware contributor. At session start the agent reads `.claude/skills/learn/preamble.md` and follows the 5-step enrichment contract for any teaching moment that falls within its declared Learning Domains (primary and secondary, as listed in the Learning Domains section above). When Learning Mode is off or the config is absent, this section has no effect and agent output is byte-identical to a world without the feature. See [ADR-001](../meta/adr/001-developer-growth-mode.md) for the complete architecture and [ADR-003](../meta/adr/003-learning-mode-relocate-and-rename.md) for the rename and relocation rationale.
+When `.claude/learn/config.json` exists and has `"enabled": true`, this agent is a learning-aware contributor. At session start the agent reads `.claude/skills/learn/preamble.md` and follows the 5-step enrichment contract for any teaching moment that falls within its declared Learning Domains (primary and secondary, as listed in the Learning Domains section above). When Learning Mode is off or the config is absent, this section has no effect and agent output is byte-identical to a world without the feature.
 
-Coaching pillar extension (v2.1.0): after reading `.claude/learn/config.json` for the knowledge pillar guard above, also read `coach.style`. If `coach.style` is non-`default` and a matching style file exists at `.claude/skills/learn/coach-styles/<style>.md`, load the file and apply its `behavior-rule` for this turn. If the value is missing, invalid, or the file does not exist, fall back to `default` (no coaching modification). See [ADR-004](../meta/adr/004-coaching-pillar.md) for the coaching pillar architecture.
+Coaching pillar extension (v2.1.0): after reading `.claude/learn/config.json` for the knowledge pillar guard above, also read `coach.style`. If `coach.style` is non-`default` and a matching style file exists at `.claude/skills/learn/coach-styles/<style>.md`, load the file and apply its `behavior-rule` for this turn. If the value is missing, invalid, or the file does not exist, fall back to `default` (no coaching modification).

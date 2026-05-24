@@ -120,12 +120,9 @@ the rest of the document; you append findings and the verdict.
 
 Use the four-level severity table defined in
 `.claude/skills/verification-layer/SKILL.md` §"Shared invariants" (the
-shared severity vocabulary applies across all three domains). The full
-rationale is in
-`.claude/meta/adr/008-research-verification-layer.md` §"Severity
-classification (Critic findings)". Do not duplicate the table here —
-edit the canonical copy in the verification-layer SKILL.md if
-thresholds change.
+shared severity vocabulary applies across all three domains). Do not
+duplicate the table here — edit the canonical copy in the
+verification-layer SKILL.md if thresholds change.
 
 ## Collaboration
 
@@ -167,10 +164,7 @@ contract for any teaching moment that falls within its declared
 Learning Domains (primary and secondary, as listed in the Learning
 Domains section above). When Learning Mode is off or the config is
 absent, this section has no effect and agent output is byte-identical
-to a world without the feature. See
-[ADR-001](../meta/adr/001-developer-growth-mode.md) for the complete
-architecture and [ADR-003](../meta/adr/003-learning-mode-relocate-and-rename.md)
-for the rename and relocation rationale.
+to a world without the feature.
 
 Coaching pillar extension (v2.1.0): after reading
 `.claude/learn/config.json` for the knowledge pillar guard above, also
@@ -179,8 +173,7 @@ style file exists at
 `.claude/skills/learn/coach-styles/<style>.md`, load the file and apply
 its `behavior-rule` for this turn. If the value is missing, invalid,
 or the file does not exist, fall back to `default` (no coaching
-modification). See [ADR-004](../meta/adr/004-coaching-pillar.md) for
-the coaching pillar architecture.
+modification).
 
 ## See also
 
@@ -194,7 +187,3 @@ the coaching pillar architecture.
   research-error patterns
 - `.claude/agents/docs-researcher.md` — Generator counterpart
 - `.claude/templates/verification-review-template.md` — output format
-- `.claude/meta/adr/008-research-verification-layer.md` — design rationale
-  (research domain)
-- `.claude/meta/adr/010-verification-layer-generalization.md` — generalization
-  rationale (all three domains)

@@ -106,51 +106,15 @@ Detect the ecosystem and adapt deployment strategies:
 - Notify **technical-writer** to update deployment docs and changelog
 - Report deployment status to **orchestrator**
 
-## Skill invariants and docs freshness — CI ownership
+## CI workflows
 
-You own two CI workflows that protect the **claude-md-authoring**
-Skill (ADR-007):
-
-- **`.github/workflows/skill-invariants.yml`** — default-on. Runs
-  `check-skill-invariants.sh` on Skill changes. Enforces
-  `SKILL.md` ≤ 500 lines (Anthropic-recommended cap, verified
-  2026-05-06), required frontmatter fields (`name`, `description`,
-  `disable-model-invocation`), and local-link resolution.
-- **`.github/workflows/docs-freshness.yml`** — default-off, monthly.
-  Diffs `code.claude.com/docs/llms.txt` against the previous
-  snapshot. Activate it by setting `enabled: true` in
-  `.github/docs-freshness.yml`. The workflow reports the diff in the
-  job summary so `docs-researcher` can re-verify the Skill's volatile
-  rules.
-
-The 500-line cap in `check-skill-invariants.sh` is a verified
-Anthropic recommendation — do not raise it without an ADR-007
-amendment.
-
-## Upstream workaround tracking — CI ownership
-
-You own the operational state of the upstream-workaround tracking
-layer (per ADR-006). When the project adopts tracking:
-
-- Activate it by setting `enabled: true` in
-  `.github/workaround-tracker.yml`. There is no second toggle to remove
-  from `.github/workflows/workaround-check.yml` — every job is
-  config-gated.
-- Decide whether to enable `annotate_dependabot_prs` (recommended for
-  projects where Dependabot manages the bumps that resolve workarounds).
-- Choose `fail_on_marker_drift: true` once the registry is stable so
-  marker/entry mismatches block PRs.
-- Honor the trigger discipline in ADR-006: `pull_request_target` is
-  reserved for the `dependabot-annotate` job with the documented gates;
-  do not extend it to other jobs and do not check out PR head code from
-  it.
-- For multi-ecosystem repos, add an ecosystem-specific job that compares
-  installed versions against `affected_versions` from registry entries.
-  The shipped scaffold deliberately does not do this; it is your call
-  what stack to support.
+This template ships no GitHub Actions workflows. When the project
+needs CI, design workflows under `.github/workflows/` for the detected
+ecosystem (build, test, lint, coverage, security scanning) and wire
+them to the project's branch-protection rules.
 
 ## Developer Learning Mode contract
 
-When `.claude/learn/config.json` exists and has `"enabled": true`, this agent is a learning-aware contributor. At session start the agent reads `.claude/skills/learn/preamble.md` and follows the 5-step enrichment contract for any teaching moment that falls within its declared Learning Domains (primary and secondary, as listed in the Learning Domains section above). When Learning Mode is off or the config is absent, this section has no effect and agent output is byte-identical to a world without the feature. See [ADR-001](../meta/adr/001-developer-growth-mode.md) for the complete architecture and [ADR-003](../meta/adr/003-learning-mode-relocate-and-rename.md) for the rename and relocation rationale.
+When `.claude/learn/config.json` exists and has `"enabled": true`, this agent is a learning-aware contributor. At session start the agent reads `.claude/skills/learn/preamble.md` and follows the 5-step enrichment contract for any teaching moment that falls within its declared Learning Domains (primary and secondary, as listed in the Learning Domains section above). When Learning Mode is off or the config is absent, this section has no effect and agent output is byte-identical to a world without the feature.
 
-Coaching pillar extension (v2.1.0): after reading `.claude/learn/config.json` for the knowledge pillar guard above, also read `coach.style`. If `coach.style` is non-`default` and a matching style file exists at `.claude/skills/learn/coach-styles/<style>.md`, load the file and apply its `behavior-rule` for this turn. If the value is missing, invalid, or the file does not exist, fall back to `default` (no coaching modification). See [ADR-004](../meta/adr/004-coaching-pillar.md) for the coaching pillar architecture.
+Coaching pillar extension (v2.1.0): after reading `.claude/learn/config.json` for the knowledge pillar guard above, also read `coach.style`. If `coach.style` is non-`default` and a matching style file exists at `.claude/skills/learn/coach-styles/<style>.md`, load the file and apply its `behavior-rule` for this turn. If the value is missing, invalid, or the file does not exist, fall back to `default` (no coaching modification).

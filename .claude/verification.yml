@@ -1,0 +1,86 @@
+# Verification Layer configuration (ADR-008 + ADR-010).
+#
+# This is the ACTIVE configuration file. Edit this file to change
+# verification behaviour for this project.
+#
+# See `.claude/verification.yml.example` for full field annotations,
+# documentation of all options, and guidance on opt-in domains.
+#
+# Each domain has its own `enabled` switch. Turn on only the domains
+# you want to pay the cost for.
+
+# --- Research domain (ADR-008) ---
+#
+# Adversarial review of external research that informs decisions
+# (architecture, library selection, API usage, version pin).
+# Generator: docs-researcher. Critic: research-critic.
+research:
+  # When true, the Generator declares a Tier on every research output
+  # and the Critic reviews using a different tool family with primary-
+  # source-only citation. When false, the layer is inert for this
+  # domain.
+  enabled: true
+
+  # Maximum GAN rounds before escalation. After this many rounds with
+  # findings remaining, the orchestrator decides among:
+  #   - ask user for tie-break
+  #   - mark the claim UNVERIFIED: and proceed
+  #   - block downstream until resolved
+  #
+  # 1 disables iteration entirely. 2 is the default and matches
+  # ADR-008. 3+ is unusual and typically indicates ill-posed questions.
+  max_iterations: 2
+
+  # Default Tier when the Generator does not declare one explicitly.
+  # T1 — breaking changes, auth, security-sensitive APIs, crypto
+  # T2 — public API arguments, return types, defaults, version features
+  # T3 — idiomatic style, common usage, widely-known patterns
+  default_tier: T2
+
+  # Scope guard. When true, the layer activates only when external
+  # research will inform a decision. Casual lookups during pair-
+  # programming are skipped. Recommended.
+  external_facts_only: true
+
+# --- Implementation domain (ADR-010) ---
+#
+# Adversarial Critic re-implements the SAME acceptance criteria with a
+# deliberately different approach, runs the test suite against both,
+# and reports the behavioural delta.
+# Generator: implementer. Critic: adversarial-implementer.
+#
+# Cost note: implementation verification runs the implementation
+# logic twice. Token consumption per change is approximately doubled.
+# Opt in by setting enabled: true.
+implementation:
+  enabled: false
+
+  max_iterations: 1
+
+# --- Design domain (ADR-010) ---
+#
+# For every ADR in Status:Proposed that affects downstream work, the
+# Critic produces ONE concrete counter-proposal that takes a rejected
+# alternative seriously. Opt in by setting enabled: true.
+# Generator: architect. Critic: architecture-critic.
+#
+# Cost note: every Proposed ADR gains a structured counter-proposal
+# section. Reviewer load increases slightly; long-term decision
+# quality compounds.
+design:
+  enabled: false
+
+  max_iterations: 1
+
+# --- Citation discipline (cross-cutting) ---
+#
+# Knowledge entries written under .claude/learn/knowledge/, ADRs, and
+# spec / PRD files all carry the same primary-source-only citation
+# rule. A CI check enforces this mechanically using the allowlist in
+# .claude/skills/verification-layer/research/checklist.md.
+#
+# Default-on: cost is essentially zero per CI run and the failure mode
+# (silent secondary-source accumulation) is severe.
+# Disable only with a documented reason.
+citation_discipline:
+  enabled: true

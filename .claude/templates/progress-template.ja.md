@@ -9,10 +9,7 @@
    `◐` 期間中に発生した場合にのみ作成/更新されます** ── `☐ → ◐` の
    遷移時や、オペレーターのコマンドによって作成されることはありません。
    1 回の中断なしのセッションで `☐ → ☑` まで完了するマイルストーンは
-   このファイルを作成しません (不要なときはゼロの手間)。詳細な
-   根拠については
-   `.claude/meta/adr/016-cross-session-progress-persistence.md`
-   を参照してください。
+   このファイルを作成しません (不要なときはゼロの手間)。
 2. このファイルを `specs/NN-progress.md` にコピーしてください。`NN` は
    **安定した再利用されない Roadmap 行番号** です (ADR-014 の
    予約ルールが `specs/NN-slug.md` に使うものと同じキー)。
@@ -62,7 +59,7 @@ workflow_step: 4                     # integer 1–9 per ## Development Workflow
 last_updated: 2026-05-16             # YYYY-MM-DD; date this record was last written
 head_sha: 6caa258                    # git HEAD short SHA at write time (staleness pin)
 spec_exists: true                    # true once specs/NN-slug.md exists on disk (US-001 (c))
-adr_links: [".claude/meta/adr/016-cross-session-progress-persistence.md"]   # [] if no ADR
+adr_links: []   # [] if no ADR yet, else the ADR path(s)
 ---
 ```
 
